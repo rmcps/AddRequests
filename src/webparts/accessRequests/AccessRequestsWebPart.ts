@@ -7,7 +7,7 @@ import {
   PropertyPaneTextField
 } from '@microsoft/sp-webpart-base';
 import * as strings from 'AccessRequestsWebPartStrings';
-import NewAccessRequest from './components/NewAccessRequest';
+import DefaultPage from './components/DefaultPage';
 import { IAccessRequestsProps } from './components/IAccessRequestsProps';
 
 export interface IAccessRequestsWebPartProps {
@@ -20,7 +20,7 @@ export default class AccessRequestsWebPart extends BaseClientSideWebPart<IAccess
   }
   public render(): void {
     const element: React.ReactElement<IAccessRequestsProps > = React.createElement(
-      NewAccessRequest,
+      DefaultPage,
       {
         description: this.properties.description,
         context:this.context,

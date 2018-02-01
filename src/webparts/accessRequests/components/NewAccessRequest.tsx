@@ -56,7 +56,7 @@ export default class NewAccessRequest extends React.Component<IAccessRequestsPro
     if (this.state.committees.length < 1) {
       this._dataProvider.getCommittees().then(response => {
         this.setState({
-          committees: response.value
+          committees: response.value,
         }); 
       });
     }
@@ -103,7 +103,7 @@ export default class NewAccessRequest extends React.Component<IAccessRequestsPro
                     onChanged={ this._onChangeMultiSelect }
                     placeHolder='Select committee(s)'
                     label='Commitees:'
-                    selectedKeys={ Object.keys(this.state.selectedCommittees) }
+                    selectedKeys={ this.state.selectedCommittees }
                     errorMessage={this.state.dropDownErrorMsg }
                     multiSelect options={this.state.committees.map((item) => ({key:item.ID, text:item.Title}) )}
                 />                   

@@ -51,6 +51,9 @@ import SPHttpClientBatchConfiguration from '@microsoft/sp-http/lib/spHttpClient/
     private _getMembers(requester: SPHttpClient): Promise<any> {
       return null;
     }
+    public getMemberCommittees(Id: any): Promise<any[]> {
+      return null;
+  }
     public getCommittees():Promise<any> {
       return this._getCommittees(this.webPartContext.spHttpClient);
     }

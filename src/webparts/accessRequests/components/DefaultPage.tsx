@@ -1,9 +1,15 @@
 import * as React from 'react';
-import { DefaultButton, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
+import * as ReactDom from 'react-dom';
+import { Link } from 'office-ui-fabric-react/lib/Link';
 import styles from './AccessRequests.module.scss';
+import NewAccessRequest from './NewAccessRequest';
+import ModifyAccessRequest from './ModifyAccessRequest';
+import { IAccessRequestsProps } from './IAccessRequestsProps';
 
 export interface IDefaultProps {
+    description: string;
     context:any;
+    dom:any;  
 }
 
 export default class DefaultPage extends React.Component<IDefaultProps, null> {
@@ -11,6 +17,8 @@ export default class DefaultPage extends React.Component<IDefaultProps, null> {
   constructor(props) {
     super(props);
     // set initial state    
+    this._onAddNew = this._onAddNew.bind(this);
+    this._onAddExisting = this._onAddExisting.bind(this);
   }
   public componentWillReceiveProps(nextProps: IDefaultProps): void {
     // this.setState({
@@ -25,9 +33,9 @@ export default class DefaultPage extends React.Component<IDefaultProps, null> {
       <div className={ styles.accessRequests }>
         <div className={ styles.container }>
         <div className= {styles.row}>
-        <p>Proin auctor, libero eget ornare mattis, mi neque suscipit erat, mollis faucibus quam ligula quis eros. Praesent rutrum maximus ante et fringilla. Duis scelerisque eleifend sem, sed egestas sem maximus in. Quisque quis semper ligula. Duis eros neque, luctus id dui eu, pharetra maximus nibh. Mauris in tortor tortor. Nam malesuada nunc vitae ligula rhoncus volutpat. Phasellus sed ligula neque. Etiam sed euismod nisi. Etiam ac orci sed ante efficitur fringilla. Ut laoreet et nunc et finibus. Duis non bibendum mi, vel maximus ex. Mauris at ornare arcu, id suscipit urna. Aliquam erat volutpat.</p>
-            <PrimaryButton onClick={ this._onAddNew } text='Add a new member access request' />
-            <DefaultButton text='Add a request for an existing member' />                  
+        <h2>Member Access Request Submission</h2>
+        <Link onClick={this._onAddNew}>Add a new member access request</Link> &nbsp;&nbsp;&nbsp;
+        <Link onClick={this._onAddExisting}>Add a requet to modify an existing member</Link>
           </div>                    
         </div>
       </div>
@@ -35,10 +43,26 @@ export default class DefaultPage extends React.Component<IDefaultProps, null> {
   }
 
   private _onAddNew() {
-
+    const element: React.ReactElement<IAccessRequestsProps > = React.createElement(
+        NewAccessRequest,
+        {
+          description: this.props.description,
+          context:this.props.context,
+          dom: this.props.dom,
+        }
+      );
+      ReactDom.render(element, this.props.dom);
   }
   private _onAddExisting() {
-
+    const element: React.ReactElement<IAccessRequestsProps > = React.createElement(
+      ModifyAccessRequest,
+        {
+          description: this.props.description,
+          context:this.props.context,
+          dom: this.props.dom,
+        }
+      );
+      ReactDom.render(element, this.props.dom);
   }
   // private listNotConfigured(props: IAccessRequestsProps): boolean {
   //   return props.listName === undefined ||
