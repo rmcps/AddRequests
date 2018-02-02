@@ -99,7 +99,7 @@ import SPHttpClientBatchConfiguration from '@microsoft/sp-http/lib/spHttpClient/
               'Title': `${newItem.FirstName} ${newItem.LastName}`,
               'RequestReason': 'New member',
               'RequestStatus': 'New',
-              'CommitteesId': {
+              'AddCommitteesId': {
                 'results': newItem.Committees
               }
             });       

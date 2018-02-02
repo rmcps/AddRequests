@@ -5,6 +5,7 @@ export interface INewAccessRequestsState {
   newItem: INewAccessRequest;
   errors: string[];
   isLoadingData: boolean;
+  isSaving: boolean;
   committees:any;
   selectedCommittees:any[];
   dropDownErrorMsg:string;

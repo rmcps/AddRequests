@@ -39,8 +39,8 @@ export default class MockNewAccessRequest implements IAccessRequestsDataProvider
             {Id:2,Title:'Executive',ID:2},
             {Id:3,Title:'Legal',ID:3},
             {Id:4,Title:'HIT',ID:4},
-            {Id:4,Title:'More',ID:5},
-            {Id:4,Title:'Something',ID:6}
+            {Id:5,Title:'More',ID:5},
+            {Id:6,Title:'Something',ID:6}
             ]};
         this._memberCommittees = {value: [
             {memberId: 1, committeeIds:[1,3]},
@@ -90,7 +90,7 @@ export default class MockNewAccessRequest implements IAccessRequestsDataProvider
         });
     }
     public getCommittees(): Promise<any> {
-        let comms = this._committees.value;
+        let comms = this._committees;
         const items: any = lodash.clone(comms);
 
         return new Promise<any>((resolve) => {

@@ -1,9 +1,10 @@
 import * as React from 'react';
+import * as ReactDom from 'react-dom';
 import { DefaultButton, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
 import { MessageBar, MessageBarType } from 'office-ui-fabric-react/lib/MessageBar';
 import { TextField } from 'office-ui-fabric-react/lib/TextField';
 import { Dropdown, IDropdown, IDropdownOption } from 'office-ui-fabric-react/lib/Dropdown';
-import { Dialog, DialogType, DialogFooter } from 'office-ui-fabric-react/lib/Dialog';
+import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import { autobind } from 'office-ui-fabric-react/lib/Utilities';
 import styles from './AccessRequests.module.scss';
 import { IAccessRequestsProps } from './IAccessRequestsProps';
@@ -15,6 +16,8 @@ import MockSharePointDataProvider from '../test/MockSharePointDataProvider';
 import IAccessRequestsDataProvider from '../models/IAccessRequestsDataProvider';
 import CommitteesList from '../components/CommitteesList';
 import INewAccessRequest from '../models/INewAccessRequest';
+import DisplayRequest from '../components/DisplayRequest';
+import IDisplayRequestProps from './IDisplayRequestProps';
 
 export default class NewAccessRequest extends React.Component<IAccessRequestsProps, INewAccessRequestsState> {
   private _dataProvider: IAccessRequestsDataProvider;
@@ -25,6 +28,7 @@ export default class NewAccessRequest extends React.Component<IAccessRequestsPro
     this.state = {
       status: '', //this.listNotConfigured(this.props) ? 'Please configure list in Web Part properties' : '',
       isLoadingData: false,
+      isSaving: false,
       newItem:{},
       errors:[],
       committees: [],
@@ -43,10 +47,24 @@ export default class NewAccessRequest extends React.Component<IAccessRequestsPro
     } else {
       this._dataProvider = new SharePointDataProvider();
       this._dataProvider.webPartContext = this.props.context;
-      this._dataProvider.accessListTitle = "New Access Requests";
+      this._dataProvider.accessListTitle = "Site Access Requests";
     }
     
   }
+  public componentWillMount() {
+    // FOR TESTING ONLY.  Remove after:
+    let access: INewAccessRequest = {
+      FirstName:"Sheila",
+      LastName: "Allen",
+      EMail: 'sheila.allen@rmcps.com',
+        Company: "RMC"
+    }
+    this.setState({
+      newItem: access
+    }); 
+  }
+
+
   public componentWillReceiveProps(nextProps: IAccessRequestsProps): void {
     // this.setState({
     //   status: this.listNotConfigured(nextProps) ? 'Please configure list in Web Part properties' : '',
@@ -66,30 +84,28 @@ export default class NewAccessRequest extends React.Component<IAccessRequestsPro
       <div className={ styles.accessRequests }>
         <div className={ styles.container }>
         <div className= {styles.row}>
-        {this.renderErrors()}
-        <MessageBar messageBarType={MessageBarType.warning}>{this.state.status}</MessageBar>
           <span className={ styles.title }>Access Requests</span>
         </div>
           <div className={ styles.row }>
           <form>
             <div className={ styles.column }>      
               <div className={ styles.formFieldsContainer}>
-                <TextField label='First Name' name='FirstName' required={ true }
+                <TextField label='First Name' name='FirstName' required={ true } value={this.state.newItem.FirstName}
                   onChanged={this._onFirstNameChanged} onGetErrorMessage={ this._getErrorMessage }
                   validateOnFocusIn validateOnFocusOut
                 />
-                <TextField label='Last Name' name='LastName' required={ true }
+                <TextField label='Last Name' name='LastName' required={ true } value={this.state.newItem.LastName}
                   onChanged={this._onLastNameChanged} onGetErrorMessage={ this._getErrorMessage }
                   validateOnFocusIn validateOnFocusOut
                 />
-                <TextField label='Email' name='EMail' required={ true }
+                <TextField label='Email' name='EMail' required={ true } value={this.state.newItem.EMail}
                   onChanged={this._onEmailChanged} onGetErrorMessage={ this._getErrorMessage }
                   validateOnFocusIn validateOnFocusOut
                 />
                 <TextField label='Job Title' name='JobTitle' 
                   onChanged={this._onJobTitleChanged}
                 />
-                <TextField label='Company' name='Company' required={ true }
+                <TextField label='Company' name='Company' required={ true } value={this.state.newItem.Company}
                   onChanged={this._onCompanyChanged} onGetErrorMessage={ this._getErrorMessage }
                   validateOnFocusIn validateOnFocusOut
                 />
@@ -108,42 +124,22 @@ export default class NewAccessRequest extends React.Component<IAccessRequestsPro
                     multiSelect options={this.state.committees.map((item) => ({key:item.ID, text:item.Title}) )}
                 />                   
           </div>
+              {this.state.isSaving ? <Spinner size={ SpinnerSize.small } /> : null}
               <div className={ styles.formButtonsContainer}>
                 <PrimaryButton
                   disabled={ 
-                    !this.state.enableSave || !this.state.newItem || this.state.status == 'Saving record...' 
-                }
-                  text='Save'
-                  onClick= {this._saveItem}
+                    !this.state.enableSave || !this.state.newItem || this.state.isSaving 
+                  }
+                  text='Save' onClick= {this._saveItem}
                 />
-                <DefaultButton
-                  disabled={ false }
-                  text='Reset'
-              />
+                <DefaultButton disabled={ false } text='Reset' />
               </div>
-
+              <div className={styles.row}>
+                {this.renderErrors()}
+              </div>
             </div>
             </form>
-          </div>
-          <div className={ styles.row }>            
-          <Dialog 
-            hidden={ this.state.hideDialog }
-            onDismiss={ this._closeDialog }
-            dialogContentProps={{
-              type: DialogType.normal,
-              title: 'Request created',
-              subText: "Your new access request was created.  You will receive email updates with the status of your request."
-            }}
-            modalProps={{
-              isBlocking: true,
-              containerClassName: 'ms-dialogMainOverride'
-            }}
-          >
-          <DialogFooter>
-            <PrimaryButton onClick={ this._closeDialog } text='OK' />
-          </DialogFooter>
-          </Dialog>
-          </div>                    
+          </div>                  
         </div>
       </div>
     );
@@ -256,16 +252,6 @@ export default class NewAccessRequest extends React.Component<IAccessRequestsPro
     return re.test(value);
   }
   @autobind
-  private _showDialog() {
-    this.setState({ hideDialog: false });
-  }
-
-  @autobind
-  private _closeDialog() {
-    this.setState({ hideDialog: true });
-    window.location.href = "https://uphpcin.sharepoint.com";
-  }
-  @autobind
   private async _saveItem(): Promise<void> {
     this.setState((prevState: INewAccessRequestsState ,props:IAccessRequestsProps): INewAccessRequestsState => {
       prevState.errors.length = 0;
@@ -295,23 +281,33 @@ export default class NewAccessRequest extends React.Component<IAccessRequestsPro
     }
     this.setState( {
       status: 'Saving record...',
+      isSaving: true,
     });
-  
     this._dataProvider.saveNewItem(this.state.newItem).then((result) => {
       if(result.ok) {
-        this._showDialog();
-        this.setState( {
-          enableSave:false,
-          status: 'New Access Request Created',
-        });
+        const element: React.ReactElement<IDisplayRequestProps > = React.createElement(
+          DisplayRequest, {
+            description: this.props.description,
+            context:this.props.context,
+            dom: this.props.dom,      
+            recordType: "New",
+            Title: this.state.newItem.FirstName + ' ' + this.state.newItem.LastName,
+            Comments: this.state.newItem.Comments,
+            Committees: this.state.committees.filter((item) => this.state.newItem.Committees.indexOf(item.ID) !== -1), // return only items from this.state.committees that are in this.newItem.Committees
+            EMail: this.state.newItem.EMail,
+            FirstName: this.state.newItem.FirstName,
+            LastName: this.state.newItem.LastName,
+            Company: this.state.newItem.Company,
+            }
+        );      
+        ReactDom.unmountComponentAtNode(this.props.dom);          
+        ReactDom.render(element, this.props.dom);
       }
       else {
-        //this.setState( {
-        //  status: '',
-        //});        
         this.setState((prevState: INewAccessRequestsState ,props:IAccessRequestsProps): INewAccessRequestsState => {
           prevState.errors.push('Error: Failed to save record.');
           prevState.status = '';
+          prevState.isSaving = false;
           return prevState;
         });          
       }

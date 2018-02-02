@@ -5,12 +5,7 @@ import styles from './AccessRequests.module.scss';
 import NewAccessRequest from './NewAccessRequest';
 import ModifyAccessRequest from './ModifyAccessRequest';
 import { IAccessRequestsProps } from './IAccessRequestsProps';
-
-export interface IDefaultProps {
-    description: string;
-    context:any;
-    dom:any;  
-}
+import IDefaultProps from './IDefaultProps';
 
 export default class DefaultPage extends React.Component<IDefaultProps, null> {
 
@@ -51,6 +46,7 @@ export default class DefaultPage extends React.Component<IDefaultProps, null> {
           dom: this.props.dom,
         }
       );
+      ReactDom.unmountComponentAtNode(this.props.dom);          
       ReactDom.render(element, this.props.dom);
   }
   private _onAddExisting() {
@@ -62,6 +58,7 @@ export default class DefaultPage extends React.Component<IDefaultProps, null> {
           dom: this.props.dom,
         }
       );
+      ReactDom.unmountComponentAtNode(this.props.dom);          
       ReactDom.render(element, this.props.dom);
   }
   // private listNotConfigured(props: IAccessRequestsProps): boolean {
