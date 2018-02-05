@@ -4,10 +4,10 @@ import { DefaultButton, PrimaryButton } from 'office-ui-fabric-react/lib/Button'
 import { TextField } from 'office-ui-fabric-react/lib/TextField';
 import { Link } from 'office-ui-fabric-react/lib/Link';
 import { MessageBar, MessageBarType } from 'office-ui-fabric-react/lib/MessageBar';
-import styles from './AccessRequests.module.scss';
-import NewAccessRequest from './NewAccessRequest';
-import ModifyAccessRequest from './ModifyAccessRequest';
-import { IAccessRequestsProps } from './IAccessRequestsProps';
+import styles from '../AccessRequests.module.scss';
+import NewAccessRequest from '../NewAccessRequest/NewAccessRequest';
+import ModifyAccessRequest from '../ModifyAccessRequest/ModifyAccessRequest';
+import { IAccessRequestsProps } from '../IAccessRequestsProps';
 import IDisplayRequestProps from './IDisplayRequestProps';
 
 export interface IDisplayRequestState {
@@ -44,11 +44,10 @@ export default class DisplayRequest extends React.Component<IDisplayRequestProps
         this.setState({
             committeeString: this.props.Committees.map(c => c.Title).join(",")
         });
-        console.log(this.state.committeeString);
     }
     public render(): React.ReactElement<IDisplayRequestProps> {
         return (
-            <div className={ styles.accessRequests }>
+            <div className={styles.accessRequests }>
                 <div className={ styles.container }>
                 <div className= {styles.row}>
                 <MessageBar messageBarType={this.state.messageBarType}>{this.state.message}</MessageBar>
@@ -65,7 +64,8 @@ export default class DisplayRequest extends React.Component<IDisplayRequestProps
                         {this.props.JobTitle && <TextField label='Title' disabled={ true } value={this.props.JobTitle} />}
                         <TextField label='Organization' disabled={ true } value={this.props.Company} />
                         {this.props.Office && <TextField label='Phone' disabled={ true } value={this.props.Office} /> }
-                        <TextField label='Committees' disabled={ true } 
+                        {this.props.Comments && <TextField label='Comments' disabled={ true } multiline value={this.props.Comments} /> }
+                        <TextField label='Committees' disabled={ true } multiline
                             value={this.state.committeeString}
                         />
                         </div>

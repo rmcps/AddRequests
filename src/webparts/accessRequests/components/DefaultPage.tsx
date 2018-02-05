@@ -2,8 +2,8 @@ import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import { Link } from 'office-ui-fabric-react/lib/Link';
 import styles from './AccessRequests.module.scss';
-import NewAccessRequest from './NewAccessRequest';
-import ModifyAccessRequest from './ModifyAccessRequest';
+import NewAccessRequest from './NewAccessRequest/NewAccessRequest';
+import ModifyAccessRequest from './ModifyAccessRequest/ModifyAccessRequest';
 import { IAccessRequestsProps } from './IAccessRequestsProps';
 import IDefaultProps from './IDefaultProps';
 

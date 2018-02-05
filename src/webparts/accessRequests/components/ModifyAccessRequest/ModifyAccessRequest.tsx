@@ -2,19 +2,23 @@ import * as React from 'react';
 import { DefaultButton, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
 import { MessageBar, MessageBarType } from 'office-ui-fabric-react/lib/MessageBar';
 import { TextField } from 'office-ui-fabric-react/lib/TextField';
+import {
+  ComboBox,
+  IComboBoxProps,
+  IComboBoxOption
+} from 'office-ui-fabric-react/lib/ComboBox';
 import { Dropdown, IDropdown, IDropdownOption } from 'office-ui-fabric-react/lib/Dropdown';
 import { Dialog, DialogType, DialogFooter } from 'office-ui-fabric-react/lib/Dialog';
 import { autobind } from 'office-ui-fabric-react/lib/Utilities';
-import styles from './AccessRequests.module.scss';
-import { IAccessRequestsProps } from './IAccessRequestsProps';
+import styles from '../AccessRequests.module.scss';
+import { IAccessRequestsProps } from '../IAccessRequestsProps';
 import { IModifyAccessRequestsState } from './IModifyAccessRequestsState';
 import { escape } from '@microsoft/sp-lodash-subset';
 import { Environment, EnvironmentType } from '@microsoft/sp-core-library';
-import SharePointDataProvider from '../services/SharePointDataProvider';
-import MockSharePointDataProvider from '../test/MockSharePointDataProvider';
-import IAccessRequestsDataProvider from '../models/IAccessRequestsDataProvider';
-import CommitteesList from '../components/CommitteesList';
-import IModifyAccessRequest from '../models/IModifyAccessRequest';
+import SharePointDataProvider from '../../services/SharePointDataProvider';
+import MockSharePointDataProvider from '../../test/MockSharePointDataProvider';
+import IAccessRequestsDataProvider from '../../models/IAccessRequestsDataProvider';
+import IModifyAccessRequest from '../../models/IModifyAccessRequest';
 
 export default class ModifyAccessRequest extends React.Component<IAccessRequestsProps, IModifyAccessRequestsState> {
   private _dataProvider: IAccessRequestsDataProvider;
@@ -30,7 +34,7 @@ export default class ModifyAccessRequest extends React.Component<IAccessRequests
       members:[],
       committees: [],
       selectedCommittees:[],
-      dropDownErrorMsg:'Select one or more committee(s)',
+      dropDownErrorMsg:'',
       hideDialog:true,
       enableSave:true
     };
@@ -44,7 +48,7 @@ export default class ModifyAccessRequest extends React.Component<IAccessRequests
     } else {
       this._dataProvider = new SharePointDataProvider();
       this._dataProvider.webPartContext = this.props.context;
-      this._dataProvider.accessListTitle = "New Access Requests";
+      this._dataProvider.accessListTitle = "Site Access Requests";
     }
     
   }
@@ -61,9 +65,11 @@ export default class ModifyAccessRequest extends React.Component<IAccessRequests
         }); 
       });
     }
-    this._dataProvider.getMembers().then(response => {
-      this.setState({members: response.value});
-    });
+    if (this.state.members.length < 1) {
+      this._dataProvider.getMembers().then(response => {
+        this.setState({members: response.value});
+      });
+    }
   }
   public render(): React.ReactElement<IAccessRequestsProps> {
     return (
@@ -78,14 +84,17 @@ export default class ModifyAccessRequest extends React.Component<IAccessRequests
           <form>
             <div className={ styles.column }>      
               <div className={ styles.formFieldsContainer}>
-              <Dropdown
-                className='MemberDropDown'
-                placeHolder='Select a member'
-                label='Member:'
-                id='MemberDropDown'
-                ariaLabel='Member'
-                options={[]}
-              />
+              <ComboBox
+          defaultSelectedKey='C'
+          className='MemberDropDown'
+          label='Member:'
+          id='MemberDropDown'
+          ariaLabel='Basic ComboBox example'
+          allowFreeform={ true }
+          autoComplete='on'
+          options={this.state.members.map((item) => ({key:item.Id, text:item.LastName}) )}
+          onChanged={ this._onMemberChanged }
+        />
                 <TextField label='Comments' name='Comments' multiline rows={2} placeholder='Enter any special instructions'
                   onChanged={this._onCommentsChanged}
                 />
@@ -93,7 +102,7 @@ export default class ModifyAccessRequest extends React.Component<IAccessRequests
                     onChanged={ this._onChangeMultiSelect }
                     placeHolder='Select committee(s)'
                     label='Commitees:'
-                    selectedKeys={ Object.keys(this.state.selectedCommittees) }
+                    selectedKeys={ this.state.selectedCommittees }
                     errorMessage={this.state.dropDownErrorMsg }
                     multiSelect options={this.state.committees.map((item) => ({key:item.ID, text:item.Title}) )}
                 />                   
@@ -179,6 +188,17 @@ export default class ModifyAccessRequest extends React.Component<IAccessRequests
 
   }
   @autobind
+  private _onMemberChanged(option: IComboBoxOption, index: number, value: string) {
+
+    this._dataProvider.getMemberCommittees(option.key).then(response => {
+      this.setState((prevState: IModifyAccessRequestsState ,props:IAccessRequestsProps): IModifyAccessRequestsState => {
+        prevState.selectedCommittees = response;
+        return prevState;
+      });
+    });
+  }
+  
+  @autobind
   private _onChangeMultiSelect(item: IDropdownOption) {
       let updatedSelectedItems = this.state.selectedCommittees.length > 0 ? this.copyArray(this.state.selectedCommittees) : [];
       if (item.selected) {
@@ -223,6 +243,11 @@ export default class ModifyAccessRequest extends React.Component<IAccessRequests
   }
   @autobind
   private async _saveItem(): Promise<void> {
+    
+    if(this.state.selectedCommittees.length < 1) {
+      this.setState({dropDownErrorMsg: "Select one or more committee(s)"});
+      return null;
+    }
     this.setState( {
       status: 'Saving record...',
     });

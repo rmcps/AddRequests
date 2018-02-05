@@ -1,11 +1,11 @@
-import IModifyAccessRequest from "../models/IModifyAccessRequest";
+import INewAccessRequest from "../../models/INewAccessRequest";
 
-export interface IModifyAccessRequestsState {
+export interface INewAccessRequestsState {
   status: string;
-  Item: IModifyAccessRequest;
+  newItem: INewAccessRequest;
   errors: string[];
   isLoadingData: boolean;
-  members:any;
+  isSaving: boolean;
   committees:any;
   selectedCommittees:any[];
   dropDownErrorMsg:string;

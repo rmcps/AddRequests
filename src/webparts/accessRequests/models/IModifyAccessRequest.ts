@@ -1,5 +1,5 @@
 interface IModifyAccessRequest {
-    Id?: number;
+    Id?: string;
     Comments?: string;
     Committees?: any[];
     EMail?: string;

@@ -1,4 +1,4 @@
-@import '~@microsoft/sp-office-ui-fabric-core/dist/sass/SPFabricCore.scss';
+@import '~office-ui-fabric-react/dist/sass/References.scss';
 
 .accessRequests {
   .container {
@@ -9,8 +9,8 @@
 
   .row {
     @include ms-Grid-row;
-    color: "[theme:primaryText, default:#0078d7]";
-    background-color: "[theme:neutralLighter, default:#f4f4f4]";
+    /*color: "[theme:primaryText, default:#0078d7]";*/
+    /*background-color: "[theme:neutralLighter, default:#f4f4f4]";*/
     padding: 20px;
   }
 

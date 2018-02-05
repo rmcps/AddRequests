@@ -6,18 +6,17 @@ import { TextField } from 'office-ui-fabric-react/lib/TextField';
 import { Dropdown, IDropdown, IDropdownOption } from 'office-ui-fabric-react/lib/Dropdown';
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import { autobind } from 'office-ui-fabric-react/lib/Utilities';
-import styles from './AccessRequests.module.scss';
-import { IAccessRequestsProps } from './IAccessRequestsProps';
+import styles from '../AccessRequests.module.scss';
+import { IAccessRequestsProps } from '../IAccessRequestsProps';
 import { INewAccessRequestsState } from './INewAccessRequestsState';
 import { escape } from '@microsoft/sp-lodash-subset';
 import { Environment, EnvironmentType } from '@microsoft/sp-core-library';
-import SharePointDataProvider from '../services/SharePointDataProvider';
-import MockSharePointDataProvider from '../test/MockSharePointDataProvider';
-import IAccessRequestsDataProvider from '../models/IAccessRequestsDataProvider';
-import CommitteesList from '../components/CommitteesList';
-import INewAccessRequest from '../models/INewAccessRequest';
-import DisplayRequest from '../components/DisplayRequest';
-import IDisplayRequestProps from './IDisplayRequestProps';
+import SharePointDataProvider from '../../services/SharePointDataProvider';
+import MockSharePointDataProvider from '../../test/MockSharePointDataProvider';
+import IAccessRequestsDataProvider from '../../models/IAccessRequestsDataProvider';
+import INewAccessRequest from '../../models/INewAccessRequest';
+import DisplayRequest from '../DisplayAccessRequest/DisplayRequest';
+import IDisplayRequestProps from '../DisplayAccessRequest/IDisplayRequestProps';
 
 export default class NewAccessRequest extends React.Component<IAccessRequestsProps, INewAccessRequestsState> {
   private _dataProvider: IAccessRequestsDataProvider;
@@ -90,35 +89,34 @@ export default class NewAccessRequest extends React.Component<IAccessRequestsPro
           <form>
             <div className={ styles.column }>      
               <div className={ styles.formFieldsContainer}>
-                <TextField label='First Name' name='FirstName' required={ true } value={this.state.newItem.FirstName}
+                <TextField placeholder='First Name' name='FirstName' required={ true } value={this.state.newItem.FirstName}
                   onChanged={this._onFirstNameChanged} onGetErrorMessage={ this._getErrorMessage }
-                  validateOnFocusIn validateOnFocusOut
+                  validateOnFocusIn validateOnFocusOut underlined
                 />
-                <TextField label='Last Name' name='LastName' required={ true } value={this.state.newItem.LastName}
+                <TextField placeholder='Last Name' name='LastName' required={ true } value={this.state.newItem.LastName}
                   onChanged={this._onLastNameChanged} onGetErrorMessage={ this._getErrorMessage }
-                  validateOnFocusIn validateOnFocusOut
+                  validateOnFocusIn validateOnFocusOut underlined
                 />
-                <TextField label='Email' name='EMail' required={ true } value={this.state.newItem.EMail}
+                <TextField placeholder='Email' name='EMail' required={ true } value={this.state.newItem.EMail}
                   onChanged={this._onEmailChanged} onGetErrorMessage={ this._getErrorMessage }
-                  validateOnFocusIn validateOnFocusOut
+                  validateOnFocusIn validateOnFocusOut underlined
                 />
-                <TextField label='Job Title' name='JobTitle' 
-                  onChanged={this._onJobTitleChanged}
+                <TextField placeholder='Job Title' name='JobTitle' 
+                  onChanged={this._onJobTitleChanged} underlined
                 />
-                <TextField label='Company' name='Company' required={ true } value={this.state.newItem.Company}
+                <TextField placeholder='Company' name='Company' required={ true } value={this.state.newItem.Company}
                   onChanged={this._onCompanyChanged} onGetErrorMessage={ this._getErrorMessage }
                   validateOnFocusIn validateOnFocusOut
                 />
-                <TextField label='Phone Number' name='Office' 
-                  onChanged={this._onOfficeChanged}
+                <TextField placeholder='Phone Number' name='Office' 
+                  onChanged={this._onOfficeChanged} underlined
                 />
-                <TextField label='Comments' name='Comments' multiline rows={2} placeholder='Enter any special instructions'
+                <TextField name='Comments' multiline rows={2} placeholder='Enter any special instructions'
                   onChanged={this._onCommentsChanged}
                 />
                 <Dropdown
                     onChanged={ this._onChangeMultiSelect }
                     placeHolder='Select committee(s)'
-                    label='Commitees:'
                     selectedKeys={ this.state.selectedCommittees }
                     errorMessage={this.state.dropDownErrorMsg }
                     multiSelect options={this.state.committees.map((item) => ({key:item.ID, text:item.Title}) )}

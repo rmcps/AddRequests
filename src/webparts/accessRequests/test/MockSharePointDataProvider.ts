@@ -11,12 +11,12 @@ export default class MockNewAccessRequest implements IAccessRequestsDataProvider
     private _listsUrl: string;
     private _accessListItemsUrl: string;
     private _webPartContext: IWebPartContext;
-    private _items: IModifyAccessRequest[];
+    private _items: any;
     private _committees: any;
     private _memberCommittees: any;
 
     constructor() {
-        this._items = [
+        this._items = {value: [
             {Id:"1", FirstName: 'Mary', LastName:'May',EMail:'mmary@rmcps.com',Company:'', 
                 Committees:[],
                 RequestReason:'New member'
@@ -33,7 +33,7 @@ export default class MockNewAccessRequest implements IAccessRequestsDataProvider
                 Committees:[],
                 RequestReason:'New member'
             }            
-        ];
+        ]};
         this._committees = {value: [
             {Id:1,Title:'Board',ID:1},
             {Id:2,Title:'Executive',ID:2},
@@ -82,7 +82,7 @@ export default class MockNewAccessRequest implements IAccessRequestsDataProvider
             setTimeout(() => resolve(items), 500);
         });
     }
-    public getMemberCommittees(Id: any): Promise<any[]> {
+    public getMemberCommittees(Id: any): Promise<any> {
         let selected = this._memberCommittees.value.filter((member) => member.memberId == Id );              
         const items: any = lodash.clone(selected[0].committeeIds);
         return new Promise<any>((resolve) => {
