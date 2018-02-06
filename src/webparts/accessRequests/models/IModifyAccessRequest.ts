@@ -1,5 +1,6 @@
 interface IModifyAccessRequest {
     Id?: string;
+    spLoginName?: any;
     Comments?: string;
     Committees?: any[];
     EMail?: string;

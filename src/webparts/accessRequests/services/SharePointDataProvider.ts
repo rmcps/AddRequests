@@ -19,6 +19,8 @@ import SPHttpClientBatchConfiguration from '@microsoft/sp-http/lib/spHttpClient/
     private _lastListName: string = undefined;
     private _listItemEntityTypeName:string = undefined;
     private _committeesListTitle:string = 'UPHP Committees';
+    private _membersList:string = 'UPHP Members';
+    private _membersCommList:string = 'UPHP Member Committees';
   
     public set accessListTitle(value:string) {
       this._accessListTitle = value;
@@ -49,10 +51,47 @@ import SPHttpClientBatchConfiguration from '@microsoft/sp-http/lib/spHttpClient/
     }
 
     private _getMembers(requester: SPHttpClient): Promise<any> {
-      return null;
+      const queryString: string = '?$select=Id,spLoginName,Title';
+      let options: ISPHttpClientOptions = { 
+        headers: { "accept": "application/json;odata=nometadata",
+        "content-type": "application/json;odata=verbose" }
+      };
+      const queryUrl: string = `${this._listsUrl}/GetByTitle('${this._membersList}')/items` + queryString;
+  
+      return requester.get(queryUrl, SPHttpClient.configurations.v1,
+        {
+          headers: {
+            'Accept': 'application/json;odata=nometadata',
+            'odata-version': ''
+          }
+        })
+        .then((response: SPHttpClientResponse) => {
+          return response.json();
+        });
     }
-    public getMemberCommittees(Id: any): Promise<any[]> {
-      return null;
+    public getMemberCommittees(loginName: any): Promise<any> {
+      return this._getMemberCommittees(loginName, this.webPartContext.spHttpClient);
+    }
+    public _getMemberCommittees(loginName: string, requester: SPHttpClient): Promise<any> {
+      let decodedName = loginName.replace(/#/g,"%23");
+      const queryString: string = `?$select=Id,Title,Committee&$filter=Title%20eq%20'${decodedName}'`;
+      let options: ISPHttpClientOptions = { 
+        headers: { "accept": "application/json;odata=nometadata",
+        "content-type": "application/json;odata=verbose" }
+      };
+      const queryUrl: string = `${this._listsUrl}/GetByTitle('${this._membersCommList}')/items` + queryString;
+  debugger;
+      return requester.get(queryUrl, SPHttpClient.configurations.v1,
+        {
+          headers: {
+            'Accept': 'application/json;odata=nometadata',
+            'odata-version': ''
+          }
+        })
+        .then((response: SPHttpClientResponse) => {
+          return response.json();
+        });
+
   }
     public getCommittees():Promise<any> {
       return this._getCommittees(this.webPartContext.spHttpClient);

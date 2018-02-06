@@ -17,19 +17,19 @@ export default class MockNewAccessRequest implements IAccessRequestsDataProvider
 
     constructor() {
         this._items = {value: [
-            {Id:"1", FirstName: 'Mary', LastName:'May',EMail:'mmary@rmcps.com',Company:'', 
+            {Id:"1",spLoginName:"1", Title: "Mary May", FirstName: 'Mary', LastName:'May',EMail:'mmary@rmcps.com',Company:'', 
                 Committees:[],
                 RequestReason:'New member'
             },
-            {Id:"2", FirstName: 'Judy', LastName:'Jones',EMail:'jjones@rmcps.com',Company:'', 
+            {Id:"2",spLoginName:"2", Title: "Judy Jones", FirstName: 'Judy', LastName:'Jones',EMail:'jjones@rmcps.com',Company:'', 
                 Committees:[],
                 RequestReason:'New member'
             },
-            {Id:"3", FirstName: 'Tany', LastName:'Thomas',EMail:'ttom@rmcps.com',Company:'', 
+            {Id:"3",spLoginName:"3", Title: "Tiny Thomas", FirstName: 'Tiny', LastName:'Thomas',EMail:'ttom@rmcps.com',Company:'', 
                 Committees:[],
                 RequestReason:'New member'
             },
-            {Id:"4", FirstName: 'Walt', LastName:'Whitman',EMail:'wwhitman@rmcps.com',Company:'', 
+            {Id:"4",spLoginName:"4", Title: "Walt Disney", FirstName: 'Walt', LastName:'Disney',EMail:'wdisney@rmcps.com',Company:'', 
                 Committees:[],
                 RequestReason:'New member'
             }            
@@ -42,12 +42,14 @@ export default class MockNewAccessRequest implements IAccessRequestsDataProvider
             {Id:5,Title:'More',ID:5},
             {Id:6,Title:'Something',ID:6}
             ]};
-        this._memberCommittees = {value: [
-            {memberId: 1, committeeIds:[1,3]},
-            {memberId: 2, committeeIds:[1]},
-            {memberId: 3, committeeIds:[2,4]},
-            {memberId: 4, committeeIds:[4]},
-            ]};
+        this._memberCommittees = {"value":[
+            {"loginName": "1", "Committee":"Board"},
+            {"loginName": "1", "Committee":"Legal"},
+            {"loginName": "2", "Committee":["Board"]},
+            {"loginName": "3", "Committee":"Executive"},
+            {"loginName": "3", "Committee":"HIT"},
+            {"loginName": "4", "Committee":"HIT"},
+        ]};
     }
   
     public set accessListTitle(value:string) {
@@ -76,15 +78,17 @@ export default class MockNewAccessRequest implements IAccessRequestsDataProvider
         });
     }
     public getMembers(): Promise<any> {
-        const items: IModifyAccessRequest[] = lodash.clone(this._items);
+        const items: any = lodash.clone(this._items);
 
         return new Promise<any>((resolve) => {
             setTimeout(() => resolve(items), 500);
         });
     }
-    public getMemberCommittees(Id: any): Promise<any> {
-        let selected = this._memberCommittees.value.filter((member) => member.memberId == Id );              
-        const items: any = lodash.clone(selected[0].committeeIds);
+    public getMemberCommittees(loginName: string): Promise<any> {
+        let selected = { 
+            "value": this._memberCommittees.value.filter((member) => member.loginName == loginName )
+        };
+        const items: any = lodash.clone(selected);
         return new Promise<any>((resolve) => {
             setTimeout(() => resolve(items), 500);
         });

@@ -9,7 +9,7 @@ interface INewAccessRequestsDataProvider {
     webPartContext: IWebPartContext;   
     getItem(listId:number): Promise<IModifyAccessRequest>;
     getMembers(): Promise<any>;
-    getMemberCommittees(Id: any):Promise<any[]>;
+    getMemberCommittees(loginName: any):Promise<any>;
     getCommittees(): Promise<any>;
     saveNewItem(INewAccessRequest): Promise<any>;
 }

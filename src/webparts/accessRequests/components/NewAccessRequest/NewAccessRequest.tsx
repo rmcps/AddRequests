@@ -57,7 +57,7 @@ export default class NewAccessRequest extends React.Component<IAccessRequestsPro
       LastName: "Allen",
       EMail: 'sheila.allen@rmcps.com',
         Company: "RMC"
-    }
+    };
     this.setState({
       newItem: access
     }); 

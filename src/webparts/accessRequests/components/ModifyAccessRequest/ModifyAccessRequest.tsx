@@ -84,17 +84,17 @@ export default class ModifyAccessRequest extends React.Component<IAccessRequests
           <form>
             <div className={ styles.column }>      
               <div className={ styles.formFieldsContainer}>
-              <ComboBox
-          defaultSelectedKey='C'
-          className='MemberDropDown'
-          label='Member:'
-          id='MemberDropDown'
-          ariaLabel='Basic ComboBox example'
-          allowFreeform={ true }
-          autoComplete='on'
-          options={this.state.members.map((item) => ({key:item.Id, text:item.LastName}) )}
-          onChanged={ this._onMemberChanged }
-        />
+                <ComboBox
+                  selectedKey= {this.state.Item.spLoginName}
+                  className='MemberCombo'
+                  label='Member:'
+                  id='MemberCombo'
+                  ariaLabel='Member List'
+                  allowFreeform={ false }
+                  autoComplete='on'
+                  options={this.state.members.map((item) => ({key:item.spLoginName, value:item.spLoginName, text:item.Title}) )}
+                  onChanged={ this._onMemberChanged }
+                />
                 <TextField label='Comments' name='Comments' multiline rows={2} placeholder='Enter any special instructions'
                   onChanged={this._onCommentsChanged}
                 />
@@ -104,7 +104,7 @@ export default class ModifyAccessRequest extends React.Component<IAccessRequests
                     label='Commitees:'
                     selectedKeys={ this.state.selectedCommittees }
                     errorMessage={this.state.dropDownErrorMsg }
-                    multiSelect options={this.state.committees.map((item) => ({key:item.ID, text:item.Title}) )}
+                    multiSelect options={this.state.committees.map((item) => ({key:item.Title, text:item.Title}) )}
                 />                   
           </div>
               <div className={ styles.formButtonsContainer}>
@@ -189,17 +189,27 @@ export default class ModifyAccessRequest extends React.Component<IAccessRequests
   }
   @autobind
   private _onMemberChanged(option: IComboBoxOption, index: number, value: string) {
-
-    this._dataProvider.getMemberCommittees(option.key).then(response => {
+    this._dataProvider.getMemberCommittees(option.key).then(response => {      
+      // let sel = [];
+      // response.value.forEach(function(valObj, idx) {
+      //     valObj.Committee.forEach(function(comm) {
+      //       sel.push(comm);
+      //     });
+      // });
+      // debugger;
+      
       this.setState((prevState: IModifyAccessRequestsState ,props:IAccessRequestsProps): IModifyAccessRequestsState => {
-        prevState.selectedCommittees = response;
+        prevState.Item.spLoginName = option.key;
+        prevState.selectedCommittees = response.value.map(c => c.Committee);
         return prevState;
       });
     });
-  }
+   
+   }
   
   @autobind
   private _onChangeMultiSelect(item: IDropdownOption) {
+    debugger
       let updatedSelectedItems = this.state.selectedCommittees.length > 0 ? this.copyArray(this.state.selectedCommittees) : [];
       if (item.selected) {
         // add the option if it's checked
