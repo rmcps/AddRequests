@@ -162,7 +162,7 @@ import SPHttpClientBatchConfiguration from '@microsoft/sp-http/lib/spHttpClient/
     return this._saveModifyRequest(item,this.webPartContext.spHttpClient);
   }
   public _saveModifyRequest(item: IModifyAccessRequest, requester:SPHttpClient):Promise<any> {
-    const requestReason:string = item.RequestReason == 'Terminate' ? 'Terminate' : 'Modify';
+    const requestReason:string = item.RequestReason == 'Terminate' ? 'Terminate' : 'Change';
     let restUrl = this.accessListItemsUrl.replace("/items","");
     const queryUrl: string = this.accessListItemsUrl;
     
