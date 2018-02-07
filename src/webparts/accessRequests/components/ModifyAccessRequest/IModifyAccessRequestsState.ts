@@ -8,7 +8,7 @@ export interface IModifyAccessRequestsState {
   members:any;
   committees:any;
   selectedCommittees:any[];
+  originalCommittees:any[];
   dropDownErrorMsg:string;
-  hideDialog:boolean;
   enableSave:boolean;
 }

@@ -74,13 +74,12 @@ import SPHttpClientBatchConfiguration from '@microsoft/sp-http/lib/spHttpClient/
     }
     public _getMemberCommittees(loginName: string, requester: SPHttpClient): Promise<any> {
       let decodedName = loginName.replace(/#/g,"%23");
-      const queryString: string = `?$select=Id,Title,Committee&$filter=Title%20eq%20'${decodedName}'`;
+      const queryString: string = `?$select=Id,Title,CommitteeId&$filter=Title%20eq%20'${decodedName}'`;
       let options: ISPHttpClientOptions = { 
         headers: { "accept": "application/json;odata=nometadata",
         "content-type": "application/json;odata=verbose" }
       };
       const queryUrl: string = `${this._listsUrl}/GetByTitle('${this._membersCommList}')/items` + queryString;
-  debugger;
       return requester.get(queryUrl, SPHttpClient.configurations.v1,
         {
           headers: {
@@ -159,6 +158,52 @@ import SPHttpClientBatchConfiguration from '@microsoft/sp-http/lib/spHttpClient/
             });
         });
   }
+  public saveModifyRequest(item: IModifyAccessRequest):Promise<any> {
+    return this._saveModifyRequest(item,this.webPartContext.spHttpClient);
+  }
+  public _saveModifyRequest(item: IModifyAccessRequest, requester:SPHttpClient):Promise<any> {
+    const requestReason:string = item.RequestReason == 'Terminate' ? 'Terminate' : 'Modify';
+    let restUrl = this.accessListItemsUrl.replace("/items","");
+    const queryUrl: string = this.accessListItemsUrl;
+    
+    return this._getListItemEntityTypeName(this._accessListTitle,this.webPartContext.spHttpClient)
+      .then ((listItemEntityTypeName: string): Promise<SPHttpClientResponse> => {
+          const body: string = JSON.stringify({
+            '__metadata': {
+              'type': listItemEntityTypeName
+            },
+            'FirstName': item.FirstName,
+            'LastName': item.LastName,
+            'Comments': item.Comments,
+            'Title': item.Title,
+            'RequestReason': requestReason,
+            'RequestStatus': 'New',
+            'spLoginName': item.spLoginName,
+            'AddCommitteesId': {
+              'results': item.AddCommittees ? item.AddCommittees : [],
+            },
+            'RemoveCommitteesId': {
+              'results': item.RemoveCommittees ? item.RemoveCommittees : [],
+            }            
+          });
+        return requester.post(queryUrl,SPHttpClient.configurations.v1,
+            {
+              headers: {
+                'Accept': 'application/json;odata=nometadata',
+                'Content-type': 'application/json;odata=verbose',
+                'odata-version': ''
+              },
+              body: body
+            })
+          .then((postResponse: SPHttpClientResponse) => {
+            return(postResponse);
+          })
+          .catch((error) => {
+            return error;
+          });
+      });
+
+}
     private _getListItemEntityTypeName(listName:string, requester:SPHttpClient): Promise<string> {
       return new Promise<string>((resolve: (listItemEntityTypeName: string) => void, reject: (error: any) => void): void => {
         if (listName == this._lastListName && this._listItemEntityTypeName) {

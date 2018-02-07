@@ -83,37 +83,53 @@ export default class NewAccessRequest extends React.Component<IAccessRequestsPro
       <div className={ styles.accessRequests }>
         <div className={ styles.container }>
         <div className= {styles.row}>
-          <span className={ styles.title }>Access Requests</span>
+          <div className={styles.sectionDivider}> <h2>Access Requests</h2></div>
+          <div className={styles.subTitle}>Request for member access</div>
         </div>
           <div className={ styles.row }>
           <form>
             <div className={ styles.column }>      
               <div className={ styles.formFieldsContainer}>
+              <div className={ styles.row }>
                 <TextField placeholder='First Name' name='FirstName' required={ true } value={this.state.newItem.FirstName}
                   onChanged={this._onFirstNameChanged} onGetErrorMessage={ this._getErrorMessage }
                   validateOnFocusIn validateOnFocusOut underlined
                 />
+                </div>
+                <div className={ styles.row }>
                 <TextField placeholder='Last Name' name='LastName' required={ true } value={this.state.newItem.LastName}
                   onChanged={this._onLastNameChanged} onGetErrorMessage={ this._getErrorMessage }
                   validateOnFocusIn validateOnFocusOut underlined
                 />
+                </div>
+                <div className={ styles.row }>
                 <TextField placeholder='Email' name='EMail' required={ true } value={this.state.newItem.EMail}
                   onChanged={this._onEmailChanged} onGetErrorMessage={ this._getErrorMessage }
                   validateOnFocusIn validateOnFocusOut underlined
                 />
+                </div>
+                <div className={ styles.row }>
                 <TextField placeholder='Job Title' name='JobTitle' 
                   onChanged={this._onJobTitleChanged} underlined
                 />
+                </div>
+                <div className={ styles.row }>
                 <TextField placeholder='Company' name='Company' required={ true } value={this.state.newItem.Company}
                   onChanged={this._onCompanyChanged} onGetErrorMessage={ this._getErrorMessage }
-                  validateOnFocusIn validateOnFocusOut
+                  validateOnFocusIn validateOnFocusOut underlined
                 />
+                </div>
+                <div className={ styles.row }>
                 <TextField placeholder='Phone Number' name='Office' 
                   onChanged={this._onOfficeChanged} underlined
                 />
+                </div>
+                <div className={ styles.row }>
                 <TextField name='Comments' multiline rows={2} placeholder='Enter any special instructions'
                   onChanged={this._onCommentsChanged}
                 />
+                </div>
+                <div className={ styles.row }>
                 <Dropdown
                     onChanged={ this._onChangeMultiSelect }
                     placeHolder='Select committee(s)'
@@ -121,6 +137,7 @@ export default class NewAccessRequest extends React.Component<IAccessRequestsPro
                     errorMessage={this.state.dropDownErrorMsg }
                     multiSelect options={this.state.committees.map((item) => ({key:item.ID, text:item.Title}) )}
                 />                   
+                </div>
           </div>
               {this.state.isSaving ? <Spinner size={ SpinnerSize.small } /> : null}
               <div className={ styles.formButtonsContainer}>
@@ -130,7 +147,7 @@ export default class NewAccessRequest extends React.Component<IAccessRequestsPro
                   }
                   text='Save' onClick= {this._saveItem}
                 />
-                <DefaultButton disabled={ false } text='Reset' />
+                <DefaultButton disabled={ false } text='Cancel' onClick={this._cancelItem} />
               </div>
               <div className={styles.row}>
                 {this.renderErrors()}
@@ -250,7 +267,13 @@ export default class NewAccessRequest extends React.Component<IAccessRequestsPro
     return re.test(value);
   }
   @autobind
-  private async _saveItem(): Promise<void> {
+  private _cancelItem(): void {
+    window.location.href = "https://uphpcin.sharepoint.com";
+  }
+
+  private
+  @autobind
+  private _saveItem(): Promise<void> {
     this.setState((prevState: INewAccessRequestsState ,props:IAccessRequestsProps): INewAccessRequestsState => {
       prevState.errors.length = 0;
       return prevState;
@@ -270,7 +293,6 @@ export default class NewAccessRequest extends React.Component<IAccessRequestsPro
       return null;
     }
     if (!this._validateEmail(this.state.newItem.EMail)) {
-      //this.setState({errors: [...this.state.errors, 'Email address is invalid.'],});
       this.setState((prevState: INewAccessRequestsState ,props:IAccessRequestsProps): INewAccessRequestsState => {
         prevState.errors.push('Email address is invalid.');
         return prevState;
@@ -291,7 +313,8 @@ export default class NewAccessRequest extends React.Component<IAccessRequestsPro
             recordType: "New",
             Title: this.state.newItem.FirstName + ' ' + this.state.newItem.LastName,
             Comments: this.state.newItem.Comments,
-            Committees: this.state.committees.filter((item) => this.state.newItem.Committees.indexOf(item.ID) !== -1), // return only items from this.state.committees that are in this.newItem.Committees
+            addtionalInfo: this.state.committees.filter((item) => 
+                      this.state.newItem.Committees.indexOf(item.ID) !== -1).map(c => c.Title).join(","), // return only items from this.state.committees that are in this.newItem.Committees
             EMail: this.state.newItem.EMail,
             FirstName: this.state.newItem.FirstName,
             LastName: this.state.newItem.LastName,

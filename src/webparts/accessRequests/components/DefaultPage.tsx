@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
+import { autobind } from 'office-ui-fabric-react/lib/Utilities';
 import { Link } from 'office-ui-fabric-react/lib/Link';
 import styles from './AccessRequests.module.scss';
 import NewAccessRequest from './NewAccessRequest/NewAccessRequest';
@@ -12,8 +13,6 @@ export default class DefaultPage extends React.Component<IDefaultProps, null> {
   constructor(props) {
     super(props);
     // set initial state    
-    this._onAddNew = this._onAddNew.bind(this);
-    this._onAddExisting = this._onAddExisting.bind(this);
   }
   public componentWillReceiveProps(nextProps: IDefaultProps): void {
     // this.setState({
@@ -27,16 +26,19 @@ export default class DefaultPage extends React.Component<IDefaultProps, null> {
     return (
       <div className={ styles.accessRequests }>
         <div className={ styles.container }>
-        <div className= {styles.row}>
-        <h2>Member Access Request Submission</h2>
-        <Link onClick={this._onAddNew}>Add a new member access request</Link> &nbsp;&nbsp;&nbsp;
-        <Link onClick={this._onAddExisting}>Add a requet to modify an existing member</Link>
-          </div>                    
-        </div>
+          <div className= {styles.row}>
+            <div className={styles.sectionDivider}> <h2>Member Access Request Submission</h2></div>
+          </div>        
+          <div className= {styles.row}>
+            <div><Link onClick={this._onAddNew}>Add a new member access request</Link></div>
+            <div><Link onClick={this._onAddExisting}>Add a requet to modify an existing member</Link></div>  
+            <div><Link onClick={this._onCancel}>Cancel and return</Link></div>  
+          </div>
+      </div>
       </div>
     );
   }
-
+@autobind
   private _onAddNew() {
     const element: React.ReactElement<IAccessRequestsProps > = React.createElement(
         NewAccessRequest,
@@ -49,6 +51,7 @@ export default class DefaultPage extends React.Component<IDefaultProps, null> {
       ReactDom.unmountComponentAtNode(this.props.dom);          
       ReactDom.render(element, this.props.dom);
   }
+  @autobind
   private _onAddExisting() {
     const element: React.ReactElement<IAccessRequestsProps > = React.createElement(
       ModifyAccessRequest,
@@ -61,6 +64,10 @@ export default class DefaultPage extends React.Component<IDefaultProps, null> {
       ReactDom.unmountComponentAtNode(this.props.dom);          
       ReactDom.render(element, this.props.dom);
   }
+@autobind
+private _onCancel():void {
+  window.location.href = "https://uphpcin.sharepoint.com";
+}
   // private listNotConfigured(props: IAccessRequestsProps): boolean {
   //   return props.listName === undefined ||
   //     props.listName === null ||

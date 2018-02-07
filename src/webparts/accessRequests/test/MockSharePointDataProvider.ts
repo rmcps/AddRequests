@@ -109,4 +109,7 @@ export default class MockNewAccessRequest implements IAccessRequestsDataProvider
             setTimeout(() => resolve(result), 500);
         });
     }
+    public saveModifyRequest(item: IModifyAccessRequest):Promise<any> {
+        return null;
+    }
 }

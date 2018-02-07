@@ -13,7 +13,6 @@ import IDisplayRequestProps from './IDisplayRequestProps';
 export interface IDisplayRequestState {
     message: string;
     messageBarType: MessageBarType;
-    committeeString: string;
 }
 export default class DisplayRequest extends React.Component<IDisplayRequestProps, IDisplayRequestState> {
 
@@ -23,7 +22,6 @@ export default class DisplayRequest extends React.Component<IDisplayRequestProps
         this.state = {
             message: '',
             messageBarType: MessageBarType.info,
-            committeeString: ''
         };
         this._onAddNew = this._onAddNew.bind(this);
         this._onAddExisting = this._onAddExisting.bind(this);        
@@ -37,13 +35,10 @@ export default class DisplayRequest extends React.Component<IDisplayRequestProps
         }
         else if (this.props.recordType == "Modified") {
             this.setState({
-                message: "Your access request changed request was created.  You will receive email updates with the status of your request.",
+                message: "Your change request was created.  You will receive email updates with the status of your request.",
                 messageBarType: MessageBarType.success
         });
         }
-        this.setState({
-            committeeString: this.props.Committees.map(c => c.Title).join(",")
-        });
     }
     public render(): React.ReactElement<IDisplayRequestProps> {
         return (
@@ -58,17 +53,31 @@ export default class DisplayRequest extends React.Component<IDisplayRequestProps
                     </div>
                      <div className= {styles.row}>
                        <div className={ styles.column }>  
-                        <TextField label='First Name' disabled={ true } value={this.props.FirstName} />
-                        <TextField label='Last Name' disabled={ true } value={this.props.LastName} />
-                        <TextField label='Email' disabled={ true } value={this.props.EMail} />
-                        {this.props.JobTitle && <TextField label='Title' disabled={ true } value={this.props.JobTitle} />}
-                        <TextField label='Organization' disabled={ true } value={this.props.Company} />
-                        {this.props.Office && <TextField label='Phone' disabled={ true } value={this.props.Office} /> }
-                        {this.props.Comments && <TextField label='Comments' disabled={ true } multiline value={this.props.Comments} /> }
-                        <TextField label='Committees' disabled={ true } multiline
-                            value={this.state.committeeString}
-                        />
-                        </div>
+                       {this.props.RequestReason && <div className={styles.row}>
+                            <TextField label='Reason for request' disabled={ true } value={this.props.RequestReason} />
+                        </div> }
+                        {this.props.Title && <div className={styles.row}>
+                            <TextField label='Name' disabled={ true } value={this.props.Title} />
+                        </div>}
+                        {this.props.EMail && <div className={styles.row}>
+                            <TextField label='Email' disabled={ true } value={this.props.EMail} /> 
+                        </div>}
+                        {this.props.JobTitle && <div className={styles.row}>
+                            <TextField label='Title' disabled={ true } value={this.props.JobTitle} />
+                        </div>}
+                        {this.props.Company && <div className={styles.row}>
+                            <TextField label='Organization' disabled={ true } value={this.props.Company} /> 
+                        </div>}
+                        {this.props.Office && <div className={styles.row}>
+                            <TextField label='Phone' disabled={ true } value={this.props.Office} /> 
+                        </div>}
+                        {this.props.Comments && <div className={styles.row}>
+                            <TextField label='Comments' disabled={ true } multiline value={this.props.Comments} /> 
+                        </div>}
+                        {this.props.addtionalInfo && <div className={styles.row}>
+                            <TextField disabled={ true } multiline value={this.props.addtionalInfo} /> 
+                        </div>}
+                    </div>
                     </div>
                 </div>
             </div>

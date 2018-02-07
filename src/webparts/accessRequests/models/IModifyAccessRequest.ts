@@ -2,12 +2,13 @@ interface IModifyAccessRequest {
     Id?: string;
     spLoginName?: any;
     Comments?: string;
-    Committees?: any[];
+    AddCommittees?: any[];
+    RemoveCommittees?: any[];
     EMail?: string;
     FirstName?: string;
     JobTitle?: string;
     LastName?: string;
-    Company?: string;
+    Title?: string;    
     Office?: string;
     RequestReason?: string;
   }
