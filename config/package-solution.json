@@ -1,0 +1,11 @@
+{
+  "$schema": "https://dev.office.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "access-requests-client-side-solution",
+    "id": "2d05e43c-f87d-4a93-a926-fce9ba5a5d1a",
+    "version": "1.0.0.0"
+  },
+  "paths": {
+    "zippedPackage": "solution/access-requests.sppkg"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "$schema": "https://dev.office.com/json-schemas/spfx-build/config.2.0.schema.json",
+  "version": "2.0",
+  "bundles": {
+    "access-requests-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/accessRequests/AccessRequestsWebPart.js",
+          "manifest": "./src/webparts/accessRequests/AccessRequestsWebPart.manifest.json"
+        }
+      ]
+    }
+  },
+  "externals": {},
+  "localizedResources": {
+    "AccessRequestsWebPartStrings": "lib/webparts/accessRequests/loc/{locale}.js"
+  }
+}
