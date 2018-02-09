@@ -1,0 +1,41 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+@import '../AccessRequests.module.scss';
+
+.accessRequestsList {
+    .itemCell {
+        // @include focus-border();
+        border: 1px $ms-color-neutralTertiaryAlt solid;
+        min-height: 54px;
+        padding: 10px;
+        box-sizing: border-box;
+        // border-bottom: 1px solid $bodyDividerColor;
+        display: flex;
+    }
+    .itemCell:hover{
+        background: #EEE;
+        // cursor: pointer;
+    }
+    .itemContent {
+        margin-left: 10px;
+        // @include margin-left(10px);
+        overflow: hidden;
+        flex-grow: 1;
+    }
+    .itemName {
+        @include ms-font-m-plus;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }   
+      .itemLabel {
+          font-weight: 600;
+      } 
+      .chevron {
+        align-self: center;
+        margin-left: 10px;
+        // @include margin-left(10px);
+        color: $ms-color-neutralTertiary;
+        font-size: $ms-font-size-l;
+        flex-shrink: 0;
+      }
+}

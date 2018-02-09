@@ -1,8 +1,9 @@
 interface IAccessRequest {
-    Id?: number;
+    Id?: string;
     Title?: string;
     Comments?: string;
-    Committees?: any[];
+    AddCommittees?: any[];
+    RemoveCommittees?: any[];
     Created?: string;
     EMail?: string;
     FirstName?: string;
@@ -14,7 +15,9 @@ interface IAccessRequest {
     RequestReason?: string;
     RequestStatus?: string;
     AuthorId?: number;
+    CreatedBy?: string;
     EditorId?: number;
+    ModifiedBy?: string;
   }
   
   export default IAccessRequest;

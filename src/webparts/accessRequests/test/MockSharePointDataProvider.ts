@@ -1,5 +1,6 @@
 import { IWebPartContext } from '@microsoft/sp-webpart-base';
 import * as lodash from '@microsoft/sp-lodash-subset';
+import IAccessRequest from '../models/IAccessRequest';
 import INewAccessRequest from "../models/INewAccessRequest";
 import IModifyAccessRequest from "../models/IModifyAccessRequest";
 import SharePointDataProvider from '../models/IAccessRequestsDataProvider';
@@ -71,11 +72,18 @@ export default class MockNewAccessRequest implements IAccessRequestsDataProvider
     public get webPartContext(): IWebPartContext {
         return this._webPartContext;
     }
-    public getItem(listId: number): Promise<IModifyAccessRequest> {
-        const item: IModifyAccessRequest = lodash.clone(this._items[1]);
-        return new Promise<IModifyAccessRequest>((resolve) => {
+    public getItem(requestId: string): Promise<IAccessRequest> {
+        const item: IAccessRequest = lodash.clone(this._items[1]);
+        return new Promise<IAccessRequest>((resolve) => {
             setTimeout(() => resolve(item), 500);
         });
+    }
+    public getCurrentUser():Promise<any> {
+        return null;
+    }
+
+    public  getItemsForCurrentUser(): Promise<IAccessRequest[]> {
+        return null;
     }
     public getMembers(): Promise<any> {
         const items: any = lodash.clone(this._items);

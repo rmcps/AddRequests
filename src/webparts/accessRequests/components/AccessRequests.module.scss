@@ -2,7 +2,7 @@
 
 .accessRequests {
   .container {
-    max-width: 700px;
+    max-width: 1023px;
     margin: 0px auto;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 25px 50px 0 rgba(0, 0, 0, 0.1);
   }
@@ -16,10 +16,9 @@
 
   .column {
     @include ms-Grid-col;
-    @include ms-lg10;
-    @include ms-xl8;
-    @include ms-xlPush2;
-    @include ms-lgPush1;
+    @include ms-sm12;
+    @include ms-md12;
+    @include ms-lg12;
   }
 
   .title {
@@ -36,7 +35,10 @@
     @include ms-font-l;
     @include ms-fontColor-white;
   }
-
+  .fieldContainer {
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
   .button {
     // Our button
     text-decoration: none;
@@ -71,19 +73,28 @@
       display: inline-block;
     }
   }
+  .headerBar {
+    padding-top: 5px ;
+    padding-bottom: 5px;
+    padding-left: 20px;
+    padding-right: 20px;
+    @include ms-fontColor-white;
+    background-color: #004578 ;
+    margin-bottom: 4px;    
+  }
   .sectionDivider
    {
-     padding-top: 4px ;
-     padding-bottom: 4px;
      padding-left: 20px;
      padding-right: 20px;
      @include ms-fontColor-white;
-     background-color: #004578 ;
-     margin-bottom: 4px;
+     background-color: #355e7e ;
+     margin-bottom: 0px;
    }
    .formFieldsContainer{
     padding-top: 4px;
     padding-bottom: 10px;
+    padding-left: 8px;
+    padding-right: 8px;
 
     &.isDataLoading{
       opacity: 0.5;
@@ -96,5 +107,9 @@
     button {
       margin-right: 4px;
     }
+  }
+  :global .ms-MessageBar {
+    margin-top: 24px;
+    margin-bottom: 24px;
   }
 }

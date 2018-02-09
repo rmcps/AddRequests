@@ -5,7 +5,7 @@ export interface IModifyAccessRequestsState {
   Item: IModifyAccessRequest;
   errors: string[];
   isLoadingData: boolean;
-  members:any;
+  members:IModifyAccessRequest[];
   committees:any;
   selectedCommittees:any[];
   originalCommittees:any[];

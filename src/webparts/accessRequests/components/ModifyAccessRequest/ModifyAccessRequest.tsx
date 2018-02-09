@@ -67,78 +67,78 @@ export default class ModifyAccessRequest extends React.Component<IAccessRequests
     }
     if (this.state.members.length < 1) {
       this._dataProvider.getMembers().then(response => {
-        this.setState({members: response.value});
+        this.setState({members: response});
       });
     }
   }
   public render(): React.ReactElement<IAccessRequestsProps> {
     return (
-      <div className={ styles.accessRequests }>
-        <div className={ styles.container }>
-        <div className= {styles.row}>
-          <div className={styles.sectionDivider}> <h2>Change Access Requests</h2></div>
-          <div className={styles.subTitle}>Request for changes to member access</div>
-        </div>
-          <div className={ styles.row }>
-          <form>
-            <div className={ styles.column }>      
-              <div className={ styles.formFieldsContainer}>
-              <div className={ styles.row }>
-                <ComboBox
-                  selectedKey= {this.state.Item.spLoginName}
-                  className='MemberCombo'
-                  label='Select a Member:'
-                  id='MemberCombo'
-                  ariaLabel='Member List'
-                  allowFreeform={ false }
-                  autoComplete='on'
-                  options={this.state.members.map((item) => ({key:item.spLoginName, value:item.spLoginName, text:item.Title}) )}
-                  onChanged={ this._onMemberChanged }
-                />
-                </div>
-                <div className={ styles.row }>
-                <Toggle
-                  checked={ this.state.Item.RequestReason == 'Terminate' }
-                  label='Remove user access'
-                  onText='Yes'
-                  offText='No'
-                  onChanged={this._onToggleRemoveUser}
-                />
-                </div>
-                <div className={ styles.row }>
-                <TextField label='Comments' name='Comments' multiline rows={2} placeholder='Enter any special instructions'
-                  onChanged={this._onCommentsChanged}
-                />
-                </div>
-                {this.state.Item.RequestReason != 'Terminate' &&<div className={ styles.row }>                
-                  <Dropdown
-                      onChanged={ this._onChangeMultiSelect }
+      <div className={styles.accessRequests}>
+        <div className={styles.container}>
+          <div className={styles.row}>
+            <div className={styles.column}>
+              <div className={styles.headerBar}> <h2>Change Access Requests</h2></div>
+              <div className={styles.subTitle}>Request for changes to member access</div>
+            </div>
+          </div>
+          <div className={styles.row}>
+            <div className={styles.column}>
+              <form>
+                <div className={styles.formFieldsContainer}>
+                  <div className={styles.fieldContainer}>
+                    <ComboBox
+                      selectedKey={this.state.Item.spLoginName}
+                      className='MemberCombo'
+                      label='Select a Member:'
+                      id='MemberCombo'
+                      ariaLabel='Member List'
+                      allowFreeform={false}
+                      autoComplete='on'
+                      options={this.state.members.map((item) => ({ key: item.spLoginName, value: item.spLoginName, text: item.Title }))}
+                      onChanged={this._onMemberChanged}
+                    />
+                  </div>
+                  <div className={styles.fieldContainer}>
+                    <Toggle
+                      checked={this.state.Item.RequestReason == 'Terminate'}
+                      label='Remove user access'
+                      onText='Yes'
+                      offText='No'
+                      onChanged={this._onToggleRemoveUser}
+                    />
+                  </div>
+                  <div className={styles.fieldContainer}>
+                    <TextField label='Comments' name='Comments' multiline rows={2} placeholder='Enter any special instructions'
+                      onChanged={this._onCommentsChanged}
+                    />
+                  </div>
+                  {this.state.Item.RequestReason != 'Terminate' && <div className={styles.fieldContainer}>
+                    <Dropdown
+                      onChanged={this._onChangeMultiSelect}
                       placeHolder='Select committee(s)'
                       label='Add or Remove Commitees:'
-                      selectedKeys={ this.state.selectedCommittees }
-                      errorMessage={this.state.dropDownErrorMsg }
-                      multiSelect options={this.state.committees.map((item) => ({key:item.Id, text:item.Title}) )}
+                      selectedKeys={this.state.selectedCommittees}
+                      errorMessage={this.state.dropDownErrorMsg}
+                      multiSelect options={this.state.committees.map((item) => ({ key: item.Id, text: item.Title }))}
+                    />
+                  </div>}
+                </div>
+                <div className={styles.formButtonsContainer}>
+                  <PrimaryButton
+                    disabled={
+                      !this.state.enableSave || !this.state.Item || this.state.status == 'Saving record...'
+                    }
+                    text='Save'
+                    onClick={this._saveItem}
                   />
-                </div>}
-          </div>
-              <div className={ styles.formButtonsContainer}>
-                <PrimaryButton
-                  disabled={ 
-                    !this.state.enableSave || !this.state.Item || this.state.status == 'Saving record...' 
-                }
-                  text='Save'
-                  onClick= {this._saveItem}
-                />
-                <DefaultButton
-                  disabled={ false }
-                  text='Cancel' onClick={this._cancelItem} 
-                />
-              </div>
-              <div className={styles.row}>
+                  <DefaultButton
+                    disabled={false}
+                    text='Cancel' onClick={this._cancelItem}
+                  />
+                </div>
                 {this.renderErrors()}
-              </div>
+              </form>
             </div>
-            </form>
           </div>
         </div>
       </div>
@@ -197,6 +197,10 @@ export default class ModifyAccessRequest extends React.Component<IAccessRequests
     this.setState((prevState: IModifyAccessRequestsState ,props:IAccessRequestsProps): IModifyAccessRequestsState => {
       prevState.Item.spLoginName = option.key;
       prevState.Item.Title = option.text;
+      const selMember = this.state.members.filter((mem) => {
+        return mem.spLoginName == option.key;
+      });
+      prevState.Item.EMail = selMember[0].EMail;
       prevState.originalCommittees = response.value.map(c => c.CommitteeId);
       prevState.selectedCommittees = response.value.map(c => c.CommitteeId);
       prevState.enableSave = option.key ? true : false;
@@ -294,11 +298,12 @@ export default class ModifyAccessRequest extends React.Component<IAccessRequests
             description: this.props.description,
             context:this.props.context,
             dom: this.props.dom,      
-            recordType: "Modified",
+            recordType: "Change",
             RequestReason: this.state.Item.RequestReason,
             Title: this.state.Item.Title,
+            EMail: this.state.Item.EMail,
             Comments: this.state.Item.Comments,
-            addtionalInfo: additionalInfo,
+            additionalInfo: additionalInfo,
             }
         );      
         ReactDom.unmountComponentAtNode(this.props.dom);          
