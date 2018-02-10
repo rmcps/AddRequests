@@ -9,21 +9,26 @@ import { Dropdown, IDropdown, IDropdownOption } from 'office-ui-fabric-react/lib
 import { Dialog, DialogType, DialogFooter } from 'office-ui-fabric-react/lib/Dialog';
 import { autobind } from 'office-ui-fabric-react/lib/Utilities';
 import styles from '../AccessRequests.module.scss';
-import { IAccessRequestsProps } from '../IAccessRequestsProps';
+// import { IAccessRequestsProps } from '../IAccessRequestsProps';
 import { IModifyAccessRequestsState } from './IModifyAccessRequestsState';
 import { escape } from '@microsoft/sp-lodash-subset';
-import { Environment, EnvironmentType } from '@microsoft/sp-core-library';
-import SharePointDataProvider from '../../services/SharePointDataProvider';
-import MockSharePointDataProvider from '../../test/MockSharePointDataProvider';
+// import { Environment, EnvironmentType } from '@microsoft/sp-core-library';
+// import SharePointDataProvider from '../../services/SharePointDataProvider';
+// import MockSharePointDataProvider from '../../test/MockSharePointDataProvider';
 import IAccessRequestsDataProvider from '../../models/IAccessRequestsDataProvider';
 import IModifyAccessRequest from '../../models/IModifyAccessRequest';
-import DisplayRequest from '../DisplayAccessRequest/DisplayRequest';
-import IDisplayRequestProps from '../DisplayAccessRequest/IDisplayRequestProps';
+// import DisplayRequest from '../DisplayAccessRequest/DisplayRequest';
+// import IDisplayRequestProps from '../DisplayAccessRequest/IDisplayRequestProps';
 
-export default class ModifyAccessRequest extends React.Component<IAccessRequestsProps, IModifyAccessRequestsState> {
+export interface IModifyAccessRequestProps {
+  dataProvider: IAccessRequestsDataProvider;
+  onRecordAdded: any;
+}
+
+export default class ModifyAccessRequest extends React.Component<IModifyAccessRequestProps, IModifyAccessRequestsState> {
   private _dataProvider: IAccessRequestsDataProvider;
 
-  constructor(props: IAccessRequestsProps, state: IModifyAccessRequestsState) {
+  constructor(props: IModifyAccessRequestProps, state: IModifyAccessRequestsState) {
     super(props);
     // set initial state
     this.state = {
@@ -36,51 +41,28 @@ export default class ModifyAccessRequest extends React.Component<IAccessRequests
       selectedCommittees:[],
       originalCommittees:[],
       dropDownErrorMsg:'',
-      enableSave:false
-    };
-    /*
-    Create the appropriate data provider depending on where the web part is running.
-    The DEBUG flag will ensure the mock data provider is not bundled with the web part when you package the solution for distribution, that is, using the --ship flag with the package-solution gulp command.
-    */
-    if (DEBUG && Environment.type === EnvironmentType.Local) {
-      this._dataProvider = new MockSharePointDataProvider();
-      
-    } else {
-      this._dataProvider = new SharePointDataProvider();
-      this._dataProvider.webPartContext = this.props.context;
-      this._dataProvider.accessListTitle = "Site Access Requests";
-    }
-    
+      enableSave:false,
+      hideDialog:true
+    };    
   }
-  public componentWillReceiveProps(nextProps: IAccessRequestsProps): void {
-    // this.setState({
-    //   status: this.listNotConfigured(nextProps) ? 'Please configure list in Web Part properties' : '',
-    // });
+  public componentWillReceiveProps(nextProps: IModifyAccessRequestProps): void {
   }
   public componentDidMount() {
     if (this.state.committees.length < 1) {
-      this._dataProvider.getCommittees().then(response => {
+      this.props.dataProvider.getCommittees().then(response => {
         this.setState({
           committees: response.value
         }); 
       });
     }
     if (this.state.members.length < 1) {
-      this._dataProvider.getMembers().then(response => {
+      this.props.dataProvider.getMembers().then(response => {
         this.setState({members: response});
       });
     }
   }
-  public render(): React.ReactElement<IAccessRequestsProps> {
+  public render(): React.ReactElement<IModifyAccessRequestProps> {
     return (
-      <div className={styles.accessRequests}>
-        <div className={styles.container}>
-          <div className={styles.row}>
-            <div className={styles.column}>
-              <div className={styles.headerBar}> <h2>Change Access Requests</h2></div>
-              <div className={styles.subTitle}>Request for changes to member access</div>
-            </div>
-          </div>
           <div className={styles.row}>
             <div className={styles.column}>
               <form>
@@ -138,18 +120,30 @@ export default class ModifyAccessRequest extends React.Component<IAccessRequests
                 </div>
                 {this.renderErrors()}
               </form>
+              <Dialog
+            hidden={this.state.hideDialog}
+            onDismiss={this._closeDialog}
+            dialogContentProps={{
+              type: DialogType.normal,
+              title: 'Your request was saved.',
+              subText: 'Your access request change was created.  You will receive email updates with the status of your request.'
+            }}
+            modalProps={{
+              isBlocking: true,
+              containerClassName: 'accessRequests'
+            }}
+          >
+          <DialogFooter>
+          <PrimaryButton onClick={ this._closeDialog } text='OK' />
+          </DialogFooter>
+          
+          </Dialog>
+              
             </div>
           </div>
-        </div>
-      </div>
     );
   }
 
-  // private listNotConfigured(props: IAccessRequestsProps): boolean {
-  //   return props.listName === undefined ||
-  //     props.listName === null ||
-  //     props.listName.length === 0;
-  // }
   private renderErrors() {
     return this.state.errors.length > 0
       ?
@@ -173,7 +167,7 @@ export default class ModifyAccessRequest extends React.Component<IAccessRequests
     } );
   }
   private updateStateWithFieldValue(fieldName:string, value:string){
-    this.setState((prevState: IModifyAccessRequestsState ,props:IAccessRequestsProps): IModifyAccessRequestsState => {
+    this.setState((prevState: IModifyAccessRequestsState ,props:IModifyAccessRequestProps): IModifyAccessRequestsState => {
         prevState.Item[fieldName] = value;
       return prevState;
     });
@@ -186,15 +180,15 @@ export default class ModifyAccessRequest extends React.Component<IAccessRequests
   }
   @autobind
   private _onToggleRemoveUser(checked:boolean) {
-    this.setState((prevState: IModifyAccessRequestsState ,props:IAccessRequestsProps): IModifyAccessRequestsState => {
+    this.setState((prevState: IModifyAccessRequestsState ,props:IModifyAccessRequestProps): IModifyAccessRequestsState => {
       prevState.Item.RequestReason = checked ? 'Terminate' : '';
       return prevState;
     });
   }
   @autobind
   private _onMemberChanged(option: IComboBoxOption, index: number, value: string) {
-    this._dataProvider.getMemberCommittees(option.key).then(response => {      
-    this.setState((prevState: IModifyAccessRequestsState ,props:IAccessRequestsProps): IModifyAccessRequestsState => {
+    this.props.dataProvider.getMemberCommittees(option.key).then(response => {      
+    this.setState((prevState: IModifyAccessRequestsState ,props:IModifyAccessRequestProps): IModifyAccessRequestsState => {
       prevState.Item.spLoginName = option.key;
       prevState.Item.Title = option.text;
       const selMember = this.state.members.filter((mem) => {
@@ -223,7 +217,7 @@ export default class ModifyAccessRequest extends React.Component<IAccessRequests
           updatedSelectedItems.splice(currIndex, 1);
         }
       }  
-      this.setState((prevState: IModifyAccessRequestsState ,props:IAccessRequestsProps): IModifyAccessRequestsState => {
+      this.setState((prevState: IModifyAccessRequestsState ,props:IModifyAccessRequestProps): IModifyAccessRequestsState => {
         prevState.selectedCommittees = updatedSelectedItems;
         prevState.dropDownErrorMsg = updatedSelectedItems.length > 0 ? '' : 'Select one or more committee(s)';
         return prevState;
@@ -259,7 +253,7 @@ export default class ModifyAccessRequest extends React.Component<IAccessRequests
           arrAdd.push(item);
         }
       }));
-      this.setState((prevState: IModifyAccessRequestsState ,props:IAccessRequestsProps): IModifyAccessRequestsState => {
+      this.setState((prevState: IModifyAccessRequestsState ,props:IModifyAccessRequestProps): IModifyAccessRequestsState => {
         prevState.Item.AddCommittees = arrAdd;
         return prevState;
       });              
@@ -269,50 +263,29 @@ export default class ModifyAccessRequest extends React.Component<IAccessRequests
           arrRemove.push(item);
         }
       }));
-      this.setState((prevState: IModifyAccessRequestsState ,props:IAccessRequestsProps): IModifyAccessRequestsState => {
+      this.setState((prevState: IModifyAccessRequestsState ,props:IModifyAccessRequestProps): IModifyAccessRequestsState => {
         prevState.Item.RemoveCommittees = arrRemove;
         return prevState;
       });              
     }
     this.setState( {
       status: 'Saving record...',
+      enableSave: false
     });
   
-    this._dataProvider.saveModifyRequest(this.state.Item).then((result) => {
+    this.props.dataProvider.saveModifyRequest(this.state.Item).then((result) => {
       if(result.ok) {
-        let additionalInfo: string;
-        if (this.state.Item.RequestReason != 'Terminate') {
-          if (this.state.Item.AddCommittees) {
-            let comm = this.state.committees.filter((item) => 
-                    this.state.Item.AddCommittees.indexOf(item.ID) !== -1);
-            additionalInfo = `Add committees: ${comm.map(c => c.Title).join(",")}\r\n`;
-          }
-          if (this.state.Item.RemoveCommittees) {
-            let comm = this.state.committees.filter((item) => 
-                    this.state.Item.AddCommittees.indexOf(item.ID) !== -1);            
-            additionalInfo = `${additionalInfo}Remove committees: ${comm.map(c => c.Title).join(",")}\r\n`;
-          }
-        }
-        const element: React.ReactElement<IDisplayRequestProps > = React.createElement(
-          DisplayRequest, {
-            description: this.props.description,
-            context:this.props.context,
-            dom: this.props.dom,      
-            recordType: "Change",
-            RequestReason: this.state.Item.RequestReason,
-            Title: this.state.Item.Title,
-            EMail: this.state.Item.EMail,
-            Comments: this.state.Item.Comments,
-            additionalInfo: additionalInfo,
-            }
-        );      
-        ReactDom.unmountComponentAtNode(this.props.dom);          
-        ReactDom.render(element, this.props.dom);
+        this.setState({ 
+          hideDialog: false,
+          status :""
+        });        
+
       }
       else {
-        this.setState((prevState: IModifyAccessRequestsState ,props:IAccessRequestsProps): IModifyAccessRequestsState => {
+        this.setState((prevState: IModifyAccessRequestsState ,props:IModifyAccessRequestProps): IModifyAccessRequestsState => {
           prevState.errors.push('Error: Failed to save record.');
           prevState.status = '';
+          prevState.enableSave = true;
           return prevState;
         });          
       }
@@ -320,4 +293,13 @@ export default class ModifyAccessRequest extends React.Component<IAccessRequests
     });
     
   }
+  @autobind
+  private _closeDialog() {
+    this.setState((prevState: IModifyAccessRequestsState, props: IModifyAccessRequestProps): IModifyAccessRequestsState => {
+      prevState.hideDialog = true;
+      return prevState;
+    });
+    this.props.onRecordAdded("list");
+  }  
+
 }

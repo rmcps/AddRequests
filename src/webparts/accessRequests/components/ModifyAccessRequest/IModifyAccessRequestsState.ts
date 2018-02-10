@@ -11,4 +11,5 @@ export interface IModifyAccessRequestsState {
   originalCommittees:any[];
   dropDownErrorMsg:string;
   enableSave:boolean;
+  hideDialog:boolean;
 }

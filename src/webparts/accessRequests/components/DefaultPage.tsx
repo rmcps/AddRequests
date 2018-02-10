@@ -16,11 +16,11 @@ import AccessRequestList from './AccessRequestsList/AccessRequestList';
 import IAccessRequest from '../models/IAccessRequest';
 import DisplayRequest from './DisplayAccessRequest/DisplayRequest';
 import IDisplayRequestProps from './DisplayAccessRequest/IDisplayRequestProps';
-import TopNav from './Navigation/TopNav'
+import TopNav from './Navigation/TopNav';
 
 export interface IDefaultState {
-  listItems: IAccessRequest[];
-  show: "List" |"New" | "Change" | "Display";
+  show: "List" | "New" | "Change" | "Display";
+  selectedItem: IAccessRequest;
 }
 
 export default class DefaultPage extends React.Component<IDefaultProps, IDefaultState> {
@@ -30,10 +30,10 @@ export default class DefaultPage extends React.Component<IDefaultProps, IDefault
     super(props);
     // set initial state   
     this.state = {
-      listItems: [],
-      show: "List"
-    }; 
-    
+      show: "List",
+      selectedItem: null,
+    };
+
     if (DEBUG && Environment.type === EnvironmentType.Local) {
       this._dataProvider = new MockSharePointDataProvider();
 
@@ -42,22 +42,16 @@ export default class DefaultPage extends React.Component<IDefaultProps, IDefault
       this._dataProvider.webPartContext = this.props.context;
       this._dataProvider.accessListTitle = "Site Access Requests";
     }
-    
+
   }
   public componentWillReceiveProps(nextProps: IDefaultProps) {
-    this._dataProvider.getItemsForCurrentUser().then((items: IAccessRequest[]) => {
-      this.setState({listItems: items});     
-    });
-    
+
     // this.setState({
     //   status: this.listNotConfigured(nextProps) ? 'Please configure list in Web Part properties' : '',
     // });
   }
   public componentDidMount() {
-    this._dataProvider.getItemsForCurrentUser().then((items: IAccessRequest[]) => {
-      this.setState({listItems: items});     
-    });
-    
+
   }
   public render(): React.ReactElement<IDefaultProps> {
     return (
@@ -65,90 +59,67 @@ export default class DefaultPage extends React.Component<IDefaultProps, IDefault
         <div className={styles.container}>
           <div className={styles.row}>
             <div className={styles.column}>
-              <h2 className={styles.headerBar}>Member Access Request Submission</h2>
+              <div className={styles.headerBar}>
+              <h2 className={styles.title}>Member Access Request Submission</h2>
+              <TopNav onItemSelected={this.handleViewSelected} />
+              </div>
             </div>
           </div>
-              <TopNav onItemSelected={this.handleMenuItemSelected} />
-    {this.state.show == "List" &&  <AccessRequestList items= {this.state.listItems} onItemSelected={this.handleItemSelected} /> }
+          {this.state.show == "List" && <AccessRequestList dataProvider={this._dataProvider} onItemSelected={this.handleItemSelected} />}
+          {this.state.show == "Display" && <DisplayRequest item={this.state.selectedItem} recordType="Display" />}
+          {this.state.show == "New" && <NewAccessRequest dataProvider={this._dataProvider} onRecordAdded={this.handleViewSelected} />}
+          {this.state.show == "Change" && <ModifyAccessRequest dataProvider={this._dataProvider} onRecordAdded={this.handleViewSelected}/>}
         </div>
       </div>
     );
   }
 
-@autobind
-private handleMenuItemSelected(selectedItem) {
-  switch(selectedItem) {
-    case "addNew":
-      this._onAddNew();
-      break;
+  @autobind
+  private handleViewSelected(selectedItem) {
+    switch (selectedItem) {
+      case "addNew":
+        this.setState({
+          show: "New"
+        });
+        break;
       case "change":
-      this._onChange();
-      break;
-
+        this.setState({
+          show: "Change"
+        });
+        break;
+      case "display":
+        this.setState({
+          show: "Display"
+        });
+        break;
+      case "list":
+        this.setState({
+          show: "List"
+        });
+        break;
+      case "cancel":
+        this._onCancel();
+        break;
     }
-}
-
-@autobind
-  private _onAddNew() {
-    const element: React.ReactElement<IAccessRequestsProps > = React.createElement(
-        NewAccessRequest,
-        {
-          description: this.props.description,
-          context:this.props.context,
-          dom: this.props.dom,
-        }
-      );
-      ReactDom.unmountComponentAtNode(this.props.dom);          
-      ReactDom.render(element, this.props.dom);
   }
   @autobind
-  private _onChange() {
-    const element: React.ReactElement<IAccessRequestsProps > = React.createElement(
-      ModifyAccessRequest,
-        {
-          description: this.props.description,
-          context:this.props.context,
-          dom: this.props.dom,
-        }
-      );
-      ReactDom.unmountComponentAtNode(this.props.dom);          
-      ReactDom.render(element, this.props.dom);
+  private _onCancel(): void {
+    window.location.href = "https://uphpcin.sharepoint.com";
   }
-@autobind
-private _onCancel():void {
-  window.location.href = "https://uphpcin.sharepoint.com";
-}
 
-@autobind
-private handleItemSelected(requestId) {
-  const rItems = this.state.listItems;
-  const requestItem: IAccessRequest = rItems.filter((i) => i.Id == requestId).pop();  // should only return 1 element so take the last.
-  const element: React.ReactElement<IDisplayRequestProps> = React.createElement(
-    DisplayRequest, {
-      context: this.props.context,
-      dom: this.props.dom,
-      recordType: "Display",
-      Id: requestId,
-      Title: requestItem.Title,
-      EMail: requestItem.EMail,
-      JobTitle: requestItem.JobTitle,
-      Company: requestItem.Company,
-      Comments: requestItem.Comments,
-      RequestReason: requestItem.RequestReason,
-      AddCommittees: requestItem.AddCommittees,
-      RemoveCommittees: requestItem.RemoveCommittees,
-      additionalInfo: "",
-      description: ""
-    }
-  );
-  ReactDom.unmountComponentAtNode(this.props.dom);
-  ReactDom.render(element, this.props.dom);  
-}
+  @autobind
+  private handleItemSelected(item) {
+    this.setState({
+      selectedItem: item,
+      show: "Display"
+    });
+
+  }
   // private listNotConfigured(props: IAccessRequestsProps): boolean {
   //   return props.listName === undefined ||
   //     props.listName === null ||
   //     props.listName.length === 0;
   // }
 
-    
+
 }

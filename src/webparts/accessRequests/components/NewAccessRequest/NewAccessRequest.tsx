@@ -1,31 +1,30 @@
 import * as React from 'react';
-import * as ReactDom from 'react-dom';
 import { DefaultButton, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
 import { MessageBar, MessageBarType } from 'office-ui-fabric-react/lib/MessageBar';
 import { TextField } from 'office-ui-fabric-react/lib/TextField';
 import { Dropdown, IDropdown, IDropdownOption } from 'office-ui-fabric-react/lib/Dropdown';
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
+import { Dialog, DialogType, DialogFooter} from 'office-ui-fabric-react/lib/Dialog';
 import { autobind } from 'office-ui-fabric-react/lib/Utilities';
 import styles from '../AccessRequests.module.scss';
-import { IAccessRequestsProps } from '../IAccessRequestsProps';
 import { INewAccessRequestsState } from './INewAccessRequestsState';
 import { escape } from '@microsoft/sp-lodash-subset';
-import { Environment, EnvironmentType } from '@microsoft/sp-core-library';
-import SharePointDataProvider from '../../services/SharePointDataProvider';
-import MockSharePointDataProvider from '../../test/MockSharePointDataProvider';
 import IAccessRequestsDataProvider from '../../models/IAccessRequestsDataProvider';
 import INewAccessRequest from '../../models/INewAccessRequest';
-import DisplayRequest from '../DisplayAccessRequest/DisplayRequest';
-import IDisplayRequestProps from '../DisplayAccessRequest/IDisplayRequestProps';
 
-export default class NewAccessRequest extends React.Component<IAccessRequestsProps, INewAccessRequestsState> {
-  private _dataProvider: IAccessRequestsDataProvider;
+export interface NewAccessRequestProps {
+  dataProvider: IAccessRequestsDataProvider;
+  onRecordAdded: any;
+}
 
-  constructor(props: IAccessRequestsProps, state: INewAccessRequestsState) {
+export default class NewAccessRequest extends React.Component<NewAccessRequestProps, INewAccessRequestsState> {
+  // private _dataProvider: IAccessRequestsDataProvider;
+
+  constructor(props: NewAccessRequestProps, state: INewAccessRequestsState) {
     super(props);
     // set initial state
     this.state = {
-      status: '', //this.listNotConfigured(this.props) ? 'Please configure list in Web Part properties' : '',
+      status: '', 
       isLoadingData: false,
       isSaving: false,
       newItem: {},
@@ -36,18 +35,6 @@ export default class NewAccessRequest extends React.Component<IAccessRequestsPro
       hideDialog: true,
       enableSave: true
     };
-    /*
-    Create the appropriate data provider depending on where the web part is running.
-    The DEBUG flag will ensure the mock data provider is not bundled with the web part when you package the solution for distribution, that is, using the --ship flag with the package-solution gulp command.
-    */
-    if (DEBUG && Environment.type === EnvironmentType.Local) {
-      this._dataProvider = new MockSharePointDataProvider();
-
-    } else {
-      this._dataProvider = new SharePointDataProvider();
-      this._dataProvider.webPartContext = this.props.context;
-      this._dataProvider.accessListTitle = "Site Access Requests";
-    }
 
   }
   public componentWillMount() {
@@ -62,106 +49,110 @@ export default class NewAccessRequest extends React.Component<IAccessRequestsPro
       newItem: access
     });
   }
-  public componentWillReceiveProps(nextProps: IAccessRequestsProps): void {
+  public componentWillReceiveProps(nextProps: NewAccessRequestProps): void {
     // this.setState({
     //   status: this.listNotConfigured(nextProps) ? 'Please configure list in Web Part properties' : '',
     // });
   }
   public componentDidMount() {
     if (this.state.committees.length < 1) {
-      this._dataProvider.getCommittees().then(response => {
+      this.props.dataProvider.getCommittees().then(response => {
         this.setState({
           committees: response.value,
         });
       });
     }
   }
-  public render(): React.ReactElement<IAccessRequestsProps> {
+  public render(): React.ReactElement<NewAccessRequestProps> {
     return (
-      <div className={styles.accessRequests}>
-        <div className={styles.container}>
-          <div className={styles.row}>
-            <div className={styles.column}>
-              <div className={styles.headerBar}> <h2>Access Requests</h2></div>
-              <div className={styles.subTitle}>Request for member access</div>
+      <div className={styles.row}>
+        <div className={styles.column}>
+          <form>
+            <div className={styles.formFieldsContainer}>
+              <div className={styles.fieldContainer}>
+                <TextField placeholder='First Name' name='FirstName' required={true} value={this.state.newItem.FirstName}
+                  onChanged={this._onFirstNameChanged} onGetErrorMessage={this._getErrorMessage}
+                  validateOnFocusIn validateOnFocusOut underlined
+                />
+              </div>
+              <div className={styles.fieldContainer}>
+                <TextField placeholder='Last Name' name='LastName' required={true} value={this.state.newItem.LastName}
+                  onChanged={this._onLastNameChanged} onGetErrorMessage={this._getErrorMessage}
+                  validateOnFocusIn validateOnFocusOut underlined
+                />
+              </div>
+              <div className={styles.fieldContainer}>
+                <TextField placeholder='Email' name='EMail' required={true} value={this.state.newItem.EMail}
+                  onChanged={this._onEmailChanged} onGetErrorMessage={this._getErrorMessage}
+                  validateOnFocusIn validateOnFocusOut underlined
+                />
+              </div>
+              <div className={styles.fieldContainer}>
+                <TextField placeholder='Job Title' name='JobTitle'
+                  onChanged={this._onJobTitleChanged} underlined
+                />
+              </div>
+              <div className={styles.fieldContainer}>
+                <TextField placeholder='Company' name='Company' required={true} value={this.state.newItem.Company}
+                  onChanged={this._onCompanyChanged} onGetErrorMessage={this._getErrorMessage}
+                  validateOnFocusIn validateOnFocusOut underlined
+                />
+              </div>
+              <div className={styles.fieldContainer}>
+                <TextField placeholder='Phone Number' name='Office'
+                  onChanged={this._onOfficeChanged} underlined
+                />
+              </div>
+              <div className={styles.fieldContainer}>
+                <TextField name='Comments' multiline rows={2} placeholder='Enter any special instructions'
+                  onChanged={this._onCommentsChanged}
+                />
+              </div>
+              <div className={styles.fieldContainer}>
+                <Dropdown
+                  onChanged={this._onChangeMultiSelect}
+                  placeHolder='Select committee(s)'
+                  selectedKeys={this.state.selectedCommittees}
+                  errorMessage={this.state.dropDownErrorMsg}
+                  multiSelect options={this.state.committees.map((item) => ({ key: item.ID, text: item.Title }))}
+                />
+              </div>
             </div>
-            <div className={styles.column}>
-              <form>
-                <div className={styles.formFieldsContainer}>
-                  <div className={styles.fieldContainer}>
-                    <TextField placeholder='First Name' name='FirstName' required={true} value={this.state.newItem.FirstName}
-                      onChanged={this._onFirstNameChanged} onGetErrorMessage={this._getErrorMessage}
-                      validateOnFocusIn validateOnFocusOut underlined
-                    />
-                  </div>
-                  <div className={styles.fieldContainer}>
-                    <TextField placeholder='Last Name' name='LastName' required={true} value={this.state.newItem.LastName}
-                      onChanged={this._onLastNameChanged} onGetErrorMessage={this._getErrorMessage}
-                      validateOnFocusIn validateOnFocusOut underlined
-                    />
-                  </div>
-                  <div className={styles.fieldContainer}>
-                    <TextField placeholder='Email' name='EMail' required={true} value={this.state.newItem.EMail}
-                      onChanged={this._onEmailChanged} onGetErrorMessage={this._getErrorMessage}
-                      validateOnFocusIn validateOnFocusOut underlined
-                    />
-                  </div>
-                  <div className={styles.fieldContainer}>
-                    <TextField placeholder='Job Title' name='JobTitle'
-                      onChanged={this._onJobTitleChanged} underlined
-                    />
-                  </div>
-                  <div className={styles.fieldContainer}>
-                    <TextField placeholder='Company' name='Company' required={true} value={this.state.newItem.Company}
-                      onChanged={this._onCompanyChanged} onGetErrorMessage={this._getErrorMessage}
-                      validateOnFocusIn validateOnFocusOut underlined
-                    />
-                  </div>
-                  <div className={styles.fieldContainer}>
-                    <TextField placeholder='Phone Number' name='Office'
-                      onChanged={this._onOfficeChanged} underlined
-                    />
-                  </div>
-                  <div className={styles.fieldContainer}>
-                    <TextField name='Comments' multiline rows={2} placeholder='Enter any special instructions'
-                      onChanged={this._onCommentsChanged}
-                    />
-                  </div>
-                  <div className={styles.fieldContainer}>
-                    <Dropdown
-                      onChanged={this._onChangeMultiSelect}
-                      placeHolder='Select committee(s)'
-                      selectedKeys={this.state.selectedCommittees}
-                      errorMessage={this.state.dropDownErrorMsg}
-                      multiSelect options={this.state.committees.map((item) => ({ key: item.ID, text: item.Title }))}
-                    />
-                  </div>
-                </div>
 
-                {this.state.isSaving ? <Spinner size={SpinnerSize.small} /> : null}
-                <div className={styles.formButtonsContainer}>
-                  <PrimaryButton
-                    disabled={
-                      !this.state.enableSave || !this.state.newItem || this.state.isSaving
-                    }
-                    text='Save' onClick={this._saveItem}
-                  />
-                  <DefaultButton disabled={false} text='Cancel' onClick={this._cancelItem} />
-                </div>
-                {this.renderErrors()}
-              </form>
+            {this.state.isSaving ? <Spinner size={SpinnerSize.small} /> : null}
+            <div className={styles.formButtonsContainer}>
+              <PrimaryButton
+                disabled={
+                  !this.state.enableSave || !this.state.newItem || this.state.isSaving
+                }
+                text='Save' onClick={this._saveItem}
+              />
+              <DefaultButton disabled={false} text='Cancel' onClick={this._cancelItem} />
             </div>
-          </div>
+            {this.renderErrors()}
+          </form>
+          <Dialog
+            hidden={this.state.hideDialog}
+            onDismiss={this._closeDialog}
+            dialogContentProps={{
+              type: DialogType.normal,
+              title: 'Your request was saved.',
+              subText: 'Your new access request was created.  You will receive email updates with the status of your request.'
+            }}
+            modalProps={{
+              isBlocking: true,
+              containerClassName: 'accessRequests'
+            }}
+          >
+          <DialogFooter>
+          <PrimaryButton onClick={ this._closeDialog } text='OK' />
+          </DialogFooter>
+          
+          </Dialog>
         </div>
       </div>
     );
   }
-
-  // private listNotConfigured(props: IAccessRequestsProps): boolean {
-  //   return props.listName === undefined ||
-  //     props.listName === null ||
-  //     props.listName.length === 0;
-  // }
   private renderErrors() {
     return this.state.errors.length > 0
       ?
@@ -185,7 +176,7 @@ export default class NewAccessRequest extends React.Component<IAccessRequestsPro
     });
   }
   private updateStateWithFieldValue(fieldName: string, value: string) {
-    this.setState((prevState: INewAccessRequestsState, props: IAccessRequestsProps): INewAccessRequestsState => {
+    this.setState((prevState: INewAccessRequestsState, props: NewAccessRequestProps): INewAccessRequestsState => {
       prevState.newItem[fieldName] = value;
       return prevState;
     });
@@ -238,7 +229,7 @@ export default class NewAccessRequest extends React.Component<IAccessRequestsPro
         updatedSelectedItems.splice(currIndex, 1);
       }
     }
-    this.setState((prevState: INewAccessRequestsState, props: IAccessRequestsProps): INewAccessRequestsState => {
+    this.setState((prevState: INewAccessRequestsState, props: NewAccessRequestProps): INewAccessRequestsState => {
       prevState.newItem.Committees = updatedSelectedItems;
       prevState.selectedCommittees = updatedSelectedItems;
       prevState.dropDownErrorMsg = updatedSelectedItems.length > 0 ? '' : 'Select one or more committee(s)';
@@ -269,7 +260,7 @@ export default class NewAccessRequest extends React.Component<IAccessRequestsPro
   }
   @autobind
   private _saveItem(): Promise<void> {
-    this.setState((prevState: INewAccessRequestsState, props: IAccessRequestsProps): INewAccessRequestsState => {
+    this.setState((prevState: INewAccessRequestsState, props: NewAccessRequestProps): INewAccessRequestsState => {
       prevState.errors.length = 0;
       return prevState;
     });
@@ -281,14 +272,14 @@ export default class NewAccessRequest extends React.Component<IAccessRequestsPro
       (!this.state.newItem.Committees || this.state.newItem.Committees.length < 1)
     ) {
       //this.setState({errors: [...this.state.errors, 'Some required fields are missing.'],});
-      this.setState((prevState: INewAccessRequestsState, props: IAccessRequestsProps): INewAccessRequestsState => {
+      this.setState((prevState: INewAccessRequestsState, props: NewAccessRequestProps): INewAccessRequestsState => {
         prevState.errors.push('Some required fields are missing.');
         return prevState;
       });
       return null;
     }
     if (!this._validateEmail(this.state.newItem.EMail)) {
-      this.setState((prevState: INewAccessRequestsState, props: IAccessRequestsProps): INewAccessRequestsState => {
+      this.setState((prevState: INewAccessRequestsState, props: NewAccessRequestProps): INewAccessRequestsState => {
         prevState.errors.push('Email address is invalid.');
         return prevState;
       });
@@ -298,29 +289,15 @@ export default class NewAccessRequest extends React.Component<IAccessRequestsPro
       status: 'Saving record...',
       isSaving: true,
     });
-    this._dataProvider.saveNewItem(this.state.newItem).then((result) => {
+    this.props.dataProvider.saveNewItem(this.state.newItem).then((result) => {
       if (result.ok) {
-        const element: React.ReactElement<IDisplayRequestProps> = React.createElement(
-          DisplayRequest, {
-            description: this.props.description,
-            context: this.props.context,
-            dom: this.props.dom,
-            recordType: "New",
-            Title: this.state.newItem.FirstName + ' ' + this.state.newItem.LastName,
-            Comments: this.state.newItem.Comments,
-            additionalInfo: this.state.committees.filter((item) =>
-              this.state.newItem.Committees.indexOf(item.ID) !== -1).map(c => c.Title).join(","), // return only items from this.state.committees that are in this.newItem.Committees
-            EMail: this.state.newItem.EMail,
-            FirstName: this.state.newItem.FirstName,
-            LastName: this.state.newItem.LastName,
-            Company: this.state.newItem.Company,
-          }
-        );
-        ReactDom.unmountComponentAtNode(this.props.dom);
-        ReactDom.render(element, this.props.dom);
+        this.setState({ 
+          hideDialog: false,
+          isSaving: false
+        });        
       }
       else {
-        this.setState((prevState: INewAccessRequestsState, props: IAccessRequestsProps): INewAccessRequestsState => {
+        this.setState((prevState: INewAccessRequestsState, props: NewAccessRequestProps): INewAccessRequestsState => {
           prevState.errors.push('Error: Failed to save record.');
           prevState.status = '';
           prevState.isSaving = false;
@@ -330,4 +307,12 @@ export default class NewAccessRequest extends React.Component<IAccessRequestsPro
     });
 
   }
+  @autobind
+  private _closeDialog() {
+    this.setState((prevState: INewAccessRequestsState, props: NewAccessRequestProps): INewAccessRequestsState => {
+      prevState.hideDialog = true;
+      return prevState;
+    });
+    this.props.onRecordAdded("list");
+  }  
 }

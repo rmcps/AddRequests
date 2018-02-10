@@ -120,7 +120,7 @@ export default class SharePointDataProvider implements IAccessRequestsDataProvid
       this.getCurrentUser().then((result) => {
         let filterString: string = `spLoginName eq '${result.LoginName}' or EMail eq '${result.Email}' or AuthorId eq ${result.Id}`;
         filterString = "&$filter=" + encodeURIComponent(filterString);
-        const queryString: string = `?$select=*,Author/Title,AddCommittees/Title,RemoveCommittees/Title&$expand=Author,AddCommittees,RemoveCommittees${filterString}`;
+        const queryString: string = `?$orderby=Id desc&$select=*,Author/Title,AddCommittees/Title,RemoveCommittees/Title&$expand=Author,AddCommittees,RemoveCommittees${filterString}`;
         const queryUrl: string = `${this._listsUrl}/GetByTitle('${this._accessListTitle}')/items${queryString}`;
         return requester.get(queryUrl, SPHttpClient.configurations.v1,
           {

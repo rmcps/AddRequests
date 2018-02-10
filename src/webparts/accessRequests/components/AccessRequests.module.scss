@@ -11,7 +11,6 @@
     @include ms-Grid-row;
     /*color: "[theme:primaryText, default:#0078d7]";*/
     /*background-color: "[theme:neutralLighter, default:#f4f4f4]";*/
-    padding: 20px;
   }
 
   .column {
@@ -20,17 +19,66 @@
     @include ms-md12;
     @include ms-lg12;
   }
-
-  .title {
-    @include ms-font-xl;
-    color: "[theme:primaryText, default:#0078d7]";
+  .headerBar {
+    padding-top: 2px ;
+    padding-bottom: 2px;
+    padding-left: 20px;
+    padding-right: 20px;
+    @include ms-fontColor-white;
+    background-color: "[theme:themeDarkAlt, default: #004578]";
+    margin-bottom: 4px; 
+    font-weight: 400;   
+    overflow: hidden;
   }
-
+  .title {
+    @include ms-fontSize-xl;
+    @include ms-fontColor-white;
+    transition: font-size .167s cubic-bezier(0.1, 0.9, 0.2, 1);
+  }
   .subTitle {
     @include ms-font-l;
     color: "[theme:primaryText, default:#0078d7]";
   }
-
+  .pageNav {
+    display: block;
+  }
+  .pageNav button {
+    float:left;
+    margin-right: 28px;
+    @include ms-fontColor-white;
+    font-size: 14px;
+    font-weight: 300;
+    // height: 24px;
+    // line-height: 24px;
+    text-align: center;    
+    padding: 14px 16px;
+    @media (max-width: $ms-screen-max-sm) {
+      float: none;
+      width:100%;
+      padding: 2px 2px;
+    }
+  }
+  .pageNav button:hover {
+    font-weight: bolder;
+  }
+  .pageNav ul {
+    // display: flex;
+    list-style: none;
+  
+  }
+  .pageNav ul li {
+    float: left;
+  }
+  .pageNav ul li button {
+    margin-right: 28px;
+    @include ms-fontColor-white;
+    font-size: 14px;
+    font-weight: 300;
+    // height: 24px;
+    // line-height: 24px;
+    text-decoration: none;
+    text-align: center;
+  }
   .description {
     @include ms-font-l;
     @include ms-fontColor-white;
@@ -73,15 +121,6 @@
       display: inline-block;
     }
   }
-  .headerBar {
-    padding-top: 5px ;
-    padding-bottom: 5px;
-    padding-left: 20px;
-    padding-right: 20px;
-    @include ms-fontColor-white;
-    background-color: #004578 ;
-    margin-bottom: 4px;    
-  }
   .sectionDivider
    {
      padding-left: 20px;
@@ -112,4 +151,5 @@
     margin-top: 24px;
     margin-bottom: 24px;
   }
+
 }

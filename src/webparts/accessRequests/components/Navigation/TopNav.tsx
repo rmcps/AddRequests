@@ -4,7 +4,7 @@ import { Link } from 'office-ui-fabric-react/lib/Link';
 import styles from '../AccessRequests.module.scss';
 
 export interface TopNavProps {
-    onItemSelected: any
+    onItemSelected: any;
 }
 
 export default class TopNav extends React.Component<TopNavProps, {}> {
@@ -14,11 +14,11 @@ export default class TopNav extends React.Component<TopNavProps, {}> {
 
     public render() {
         return (
-            <div className={styles.row}>
-                <div className={styles.column}>
-                    <div><Link data-target-name="addNew" onClick={this._onItemSelected}>Add a new member access request</Link></div>
-                    <div><Link data-target-name="change" onClick={this._onItemSelected}>Add a requet to modify an existing member</Link></div>
-                </div>
+            <div className={styles.pageNav}>
+                <Link data-target-name="addNew" onClick={this._onItemSelected}>New member access</Link>
+                <Link data-target-name="change" onClick={this._onItemSelected}>modify existing member</Link>
+                <Link data-target-name="list" onClick={this._onItemSelected}>My Requests</Link>
+                <Link data-target-name="close" onClick={this._onItemSelected}>Close</Link>
             </div>
         );
     }
