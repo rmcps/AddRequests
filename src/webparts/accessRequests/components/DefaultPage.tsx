@@ -10,7 +10,6 @@ import MockSharePointDataProvider from '../test/MockSharePointDataProvider';
 import IAccessRequestsDataProvider from '../models/IAccessRequestsDataProvider';
 import NewAccessRequest from './NewAccessRequest/NewAccessRequest';
 import ModifyAccessRequest from './ModifyAccessRequest/ModifyAccessRequest';
-import { IAccessRequestsProps } from './IAccessRequestsProps';
 import IDefaultProps from './IDefaultProps';
 import AccessRequestList from './AccessRequestsList/AccessRequestList';
 import IAccessRequest from '../models/IAccessRequest';
@@ -38,9 +37,9 @@ export default class DefaultPage extends React.Component<IDefaultProps, IDefault
       this._dataProvider = new MockSharePointDataProvider();
 
     } else {
-      this._dataProvider = new SharePointDataProvider();
-      this._dataProvider.webPartContext = this.props.context;
-      this._dataProvider.accessListTitle = "Site Access Requests";
+      this._dataProvider = new SharePointDataProvider(this.props.context);
+      //this._dataProvider.webPartContext = this.props.context;
+      this._dataProvider.accessListTitle = this.props.requestsList;
     }
 
   }
@@ -60,15 +59,18 @@ export default class DefaultPage extends React.Component<IDefaultProps, IDefault
           <div className={styles.row}>
             <div className={styles.column}>
               <div className={styles.headerBar}>
-              <h2 className={styles.title}>Member Access Request Submission</h2>
-              <TopNav onItemSelected={this.handleViewSelected} />
+                <h2 className={styles.title}>Member Access Request Submission</h2>
+                <TopNav onItemSelected={this.handleViewSelected} />
               </div>
             </div>
           </div>
           {this.state.show == "List" && <AccessRequestList dataProvider={this._dataProvider} onItemSelected={this.handleItemSelected} />}
           {this.state.show == "Display" && <DisplayRequest item={this.state.selectedItem} recordType="Display" />}
-          {this.state.show == "New" && <NewAccessRequest dataProvider={this._dataProvider} onRecordAdded={this.handleViewSelected} />}
-          {this.state.show == "Change" && <ModifyAccessRequest dataProvider={this._dataProvider} onRecordAdded={this.handleViewSelected}/>}
+          {this.state.show == "New" && <NewAccessRequest
+            dataProvider={this._dataProvider} committeesListTitle={this.props.committeesList} onRecordAdded={this.handleViewSelected} />}
+          {this.state.show == "Change" && <ModifyAccessRequest
+            dataProvider={this._dataProvider} membersList={this.props.membersList} membersCommList={this.props.membersCommitteesList}
+            committeesListTitle={this.props.committeesList} onRecordAdded={this.handleViewSelected} />}
         </div>
       </div>
     );
@@ -97,15 +99,12 @@ export default class DefaultPage extends React.Component<IDefaultProps, IDefault
           show: "List"
         });
         break;
-      case "cancel":
-        this._onCancel();
-        break;
     }
   }
-  @autobind
-  private _onCancel(): void {
-    window.location.href = "https://uphpcin.sharepoint.com";
-  }
+  // @autobind
+  // private _onCancel(): void {
+  //   window.location.href = "https://uphpcin.sharepoint.com";
+  // }
 
   @autobind
   private handleItemSelected(item) {

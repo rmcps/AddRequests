@@ -19,18 +19,21 @@ export default class SharePointDataProvider implements IAccessRequestsDataProvid
   private _webPartContext: IWebPartContext;
   private _lastListName: string = undefined;
   private _listItemEntityTypeName: string = undefined;
-  private _committeesListTitle: string = 'UPHP Committees';
-  private _membersList: string = 'UPHP Members';
-  private _membersCommList: string = 'UPHP Member Committees';
+  // private _committeesListTitle: string = 'UPHP Committees';
+  // private _membersList: string = 'UPHP Members';
+  // private _membersCommList: string = 'UPHP Member Committees';
+
+  constructor(webPartContext: IWebPartContext) {
+    this._webPartContext = webPartContext;
+    this._listsUrl = `${this._webPartContext.pageContext.web.absoluteUrl}/_api/web/lists`;    
+  }
 
   public set accessListTitle(value: string) {
     this._accessListTitle = value;
   }
-
   public get accessListTitle() {
     return this._accessListTitle;
   }
-
   public get accessListItemsUrl() {
     return this._accessListItemsUrl = `${this._listsUrl}/GetByTitle('${this._accessListTitle}')/items`;
   }
@@ -165,10 +168,10 @@ export default class SharePointDataProvider implements IAccessRequestsDataProvid
       });
     });
   }
-  public getMembers(): Promise<IModifyAccessRequest[]> {
-    return this._getMembers(this.webPartContext.spHttpClient);
+  public getMembers(membersList: string, ): Promise<IModifyAccessRequest[]> {
+    return this._getMembers(membersList, this.webPartContext.spHttpClient);
   }
-  private _getMembers(requester: SPHttpClient): Promise<IModifyAccessRequest[]> {
+  private _getMembers(membersList: string, requester: SPHttpClient): Promise<IModifyAccessRequest[]> {
     const queryString: string = '?$select=Id,spLoginName,Title,EMail';
     let options: ISPHttpClientOptions = {
       headers: {
@@ -176,7 +179,7 @@ export default class SharePointDataProvider implements IAccessRequestsDataProvid
         "content-type": "application/json;odata=verbose"
       }
     };
-    const queryUrl: string = `${this._listsUrl}/GetByTitle('${this._membersList}')/items` + queryString;
+    const queryUrl: string = `${this._listsUrl}/GetByTitle('${membersList}')/items` + queryString;
     return new Promise<IModifyAccessRequest[]>((resolve, reject) => {
       requester.get(queryUrl, SPHttpClient.configurations.v1,
         {
@@ -206,10 +209,10 @@ export default class SharePointDataProvider implements IAccessRequestsDataProvid
         .catch((error) => {reject(error);});
     });
   }
-  public getMemberCommittees(loginName: any): Promise<any> {
-    return this._getMemberCommittees(loginName, this.webPartContext.spHttpClient);
+  public getMemberCommittees(membersCommList: string, loginName: any): Promise<any> {
+    return this._getMemberCommittees(membersCommList, loginName, this.webPartContext.spHttpClient);
   }
-  private _getMemberCommittees(loginName: string, requester: SPHttpClient): Promise<any> {
+  private _getMemberCommittees(membersCommList: string, loginName: string, requester: SPHttpClient): Promise<any> {
     let decodedName = loginName.replace(/#/g, "%23");
     const queryString: string = `?$select=Id,Title,CommitteeId&$filter=Title%20eq%20'${decodedName}'`;
     let options: ISPHttpClientOptions = {
@@ -218,7 +221,7 @@ export default class SharePointDataProvider implements IAccessRequestsDataProvid
         "content-type": "application/json;odata=verbose"
       }
     };
-    const queryUrl: string = `${this._listsUrl}/GetByTitle('${this._membersCommList}')/items` + queryString;
+    const queryUrl: string = `${this._listsUrl}/GetByTitle('${membersCommList}')/items` + queryString;
     return requester.get(queryUrl, SPHttpClient.configurations.v1,
       {
         headers: {
@@ -231,10 +234,10 @@ export default class SharePointDataProvider implements IAccessRequestsDataProvid
       });
 
   }
-  public getCommittees(): Promise<any> {
-    return this._getCommittees(this.webPartContext.spHttpClient);
+  public getCommittees(committeesListTitle: string): Promise<any> {
+    return this._getCommittees(committeesListTitle, this.webPartContext.spHttpClient);
   }
-  private _getCommittees(requester: SPHttpClient): Promise<any> {
+  private _getCommittees(committeesListTitle: string, requester: SPHttpClient): Promise<any> {
     const queryString: string = '?$select=Id,Title';
     let options: ISPHttpClientOptions = {
       headers: {
@@ -242,7 +245,7 @@ export default class SharePointDataProvider implements IAccessRequestsDataProvid
         "content-type": "application/json;odata=verbose"
       }
     };
-    const queryUrl: string = `${this._listsUrl}/GetByTitle('${this._committeesListTitle}')/items` + queryString;
+    const queryUrl: string = `${this._listsUrl}/GetByTitle('${committeesListTitle}')/items` + queryString;
 
     return requester.get(queryUrl, SPHttpClient.configurations.v1,
       {

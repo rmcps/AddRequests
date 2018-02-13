@@ -14,6 +14,7 @@ import INewAccessRequest from '../../models/INewAccessRequest';
 
 export interface NewAccessRequestProps {
   dataProvider: IAccessRequestsDataProvider;
+  committeesListTitle: string;
   onRecordAdded: any;
 }
 
@@ -56,7 +57,7 @@ export default class NewAccessRequest extends React.Component<NewAccessRequestPr
   }
   public componentDidMount() {
     if (this.state.committees.length < 1) {
-      this.props.dataProvider.getCommittees().then(response => {
+      this.props.dataProvider.getCommittees(this.props.committeesListTitle).then(response => {
         this.setState({
           committees: response.value,
         });

@@ -16,9 +16,8 @@ export default class TopNav extends React.Component<TopNavProps, {}> {
         return (
             <div className={styles.pageNav}>
                 <Link data-target-name="addNew" onClick={this._onItemSelected}>New member access</Link>
-                <Link data-target-name="change" onClick={this._onItemSelected}>modify existing member</Link>
+                <Link data-target-name="change" onClick={this._onItemSelected}>Modify existing member</Link>
                 <Link data-target-name="list" onClick={this._onItemSelected}>My Requests</Link>
-                <Link data-target-name="close" onClick={this._onItemSelected}>Close</Link>
             </div>
         );
     }

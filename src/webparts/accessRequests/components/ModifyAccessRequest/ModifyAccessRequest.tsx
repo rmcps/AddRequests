@@ -22,6 +22,9 @@ import IModifyAccessRequest from '../../models/IModifyAccessRequest';
 
 export interface IModifyAccessRequestProps {
   dataProvider: IAccessRequestsDataProvider;
+  membersList: string;
+  committeesListTitle: string;
+  membersCommList: string;
   onRecordAdded: any;
 }
 
@@ -49,14 +52,14 @@ export default class ModifyAccessRequest extends React.Component<IModifyAccessRe
   }
   public componentDidMount() {
     if (this.state.committees.length < 1) {
-      this.props.dataProvider.getCommittees().then(response => {
+      this.props.dataProvider.getCommittees(this.props.committeesListTitle).then(response => {
         this.setState({
           committees: response.value
         }); 
       });
     }
     if (this.state.members.length < 1) {
-      this.props.dataProvider.getMembers().then(response => {
+      this.props.dataProvider.getMembers(this.props.membersList).then(response => {
         this.setState({members: response});
       });
     }
@@ -187,7 +190,7 @@ export default class ModifyAccessRequest extends React.Component<IModifyAccessRe
   }
   @autobind
   private _onMemberChanged(option: IComboBoxOption, index: number, value: string) {
-    this.props.dataProvider.getMemberCommittees(option.key).then(response => {      
+    this.props.dataProvider.getMemberCommittees(this.props.membersCommList, option.key).then(response => {      
     this.setState((prevState: IModifyAccessRequestsState ,props:IModifyAccessRequestProps): IModifyAccessRequestsState => {
       prevState.Item.spLoginName = option.key;
       prevState.Item.Title = option.text;

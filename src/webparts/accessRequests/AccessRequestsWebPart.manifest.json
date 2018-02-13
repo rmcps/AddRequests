@@ -20,7 +20,10 @@
     "description": { "default": "For creating access requests" },
     "officeFabricIconFontName": "Page",
     "properties": {
-      "description": "Create request for new member access and permissions" 
+      "requestsList": "Site Access Requests" ,
+      "membersList": "UPHP Members",
+      "committeesList": "UPHP Committees",
+      "membersCommitteesList": "UPHP Member Committees"
     }
   }]
 }

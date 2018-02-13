@@ -11,9 +11,9 @@ interface INewAccessRequestsDataProvider {
     getCurrentUser():Promise<any>;
     getItem(requestId:string): Promise<IAccessRequest>;
     getItemsForCurrentUser():Promise<IAccessRequest[]>;
-    getMembers(): Promise<any>;
-    getMemberCommittees(loginName: any):Promise<any>;
-    getCommittees(): Promise<any>;
+    getMembers(membersList: string): Promise<any>;
+    getMemberCommittees(membersCommList: string, loginName: any):Promise<any>;
+    getCommittees(committeesListTitle: string): Promise<any>;
     saveNewItem(INewAccessRequest): Promise<any>;
     saveModifyRequest(IModifyAccessRequest): Promise<any>;
 }

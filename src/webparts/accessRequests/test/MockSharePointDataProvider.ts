@@ -85,14 +85,14 @@ export default class MockNewAccessRequest implements IAccessRequestsDataProvider
     public  getItemsForCurrentUser(): Promise<IAccessRequest[]> {
         return null;
     }
-    public getMembers(): Promise<any> {
+    public getMembers(membersList: string): Promise<any> {
         const items: any = lodash.clone(this._items);
 
         return new Promise<any>((resolve) => {
             setTimeout(() => resolve(items), 500);
         });
     }
-    public getMemberCommittees(loginName: string): Promise<any> {
+    public getMemberCommittees(membersCommList: string, loginName: string): Promise<any> {
         let selected = { 
             "value": this._memberCommittees.value.filter((member) => member.loginName == loginName )
         };
@@ -101,7 +101,7 @@ export default class MockNewAccessRequest implements IAccessRequestsDataProvider
             setTimeout(() => resolve(items), 500);
         });
     }
-    public getCommittees(): Promise<any> {
+    public getCommittees(committeesListTitle: string): Promise<any> {
         let comms = this._committees;
         const items: any = lodash.clone(comms);
 

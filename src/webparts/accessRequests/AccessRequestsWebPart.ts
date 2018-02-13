@@ -7,11 +7,14 @@ import {
   PropertyPaneTextField
 } from '@microsoft/sp-webpart-base';
 import * as strings from 'AccessRequestsWebPartStrings';
+import IDefaultProps from './components/IDefaultProps'
 import DefaultPage from './components/DefaultPage';
-import { IAccessRequestsProps } from './components/IAccessRequestsProps';
 
 export interface IAccessRequestsWebPartProps {
-  description: string;
+  requestsList: string;
+  membersList: string;
+  committeesList: string;
+  membersCommitteesList: string;
 }
 
 export default class AccessRequestsWebPart extends BaseClientSideWebPart<IAccessRequestsWebPartProps> {
@@ -19,10 +22,13 @@ export default class AccessRequestsWebPart extends BaseClientSideWebPart<IAccess
     return super.onInit();
   }
   public render(): void {
-    const element: React.ReactElement<IAccessRequestsProps > = React.createElement(
+    const element: React.ReactElement<IDefaultProps > = React.createElement(
       DefaultPage,
       {
-        description: this.properties.description,
+        requestsList: this.properties.requestsList,
+        membersList: this.properties.membersList,
+        committeesList: this.properties.committeesList,
+        membersCommitteesList: this.properties.membersCommitteesList,
         context:this.context,
         dom: this.domElement,
       }
@@ -46,10 +52,22 @@ export default class AccessRequestsWebPart extends BaseClientSideWebPart<IAccess
             {
               groupName: strings.BasicGroupName,
               groupFields: [
-                PropertyPaneTextField('description', {
-                  label: strings.DescriptionFieldLabel
+                PropertyPaneTextField('requestsList', {
+                  label: strings.RequestListFieldLabel
                 }
-              )
+              ),
+              PropertyPaneTextField('membersList', {
+                label: strings.MembersListFieldLabel
+              }
+            ),
+            PropertyPaneTextField('committeesList', {
+              label: strings.CommitteesList
+            }
+          ),
+          PropertyPaneTextField('membersCommitteesList', {
+            label: strings.MembersListFieldLabel
+          }
+        )
           ]
             }
           ]

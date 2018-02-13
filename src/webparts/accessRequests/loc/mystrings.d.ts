@@ -1,7 +1,10 @@
 declare interface IAccessRequestsWebPartStrings {
   PropertyPaneDescription: string;
   BasicGroupName: string;
-  DescriptionFieldLabel: string;
+  RequestListFieldLabel: string;
+  MembersListFieldLabel: string;
+  CommitteesList: string;
+  MembersCommitteesListFieldLabel: string;
 }
 
 declare module 'AccessRequestsWebPartStrings' {
