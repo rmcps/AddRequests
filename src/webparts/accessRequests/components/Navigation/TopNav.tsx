@@ -5,6 +5,7 @@ import styles from '../AccessRequests.module.scss';
 
 export interface TopNavProps {
     onItemSelected: any;
+    show: "List" | "New" | "Change" | "Display";
 }
 
 export default class TopNav extends React.Component<TopNavProps, {}> {
@@ -15,9 +16,9 @@ export default class TopNav extends React.Component<TopNavProps, {}> {
     public render() {
         return (
             <div className={styles.pageNav}>
-                <Link data-target-name="addNew" onClick={this._onItemSelected}>New member access</Link>
-                <Link data-target-name="change" onClick={this._onItemSelected}>Modify existing member</Link>
-                <Link data-target-name="list" onClick={this._onItemSelected}>My Requests</Link>
+                {"New" !== this.props.show && <Link data-target-name="addNew" onClick={this._onItemSelected}>New member access</Link>}
+                {"Change" !== this.props.show && <Link data-target-name="change" onClick={this._onItemSelected}>Modify existing member</Link>}
+                {"List" !== this.props.show && <Link data-target-name="list" onClick={this._onItemSelected}>My Requests</Link>}
             </div>
         );
     }

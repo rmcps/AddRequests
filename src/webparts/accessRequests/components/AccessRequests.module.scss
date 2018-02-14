@@ -12,7 +12,6 @@
     /*color: "[theme:primaryText, default:#0078d7]";*/
     /*background-color: "[theme:neutralLighter, default:#f4f4f4]";*/
   }
-
   .column {
     @include ms-Grid-col;
     @include ms-sm12;
@@ -20,13 +19,13 @@
     @include ms-lg12;
   }
   .headerBar {
-    padding-top: 2px ;
-    padding-bottom: 2px;
+    // padding-top: 2px ;
+    // padding-bottom: 2px;
     padding-left: 20px;
     padding-right: 20px;
     @include ms-fontColor-white;
     background-color: "[theme:themeDarkAlt, default: #004578]";
-    margin-bottom: 4px; 
+    // margin-bottom: 4px; 
     font-weight: 400;   
     overflow: hidden;
   }
@@ -38,6 +37,10 @@
   .subTitle {
     @include ms-font-l;
     color: "[theme:primaryText, default:#0078d7]";
+  }
+  .colContent {
+    padding-left: 6px;
+    padding-right: 6px;
   }
   .pageNav {
     display: block;
@@ -51,7 +54,7 @@
     // height: 24px;
     // line-height: 24px;
     text-align: center;    
-    padding: 14px 16px;
+    padding: 8px 16px;
     @media (max-width: $ms-screen-max-sm) {
       float: none;
       width:100%;

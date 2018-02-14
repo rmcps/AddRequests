@@ -47,44 +47,48 @@ export default class DisplayRequest extends React.Component<IDisplayRequestProps
     }
     public render(): React.ReactElement<IDisplayRequestProps> {
         return (
-                    <div className={styles.row}>
-                        <div className={styles.column}>
-                            {this.props.item.RequestReason && <div className={styles.fieldContainer}>
-                                <TextField label='Reason for request' disabled={true} value={this.props.item.RequestReason} />
-                            </div>}
-                            {this.props.item.Title && <div className={styles.fieldContainer}>
-                                <TextField label='Name' disabled={true} value={this.props.item.Title} />
-                            </div>}
-                            {this.props.item.EMail && <div className={styles.fieldContainer}>
-                                <TextField label='Email' disabled={true} value={this.props.item.EMail} />
-                            </div>}
-                            {this.props.item.JobTitle && <div className={styles.fieldContainer}>
-                                <TextField label='Title' disabled={true} value={this.props.item.JobTitle} />
-                            </div>}
-                            {this.props.item.Company && <div className={styles.fieldContainer}>
-                                <TextField label='Organization' disabled={true} value={this.props.item.Company} />
-                            </div>}
-                            {this.props.item.Office && <div className={styles.fieldContainer}>
-                                <TextField label='Phone' disabled={true} value={this.props.item.Office} />
-                            </div>}
-                            {this.props.item.Comments && <div className={styles.fieldContainer}>
-                                <TextField label='Comments' disabled={true} multiline value={this.props.item.Comments} />
-                            </div>}
-                            {this.props.item.AddCommittees.length>0 && <div className={styles.fieldContainer}>
-                                <TextField label='Add Committees' disabled={true} multiline value={this.props.item.AddCommittees.join(", ")} />
-                            </div>}
-                            
-                            {this.props.item.RemoveCommittees.length>0 && <div className={styles.fieldContainer}>
-                                <TextField label='Remove Committees' disabled={true} multiline value={this.props.item.RemoveCommittees.join(", ")} />
-                            </div>}
-                            {this.props.additionalInfo && <div className={styles.fieldContainer}>
-                                <TextField disabled={true} multiline value={this.props.additionalInfo} />
-                            </div>}
-                        </div>
+            <div className={styles.row}>
+                <div className={styles.column}>
+                    <div className={styles.colContent}>
+
+                        {this.props.item.RequestReason && <div className={styles.fieldContainer}>
+                            <TextField label='Reason for request' disabled={true} value={this.props.item.RequestReason} />
+                        </div>}
+                        {this.props.item.Title && <div className={styles.fieldContainer}>
+                            <TextField label='Name' disabled={true} value={this.props.item.Title} />
+                        </div>}
+                        {this.props.item.EMail && <div className={styles.fieldContainer}>
+                            <TextField label='Email' disabled={true} value={this.props.item.EMail} />
+                        </div>}
+                        {this.props.item.JobTitle && <div className={styles.fieldContainer}>
+                            <TextField label='Title' disabled={true} value={this.props.item.JobTitle} />
+                        </div>}
+                        {this.props.item.Company && <div className={styles.fieldContainer}>
+                            <TextField label='Organization' disabled={true} value={this.props.item.Company} />
+                        </div>}
+                        {this.props.item.Office && <div className={styles.fieldContainer}>
+                            <TextField label='Phone' disabled={true} value={this.props.item.Office} />
+                        </div>}
+                        {this.props.item.Comments && <div className={styles.fieldContainer}>
+                            <TextField label='Comments' disabled={true} multiline value={this.props.item.Comments} />
+                        </div>}
+                        {this.props.item.AddCommittees.length > 0 && <div className={styles.fieldContainer}>
+                            <TextField label='Add Committees' disabled={true} multiline value={this.props.item.AddCommittees.join(", ")} />
+                        </div>}
+
+                        {this.props.item.RemoveCommittees.length > 0 && <div className={styles.fieldContainer}>
+                            <TextField label='Remove Committees' disabled={true} multiline value={this.props.item.RemoveCommittees.join(", ")} />
+                        </div>}
+                        {this.props.additionalInfo && <div className={styles.fieldContainer}>
+                            <TextField disabled={true} multiline value={this.props.additionalInfo} />
+                        </div>}
+
                     </div>
+                </div>
+            </div>
         );
     }
-    private _onAddNew():void {
+    private _onAddNew(): void {
         // const element: React.ReactElement<IAccessRequestsProps> = React.createElement(
         //     NewAccessRequest,
         //     {
@@ -96,7 +100,7 @@ export default class DisplayRequest extends React.Component<IDisplayRequestProps
         // ReactDom.unmountComponentAtNode(this.props.dom);
         // ReactDom.render(element, this.props.dom);
     }
-    private _onAddExisting():void {
+    private _onAddExisting(): void {
         // const element: React.ReactElement<IAccessRequestsProps> = React.createElement(
         //     ModifyAccessRequest,
         //     {
@@ -109,7 +113,7 @@ export default class DisplayRequest extends React.Component<IDisplayRequestProps
         // ReactDom.render(element, this.props.dom);
     }
     @autobind
-    private _onDisplayAll():void {
+    private _onDisplayAll(): void {
         // const element: React.ReactElement<IAccessRequestsProps> = React.createElement(
         //     DefaultPage,
         //     {
@@ -122,8 +126,8 @@ export default class DisplayRequest extends React.Component<IDisplayRequestProps
         // ReactDom.render(element, this.props.dom);
     }
     @autobind
-    private _onCancel():void {
-    //   window.location.href = "https://uphpcin.sharepoint.com";
+    private _onCancel(): void {
+        //   window.location.href = "https://uphpcin.sharepoint.com";
     }
-    
+
 }

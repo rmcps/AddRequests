@@ -59,8 +59,7 @@ export default class DefaultPage extends React.Component<IDefaultProps, IDefault
           <div className={styles.row}>
             <div className={styles.column}>
               <div className={styles.headerBar}>
-                <h2 className={styles.title}>Member Access Request Submission</h2>
-                <TopNav onItemSelected={this.handleViewSelected} />
+                <TopNav onItemSelected={this.handleViewSelected} show={this.state.show}/>
               </div>
             </div>
           </div>
@@ -101,11 +100,6 @@ export default class DefaultPage extends React.Component<IDefaultProps, IDefault
         break;
     }
   }
-  // @autobind
-  // private _onCancel(): void {
-  //   window.location.href = "https://uphpcin.sharepoint.com";
-  // }
-
   @autobind
   private handleItemSelected(item) {
     this.setState({

@@ -1,5 +1,6 @@
 import * as React from 'react';
-import styles from './AccessRequestList.module.scss';
+import styles from '../AccessRequests.module.scss';
+import aLstyles from './AccessRequestList.module.scss';
 import { autobind } from 'office-ui-fabric-react/lib/Utilities';
 import { Fabric } from 'office-ui-fabric-react/lib/Fabric';
 import { FocusZone, FocusZoneDirection } from 'office-ui-fabric-react/lib/FocusZone';
@@ -27,7 +28,7 @@ export default class AccessRequestList extends React.Component<IAccessRequestLis
     this.state = {
       listItems: [],
       dataIsLoading: true
-    }
+    };
   }
   public componentWillReceiveProps(nextProps: IAccessRequestListProps) {
     this.props.dataProvider.getItemsForCurrentUser().then((items: IAccessRequest[]) => {
@@ -49,17 +50,19 @@ export default class AccessRequestList extends React.Component<IAccessRequestLis
     return (
       <div className={styles.row}>
         <div className={styles.column}>
-          <h3>My Requests</h3>
-          {this.state.dataIsLoading ? <Spinner size={SpinnerSize.medium} /> : null}
-          <Fabric>
-            <FocusZone direction={FocusZoneDirection.vertical}>
-              <List
-                className={styles.accessRequestsList}
-                items={this.state.listItems}
-                onRenderCell={this._onRenderCell}
-              />
-            </FocusZone>
-          </Fabric>
+          <div className={styles.colContent}>
+            <h3>My Requests</h3>
+            {this.state.dataIsLoading ? <Spinner size={SpinnerSize.medium} /> : null}
+            <Fabric>
+              <FocusZone direction={FocusZoneDirection.vertical}>
+                <List
+                  className={aLstyles.accessRequestsList}
+                  items={this.state.listItems}
+                  onRenderCell={this._onRenderCell}
+                />
+              </FocusZone>
+            </Fabric>
+          </div>
         </div>
       </div>
     );
@@ -68,20 +71,20 @@ export default class AccessRequestList extends React.Component<IAccessRequestLis
   @autobind
   private _onRenderCell(item: IAccessRequest, index: number | undefined): JSX.Element {
     return (
-      <div className={styles.itemCell} data-is-focusable={true}>
-        <div className={styles.itemContent}>
-          <div className={styles.itemName}><span className={styles.itemLabel}>Requested For:</span> {item.Title}</div>
-          <div><span className={styles.itemLabel}>Email:</span> {item.EMail}</div>
-          <div><span className={styles.itemLabel}>Reason for Request:</span> {item.RequestReason}</div>
-          <div><span className={styles.itemLabel}>Status:</span> {item.RequestStatus}</div>
-          <div><span className={styles.itemLabel}>Created By:</span> {item.CreatedBy}</div>
-          <div><span className={styles.itemLabel}>Submitted:</span> {item.Created} </div>
-          {item.AddCommittees.length > 0 && <div><span className={styles.itemLabel}>Add Committees:</span> {item.AddCommittees.join(", ")}</div>}
-          {item.RemoveCommittees.length > 0 && <div><span className={styles.itemLabel}>Remove Committees:</span> {item.RemoveCommittees.join(",")}</div>}
+      <div className={aLstyles.itemCell} data-is-focusable={true}>
+        <div className={aLstyles.itemContent}>
+          <div className={aLstyles.itemName}><span className={aLstyles.itemLabel}>Requested For:</span> {item.Title}</div>
+          <div><span className={aLstyles.itemLabel}>Email:</span> {item.EMail}</div>
+          <div><span className={aLstyles.itemLabel}>Reason for Request:</span> {item.RequestReason}</div>
+          <div><span className={aLstyles.itemLabel}>Status:</span> {item.RequestStatus}</div>
+          <div><span className={aLstyles.itemLabel}>Created By:</span> {item.CreatedBy}</div>
+          <div><span className={aLstyles.itemLabel}>Submitted:</span> {item.Created} </div>
+          {item.AddCommittees.length > 0 && <div><span className={aLstyles.itemLabel}>Add Committees:</span> {item.AddCommittees.join(", ")}</div>}
+          {item.RemoveCommittees.length > 0 && <div><span className={aLstyles.itemLabel}>Remove Committees:</span> {item.RemoveCommittees.join(",")}</div>}
         </div>
         <IconButton
           data-requestId={item.Id}
-          className={styles.chevron}
+          className={aLstyles.chevron}
           disabled={false}
           iconProps={{ iconName: 'ChevronRight' }}
           title='Show Item'

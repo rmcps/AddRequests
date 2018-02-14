@@ -7,7 +7,7 @@ import {
   PropertyPaneTextField
 } from '@microsoft/sp-webpart-base';
 import * as strings from 'AccessRequestsWebPartStrings';
-import IDefaultProps from './components/IDefaultProps'
+import IDefaultProps from './components/IDefaultProps';
 import DefaultPage from './components/DefaultPage';
 
 export interface IAccessRequestsWebPartProps {
