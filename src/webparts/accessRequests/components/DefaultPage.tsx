@@ -3,6 +3,7 @@ import * as ReactDom from 'react-dom';
 import { autobind } from 'office-ui-fabric-react/lib/Utilities';
 import { Link } from 'office-ui-fabric-react/lib/Link';
 import { Icon } from 'office-ui-fabric-react/lib/Icon';
+import { MessageBar, MessageBarType } from 'office-ui-fabric-react/lib/MessageBar';
 import styles from './AccessRequests.module.scss';
 import { Environment, EnvironmentType } from '@microsoft/sp-core-library';
 import SharePointDataProvider from '../services/SharePointDataProvider';
@@ -20,6 +21,7 @@ import TopNav from './Navigation/TopNav';
 export interface IDefaultState {
   show: "List" | "New" | "Change" | "Display";
   selectedItem: IAccessRequest;
+  listNotConfigured: boolean;
 }
 
 export default class DefaultPage extends React.Component<IDefaultProps, IDefaultState> {
@@ -31,6 +33,7 @@ export default class DefaultPage extends React.Component<IDefaultProps, IDefault
     this.state = {
       show: "List",
       selectedItem: null,
+      listNotConfigured: false,
     };
 
     if (DEBUG && Environment.type === EnvironmentType.Local) {
@@ -38,16 +41,14 @@ export default class DefaultPage extends React.Component<IDefaultProps, IDefault
 
     } else {
       this._dataProvider = new SharePointDataProvider(this.props.context);
-      //this._dataProvider.webPartContext = this.props.context;
       this._dataProvider.accessListTitle = this.props.requestsList;
     }
 
   }
   public componentWillReceiveProps(nextProps: IDefaultProps) {
-
-    // this.setState({
-    //   status: this.listNotConfigured(nextProps) ? 'Please configure list in Web Part properties' : '',
-    // });
+    this.setState({
+      listNotConfigured: this.listNotConfigured(nextProps),
+    });
   }
   public componentDidMount() {
 
@@ -59,15 +60,18 @@ export default class DefaultPage extends React.Component<IDefaultProps, IDefault
           <div className={styles.row}>
             <div className={styles.column}>
               <div className={styles.headerBar}>
-                <TopNav onItemSelected={this.handleViewSelected} show={this.state.show}/>
+                {this.state.listNotConfigured ?
+                  <MessageBar messageBarType={MessageBarType.warning}>Please configure the lists for this component first.</MessageBar>
+                  : <TopNav onItemSelected={this.handleViewSelected} show={this.state.show} />
+                }
               </div>
             </div>
           </div>
-          {this.state.show == "List" && <AccessRequestList dataProvider={this._dataProvider} onItemSelected={this.handleItemSelected} />}
-          {this.state.show == "Display" && <DisplayRequest item={this.state.selectedItem} recordType="Display" />}
-          {this.state.show == "New" && <NewAccessRequest
+          {(this.state.listNotConfigured == false && this.state.show == "List") && <AccessRequestList dataProvider={this._dataProvider} onItemSelected={this.handleItemSelected} />}
+          {(this.state.listNotConfigured == false && this.state.show == "Display") && <DisplayRequest item={this.state.selectedItem} recordType="Display" />}
+          {(this.state.listNotConfigured == false && this.state.show == "New") && <NewAccessRequest
             dataProvider={this._dataProvider} committeesListTitle={this.props.committeesList} onRecordAdded={this.handleViewSelected} />}
-          {this.state.show == "Change" && <ModifyAccessRequest
+          {(this.state.listNotConfigured == false && this.state.show == "Change") && <ModifyAccessRequest
             dataProvider={this._dataProvider} membersList={this.props.membersList} membersCommList={this.props.membersCommitteesList}
             committeesListTitle={this.props.committeesList} onRecordAdded={this.handleViewSelected} />}
         </div>
@@ -108,11 +112,21 @@ export default class DefaultPage extends React.Component<IDefaultProps, IDefault
     });
 
   }
-  // private listNotConfigured(props: IAccessRequestsProps): boolean {
-  //   return props.listName === undefined ||
-  //     props.listName === null ||
-  //     props.listName.length === 0;
-  // }
+  private listNotConfigured(props: IDefaultProps): boolean {
 
+    return props.requestsList === undefined ||
+      props.requestsList === null ||
+      props.requestsList.length === 0 ||
+      props.membersList === undefined ||
+      props.membersList === null ||
+      props.membersList.length === 0 ||
+      props.committeesList === undefined ||
+      props.committeesList === null ||
+      props.committeesList.length === 0 ||
+      props.membersCommitteesList === undefined ||
+      props.membersCommitteesList === null ||
+      props.membersCommitteesList.length === 0;
+
+  }
 
 }

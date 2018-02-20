@@ -19,9 +19,6 @@ export default class SharePointDataProvider implements IAccessRequestsDataProvid
   private _webPartContext: IWebPartContext;
   private _lastListName: string = undefined;
   private _listItemEntityTypeName: string = undefined;
-  // private _committeesListTitle: string = 'UPHP Committees';
-  // private _membersList: string = 'UPHP Members';
-  // private _membersCommList: string = 'UPHP Member Committees';
 
   constructor(webPartContext: IWebPartContext) {
     this._webPartContext = webPartContext;
