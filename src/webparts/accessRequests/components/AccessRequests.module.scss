@@ -1,10 +1,13 @@
 @import '~office-ui-fabric-react/dist/sass/References.scss';
 
 .accessRequests {
-  .container {
+  .outerContainer {
     max-width: 1023px;
     margin: 0px auto;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 25px 50px 0 rgba(0, 0, 0, 0.1);
+  }
+  .innerContent {
+    padding: 10px 8px;
   }
 
   .row {
@@ -12,15 +15,19 @@
     /*color: "[theme:primaryText, default:#0078d7]";*/
     /*background-color: "[theme:neutralLighter, default:#f4f4f4]";*/
   }
-  .column {
+  .column1 {
+    @include ms-Grid-col;
+    @include ms-sm12;
+    @include ms-md6;
+    @include ms-lg6;
+  }
+  .column2 {
     @include ms-Grid-col;
     @include ms-sm12;
     @include ms-md12;
     @include ms-lg12;
   }
   .headerBar {
-    // padding-top: 2px ;
-    // padding-bottom: 2px;
     padding-left: 20px;
     padding-right: 20px;
     @include ms-fontColor-white;
@@ -37,10 +44,6 @@
   .subTitle {
     @include ms-font-l;
     color: "[theme:primaryText, default:#0078d7]";
-  }
-  .colContent {
-    padding-left: 6px;
-    padding-right: 6px;
   }
   .pageNav {
     display: block;
@@ -89,6 +92,11 @@
   .fieldContainer {
     padding-top: 8px;
     padding-bottom: 8px;
+    padding-right: 8px;
+    
+    &.isDataLoading{
+      opacity: 0.5;
+    }
   }
   .button {
     // Our button
@@ -132,16 +140,6 @@
      background-color: #355e7e ;
      margin-bottom: 0px;
    }
-   .formFieldsContainer{
-    padding-top: 4px;
-    padding-bottom: 10px;
-    padding-left: 8px;
-    padding-right: 8px;
-
-    &.isDataLoading{
-      opacity: 0.5;
-    }
-  }
   .formButtonsContainer{
     padding-top: 10px;
     padding-bottom: 10px;
@@ -150,9 +148,16 @@
       margin-right: 4px;
     }
   }
+  .chevronReturn {
+    align-self: center;
+    //margin-left: 10px;
+    // @include margin-left(10px);
+    color: $ms-color-neutralTertiary;
+    font-size: $ms-font-size-l;
+    flex-shrink: 0;
+  }
   :global .ms-MessageBar {
     margin-top: 24px;
     margin-bottom: 24px;
   }
-
 }

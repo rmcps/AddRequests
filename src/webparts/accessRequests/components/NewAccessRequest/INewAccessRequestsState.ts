@@ -8,6 +8,7 @@ export interface INewAccessRequestsState {
   isSaving: boolean;
   committees:any;
   selectedCommittees:any[];
+  CommitteeAccess: boolean;
   dropDownErrorMsg:string;
   hideDialog:boolean;
   enableSave:boolean;

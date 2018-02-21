@@ -56,9 +56,9 @@ export default class DefaultPage extends React.Component<IDefaultProps, IDefault
   public render(): React.ReactElement<IDefaultProps> {
     return (
       <div className={styles.accessRequests}>
-        <div className={styles.container}>
+        <div className={styles.outerContainer}>
           <div className={styles.row}>
-            <div className={styles.column}>
+            <div className={styles.column2}>
               <div className={styles.headerBar}>
                 {this.state.listNotConfigured ?
                   <MessageBar messageBarType={MessageBarType.warning}>Please configure the lists for this component first.</MessageBar>
@@ -67,21 +67,25 @@ export default class DefaultPage extends React.Component<IDefaultProps, IDefault
               </div>
             </div>
           </div>
-          {(this.state.listNotConfigured == false && this.state.show == "List") && <AccessRequestList dataProvider={this._dataProvider} onItemSelected={this.handleItemSelected} />}
-          {(this.state.listNotConfigured == false && this.state.show == "Display") && <DisplayRequest item={this.state.selectedItem} recordType="Display" />}
-          {(this.state.listNotConfigured == false && this.state.show == "New") && <NewAccessRequest
-            dataProvider={this._dataProvider} committeesListTitle={this.props.committeesList} onRecordAdded={this.handleViewSelected} />}
-          {(this.state.listNotConfigured == false && this.state.show == "Change") && <ModifyAccessRequest
-            dataProvider={this._dataProvider} membersList={this.props.membersList} membersCommList={this.props.membersCommitteesList}
-            committeesListTitle={this.props.committeesList} onRecordAdded={this.handleViewSelected} />}
+          <div className={styles.innerContent}>
+            {(this.state.listNotConfigured == false && this.state.show == "List") && <AccessRequestList dataProvider={this._dataProvider}
+              onItemSelected={this.handleItemSelected} />}
+            {(this.state.listNotConfigured == false && this.state.show == "Display") && <DisplayRequest item={this.state.selectedItem}
+              recordType="Display" onReturnClick={this.handleViewSelected} />}
+            {(this.state.listNotConfigured == false && this.state.show == "New") && <NewAccessRequest
+              dataProvider={this._dataProvider} committeesListTitle={this.props.committeesList} onRecordAdded={this.handleViewSelected} />}
+            {(this.state.listNotConfigured == false && this.state.show == "Change") && <ModifyAccessRequest
+              dataProvider={this._dataProvider} membersList={this.props.membersList} membersCommList={this.props.membersCommitteesList}
+              committeesListTitle={this.props.committeesList} onRecordAdded={this.handleViewSelected} />}
+          </div>
         </div>
       </div>
     );
   }
 
   @autobind
-  private handleViewSelected(selectedItem) {
-    switch (selectedItem) {
+  private handleViewSelected(selectedView) {
+    switch (selectedView) {
       case "addNew":
         this.setState({
           show: "New"

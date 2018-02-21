@@ -28,19 +28,20 @@ export default class ModifyAccessRequest extends React.Component<IModifyAccessRe
   constructor(props: IModifyAccessRequestProps, state: IModifyAccessRequestsState) {
     super(props);
     // set initial state
-    this.state = {
-      status: '', 
-      isLoadingData: false,
-      Item: {},
-      errors: [],
-      members: [],
-      committees: [],
-      selectedCommittees: [],
-      originalCommittees: [],
-      dropDownErrorMsg: '',
-      enableSave: false,
-      hideDialog: true
-    };
+    this.state = this.setCleanState(true);
+    // this.state = {
+    //   status: '',
+    //   isLoadingData: false,
+    //   Item: {},
+    //   errors: [],
+    //   members: [],
+    //   committees: [],
+    //   selectedCommittees: [],
+    //   originalCommittees: [],
+    //   dropDownErrorMsg: '',
+    //   enableSave: false,
+    //   hideDialog: true
+    // };
   }
   public componentWillReceiveProps(nextProps: IModifyAccessRequestProps): void {
   }
@@ -60,64 +61,60 @@ export default class ModifyAccessRequest extends React.Component<IModifyAccessRe
   }
   public render(): React.ReactElement<IModifyAccessRequestProps> {
     return (
-      <div className={styles.row}>
-        <div className={styles.column}>
-          <div className={styles.colContent}>
-            <form>
-              <div className={styles.formFieldsContainer}>
-                <div className={styles.fieldContainer}>
-                  <ComboBox
-                    selectedKey={this.state.Item.spLoginName}
-                    className='MemberCombo'
-                    label='Select a Member:'
-                    id='MemberCombo'
-                    ariaLabel='Member List'
-                    allowFreeform={false}
-                    autoComplete='on'
-                    options={this.state.members.map((item) => ({ key: item.spLoginName, value: item.spLoginName, text: item.Title }))}
-                    onChanged={this._onMemberChanged}
-                  />
-                </div>
-                <div className={styles.fieldContainer}>
-                  <Toggle
-                    checked={this.state.Item.RequestReason == 'Terminate'}
-                    label='Remove user access'
-                    onText='Yes'
-                    offText='No'
-                    onChanged={this._onToggleRemoveUser}
-                  />
-                </div>
-                <div className={styles.fieldContainer}>
-                  <TextField label='Comments' name='Comments' multiline rows={2} placeholder='Enter any special instructions'
-                    onChanged={this._onCommentsChanged}
-                  />
-                </div>
-                {(this.state.Item.spLoginName && this.state.Item.RequestReason != 'Terminate') && <div className={styles.fieldContainer}>
-                  <Dropdown
-                    onChanged={this._onChangeMultiSelect}
-                    placeHolder='Select committee(s)'
-                    label='Add or Remove Commitees:'
-                    selectedKeys={this.state.selectedCommittees}
-                    errorMessage={this.state.dropDownErrorMsg}
-                    multiSelect options={this.state.committees.map((item) => ({ key: item.Id, text: item.Title }))}
-                  />
-                </div>}
-              </div>
-              <div className={styles.formButtonsContainer}>
-                <PrimaryButton
-                  disabled={
-                    !this.state.enableSave || !this.state.Item || this.state.status == 'Saving record...'
-                  }
-                  text='Save'
-                  onClick={this._saveItem}
-                />
-                <DefaultButton
-                  disabled={false}
-                  text='Reset' onClick={this._resetItem}
-                />
-              </div>
-              {this.renderErrors()}
-            </form>
+      <form>
+        <div className={styles.row}>
+          <div className={styles.column2}>
+            <div className={styles.fieldContainer}>
+              <ComboBox
+                selectedKey={this.state.Item.spLoginName}
+                className='MemberCombo'
+                label='Select a Member:'
+                id='MemberCombo'
+                ariaLabel='Member List'
+                allowFreeform={false}
+                autoComplete='on'
+                options={this.state.members.map((item) => ({ key: item.spLoginName, value: item.spLoginName, text: item.Title }))}
+                onChanged={this._onMemberChanged}
+              />
+            </div>
+            <div className={styles.fieldContainer}>
+              <Toggle
+                checked={this.state.Item.RequestReason == 'Terminate'}
+                label="To completely REMOVE this user's access to the UPHPCIN site, select Yes"
+                onText='Yes'
+                offText='No'
+                onChanged={this._onToggleRemoveUser}
+              />
+            </div>
+            <div className={styles.fieldContainer}>
+              <TextField label='Comments' name='Comments' multiline rows={2} placeholder='Enter any special instructions'
+                onChanged={this._onCommentsChanged}
+              />
+            </div>
+            {(this.state.Item.spLoginName && this.state.Item.RequestReason != 'Terminate') && <div className={styles.fieldContainer}>
+              <Dropdown
+                onChanged={this._onChangeMultiSelect}
+                placeHolder='Select committee(s)'
+                label='Add or Remove Commitees:'
+                selectedKeys={this.state.selectedCommittees}
+                errorMessage={this.state.dropDownErrorMsg}
+                multiSelect options={this.state.committees.map((item) => ({ key: item.Id, text: item.Title }))}
+              />
+            </div>}
+            <div className={styles.formButtonsContainer}>
+              <PrimaryButton
+                disabled={
+                  !this.state.enableSave || !this.state.Item || this.state.status == 'Saving record...'
+                }
+                text='Save'
+                onClick={this._saveItem}
+              />
+              <DefaultButton
+                disabled={false}
+                text='Reset' onClick={this._resetItem}
+              />
+            </div>
+            {this.renderErrors()}
             <Dialog
               hidden={this.state.hideDialog}
               onDismiss={this._closeDialog}
@@ -137,10 +134,44 @@ export default class ModifyAccessRequest extends React.Component<IModifyAccessRe
             </Dialog>
           </div>
         </div>
-      </div>
+      </form>
+
     );
   }
+  private setCleanState(initial: boolean): any {
+    const objItem = {
+      spLoginName: null,
+      FirstName: null,
+      LastName: null,
+      EMail: null,
+      Title: null,
+      JobTitle: null,
+      Office: null,
+      Comments: null,
+      AddCommittees: [],
+      RemoveCommittees: [],
+      RequestReason: null
+    };
 
+    let cleanState:any = {
+      Item: objItem,
+      errors: [],
+      selectedCommittees: [],
+      originalCommittees: [],
+      dropDownErrorMsg: '',
+      enableSave: false,
+      hideDialog: true  
+    };
+
+    if (initial) {
+      cleanState.status = '';
+      cleanState.members = [];
+      cleanState.committees = [];
+      cleanState.isLoadingData = false;
+      cleanState.isSaving = false;
+    }
+    return cleanState;
+  }
   private renderErrors() {
     return this.state.errors.length > 0
       ?
@@ -236,24 +267,10 @@ export default class ModifyAccessRequest extends React.Component<IModifyAccessRe
   @autobind
   private _resetItem(): void {
     this.setState((prevState: IModifyAccessRequestsState, props: IModifyAccessRequestProps): IModifyAccessRequestsState => {
-      prevState.Item = {
-        spLoginName: "",
-        Comments: "",
-        AddCommittees: [],
-        RemoveCommittees: [],
-        EMail: "",
-        FirstName: "",
-        JobTitle: "",
-        LastName: "",
-        Title: "",
-        Office: "",
-        RequestReason: ""
-      };
-      prevState.selectedCommittees = [];
-      prevState.originalCommittees = [];
+      prevState = this.setCleanState(false);
       return prevState;
     });
-  
+
   }
   @autobind
   private async _saveItem(): Promise<void> {
@@ -288,7 +305,7 @@ export default class ModifyAccessRequest extends React.Component<IModifyAccessRe
         prevState.Item.AddCommittees = [];
         prevState.Item.RemoveCommittees = [];
         return prevState;
-      });      
+      });
     }
     this.setState({
       status: 'Saving record...',

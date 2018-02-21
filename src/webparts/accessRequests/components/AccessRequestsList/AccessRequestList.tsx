@@ -49,20 +49,18 @@ export default class AccessRequestList extends React.Component<IAccessRequestLis
   public render() {
     return (
       <div className={styles.row}>
-        <div className={styles.column}>
-          <div className={styles.colContent}>
-            <h3>My Requests</h3>
-            {this.state.dataIsLoading ? <Spinner size={SpinnerSize.medium} /> : null}
-            <Fabric>
-              <FocusZone direction={FocusZoneDirection.vertical}>
-                <List
-                  className={aLstyles.accessRequestsList}
-                  items={this.state.listItems}
-                  onRenderCell={this._onRenderCell}
-                />
-              </FocusZone>
-            </Fabric>
-          </div>
+        <div className={styles.column2}>
+          <h3>My Requests</h3>
+          {this.state.dataIsLoading ? <Spinner size={SpinnerSize.medium} /> : null}
+          <Fabric>
+            <FocusZone direction={FocusZoneDirection.vertical}>
+              <List
+                className={aLstyles.accessRequestsList}
+                items={this.state.listItems}
+                onRenderCell={this._onRenderCell}
+              />
+            </FocusZone>
+          </Fabric>
         </div>
       </div>
     );

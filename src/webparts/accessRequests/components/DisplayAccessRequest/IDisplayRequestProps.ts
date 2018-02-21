@@ -5,4 +5,5 @@ export default interface IDisplayRequestProps {
     recordType: "New" | "Change" | "Display";
     item: IAccessRequest;
     additionalInfo?: string;
+    onReturnClick: any;
 }

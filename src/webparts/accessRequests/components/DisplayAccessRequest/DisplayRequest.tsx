@@ -5,12 +5,9 @@ import { DefaultButton, PrimaryButton } from 'office-ui-fabric-react/lib/Button'
 import { TextField } from 'office-ui-fabric-react/lib/TextField';
 import { Link } from 'office-ui-fabric-react/lib/Link';
 import { MessageBar, MessageBarType } from 'office-ui-fabric-react/lib/MessageBar';
+import { IconButton, IButtonProps } from 'office-ui-fabric-react/lib/Button';
 import styles from '../AccessRequests.module.scss';
-// import NewAccessRequest from '../NewAccessRequest/NewAccessRequest';
-// import ModifyAccessRequest from '../ModifyAccessRequest/ModifyAccessRequest';
-// import { IAccessRequestsProps } from '../IAccessRequestsProps';
 import IDisplayRequestProps from './IDisplayRequestProps';
-// import DefaultPage from '../DefaultPage'
 
 export interface IDisplayRequestState {
     message: string;
@@ -25,31 +22,25 @@ export default class DisplayRequest extends React.Component<IDisplayRequestProps
             message: '',
             messageBarType: MessageBarType.info,
         };
-        this._onAddNew = this._onAddNew.bind(this);
-        this._onAddExisting = this._onAddExisting.bind(this);
     }
     public componentWillReceiveProps() {
     }
 
     public componentWillMount() {
-        // if (this.props.recordType == "New") {
-        //     this.setState({
-        //         message: "Your new access request was created.  You will receive email updates with the status of your request.",
-        //         messageBarType: MessageBarType.success
-        //     });
-        // }
-        // else if (this.props.recordType == "Change") {
-        //     this.setState({
-        //         message: "Your change request was created.  You will receive email updates with the status of your request.",
-        //         messageBarType: MessageBarType.success
-        //     });
-        // }
     }
     public render(): React.ReactElement<IDisplayRequestProps> {
         return (
-            <div className={styles.row}>
-                <div className={styles.column}>
-                    <div className={styles.colContent}>
+            <div>
+        <IconButton
+          className={styles.chevronReturn}
+          disabled={false}
+          iconProps={{ iconName: 'ChevronLeftMed' }}
+          title='Return to list'
+          ariaLabel='Return to list'
+          onClick={this._onReturn}
+        />                
+                <div className={styles.row}>
+                    <div className={styles.column1}>
 
                         {this.props.item.RequestReason && <div className={styles.fieldContainer}>
                             <TextField label='Reason for request' disabled={true} value={this.props.item.RequestReason} />
@@ -60,6 +51,8 @@ export default class DisplayRequest extends React.Component<IDisplayRequestProps
                         {this.props.item.EMail && <div className={styles.fieldContainer}>
                             <TextField label='Email' disabled={true} value={this.props.item.EMail} />
                         </div>}
+                    </div>
+                    <div className={styles.column1}>
                         {this.props.item.JobTitle && <div className={styles.fieldContainer}>
                             <TextField label='Title' disabled={true} value={this.props.item.JobTitle} />
                         </div>}
@@ -69,6 +62,11 @@ export default class DisplayRequest extends React.Component<IDisplayRequestProps
                         {this.props.item.Office && <div className={styles.fieldContainer}>
                             <TextField label='Phone' disabled={true} value={this.props.item.Office} />
                         </div>}
+                    </div>
+                </div>
+                <div className={styles.row}>
+                    <div className={styles.column2}>
+
                         {this.props.item.Comments && <div className={styles.fieldContainer}>
                             <TextField label='Comments' disabled={true} multiline value={this.props.item.Comments} />
                         </div>}
@@ -82,52 +80,13 @@ export default class DisplayRequest extends React.Component<IDisplayRequestProps
                         {this.props.additionalInfo && <div className={styles.fieldContainer}>
                             <TextField disabled={true} multiline value={this.props.additionalInfo} />
                         </div>}
-
                     </div>
                 </div>
             </div>
         );
     }
-    private _onAddNew(): void {
-        // const element: React.ReactElement<IAccessRequestsProps> = React.createElement(
-        //     NewAccessRequest,
-        //     {
-        //         description: this.props.description,
-        //         context: this.props.context,
-        //         dom: this.props.dom,
-        //     }
-        // );
-        // ReactDom.unmountComponentAtNode(this.props.dom);
-        // ReactDom.render(element, this.props.dom);
-    }
-    private _onAddExisting(): void {
-        // const element: React.ReactElement<IAccessRequestsProps> = React.createElement(
-        //     ModifyAccessRequest,
-        //     {
-        //         description: this.props.description,
-        //         context: this.props.context,
-        //         dom: this.props.dom,
-        //     }
-        // );
-        // ReactDom.unmountComponentAtNode(this.props.dom);
-        // ReactDom.render(element, this.props.dom);
-    }
     @autobind
-    private _onDisplayAll(): void {
-        // const element: React.ReactElement<IAccessRequestsProps> = React.createElement(
-        //     DefaultPage,
-        //     {
-        //         description: this.props.description,
-        //         context: this.props.context,
-        //         dom: this.props.dom,
-        //     }
-        // );
-        // ReactDom.unmountComponentAtNode(this.props.dom);
-        // ReactDom.render(element, this.props.dom);
+    private _onReturn() {
+        this.props.onReturnClick("list");
     }
-    @autobind
-    private _onCancel(): void {
-        //   window.location.href = "https://uphpcin.sharepoint.com";
-    }
-
 }
