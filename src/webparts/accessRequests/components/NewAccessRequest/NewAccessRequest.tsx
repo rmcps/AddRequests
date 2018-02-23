@@ -69,52 +69,56 @@ export default class NewAccessRequest extends React.Component<NewAccessRequestPr
       <form>
         <div className={styles.row}>
           <div className={styles.column1}>
-              <div className={styles.fieldContainer}>
-                <TextField placeholder='First Name' name='FirstName' required={true} value={this.state.newItem.FirstName}
-                  onChanged={this._onFirstNameChanged}
-                  validateOnFocusIn validateOnFocusOut underlined
-                />
-              </div>
-              <div className={styles.fieldContainer}>
-                <TextField placeholder='Last Name' name='LastName' required={true} value={this.state.newItem.LastName}
-                  onChanged={this._onLastNameChanged}
-                  validateOnFocusIn validateOnFocusOut underlined
-                />
-              </div>
-              <div className={styles.fieldContainer}>
-                <TextField placeholder='Email' name='EMail' required={true} value={this.state.newItem.EMail}
-                  onChanged={this._onEmailChanged}
-                  validateOnFocusIn validateOnFocusOut underlined
-                />
-              </div>
-              <div className={styles.fieldContainer}>
-                <TextField placeholder='Job Title' name='JobTitle'
-                  onChanged={this._onJobTitleChanged} underlined
-                />
-              </div>
+            <div className={styles.fieldContainer}>
+              <TextField placeholder='First Name' name='FirstName' required={true} value={this.state.newItem.FirstName}
+                onChanged={this._onFirstNameChanged}
+                validateOnFocusIn validateOnFocusOut underlined
+              />
+            </div>
+            <div className={styles.fieldContainer}>
+              <TextField placeholder='Last Name' name='LastName' required={true} value={this.state.newItem.LastName}
+                onChanged={this._onLastNameChanged}
+                validateOnFocusIn validateOnFocusOut underlined
+              />
+            </div>
+            <div className={styles.fieldContainer}>
+              <TextField placeholder='Email' name='EMail' required={true} value={this.state.newItem.EMail}
+                onChanged={this._onEmailChanged}
+                validateOnFocusIn validateOnFocusOut underlined
+              />
+            </div>
           </div>
           <div className={styles.column1}>
-              <div className={styles.fieldContainer}>
-                <TextField placeholder='Company' name='Company' required={true} value={this.state.newItem.Company}
-                  onChanged={this._onCompanyChanged}
-                  validateOnFocusIn validateOnFocusOut underlined
-                />
-              </div>
-              <div className={styles.fieldContainer}>
-                <TextField placeholder='Phone Number' name='Office'
-                  onChanged={this._onOfficeChanged} underlined
-                />
-              </div>
+            <div className={styles.fieldContainer}>
+              <TextField placeholder='Company' name='Company' required={true} value={this.state.newItem.Company}
+                onChanged={this._onCompanyChanged}
+                validateOnFocusIn validateOnFocusOut underlined
+              />
+            </div>
+            <div className={styles.fieldContainer}>
+              <TextField placeholder='Job Title' name='JobTitle'
+                onChanged={this._onJobTitleChanged} underlined
+              />
+            </div>
+            <div className={styles.fieldContainer}>
+              <TextField placeholder='Phone Number' name='Office'
+                onChanged={this._onOfficeChanged} underlined
+              />
+            </div>
           </div>
         </div>
         <div className={styles.row}>
           <div className={styles.column2}>
-              <div className={styles.fieldContainer}>
-                <TextField name='Comments' multiline rows={2} placeholder='Enter any special instructions'
-                  onChanged={this._onCommentsChanged}
-                />
-              </div>
-              <div className={styles.fieldContainer}>
+            <div className={styles.fieldContainer}>
+              {this.state.CommitteeAccess && <Dropdown
+                onChanged={this._onChangeMultiSelect}
+                placeHolder='Select committee(s)'
+                selectedKeys={this.state.newItem.Committees}
+                errorMessage={this.state.dropDownErrorMsg}
+                multiSelect options={this.state.committees.map((item) => ({ key: item.ID, text: item.Title }))}
+              />}
+            </div>
+            <div className={styles.fieldContainer}>
               <Toggle
                 checked={this.state.CommitteeAccess}
                 label='Committee Access Requested?'
@@ -122,16 +126,12 @@ export default class NewAccessRequest extends React.Component<NewAccessRequestPr
                 offText='No'
                 onChanged={this._onToggleNoCommittees}
               />
-              </div>
-              <div className={styles.fieldContainer}>
-                {this.state.CommitteeAccess &&  <Dropdown
-                  onChanged={this._onChangeMultiSelect}
-                  placeHolder='Select committee(s)'
-                  selectedKeys={this.state.newItem.Committees}
-                  errorMessage={this.state.dropDownErrorMsg}
-                  multiSelect options={this.state.committees.map((item) => ({ key: item.ID, text: item.Title }))}
-                /> }
-              </div>
+            </div>
+            <div className={styles.fieldContainer}>
+              <TextField name='Comments' multiline rows={2} placeholder='Enter any special instructions'
+                onChanged={this._onCommentsChanged}
+              />
+            </div>
             {this.state.isSaving ? <Spinner size={SpinnerSize.small} /> : null}
             <div className={styles.formButtonsContainer}>
               <PrimaryButton
@@ -178,21 +178,21 @@ export default class NewAccessRequest extends React.Component<NewAccessRequestPr
       Committees: []
     };
 
-    let cleanState:any = {
+    let cleanState: any = {
       newItem: newItem,
       dropDownErrorMsg: '',
       CommitteeAccess: true,
-      errors: [],    
+      errors: [],
     };
 
     if (initial) {
       cleanState.status = '';
-      cleanState.isLoadingData= false;
-      cleanState.isSaving= false;
-      cleanState.committees= [];
-      cleanState.selectedCommittees= [];
-      cleanState.hideDialog= true;
-      cleanState.enableSave= true;
+      cleanState.isLoadingData = false;
+      cleanState.isSaving = false;
+      cleanState.committees = [];
+      cleanState.selectedCommittees = [];
+      cleanState.hideDialog = true;
+      cleanState.enableSave = true;
     }
     return cleanState;
   }
@@ -339,7 +339,7 @@ export default class NewAccessRequest extends React.Component<NewAccessRequestPr
         prevState.dropDownErrorMsg = 'Select one or more committee(s)';
         return prevState;
       });
-      return null;      
+      return null;
     }
     this.setState({
       status: 'Saving record...',

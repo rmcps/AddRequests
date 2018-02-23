@@ -276,8 +276,8 @@ export default class SharePointDataProvider implements IAccessRequestsDataProvid
           'Office': newItem.Office,
           'Comments': newItem.Comments,
           'Title': `${newItem.FirstName} ${newItem.LastName}`,
-          'RequestReason': 'New member',
-          'RequestStatus': 'New',
+          'RequestReason': 'Add access',
+          'RequestStatus': `${this._getFormattedDate(new Date())} New request`,
           'AddCommitteesId': {
             'results': newItem.Committees
           }
@@ -319,7 +319,7 @@ export default class SharePointDataProvider implements IAccessRequestsDataProvid
           'Title': item.Title,
           'EMail': item.EMail,
           'RequestReason': requestReason,
-          'RequestStatus': 'New',
+          'RequestStatus': `${this._getFormattedDate(new Date())} New request`,
           'spLoginName': item.spLoginName,
           'AddCommitteesId': {
             'results': item.AddCommittees ? item.AddCommittees : [],
@@ -371,5 +371,10 @@ export default class SharePointDataProvider implements IAccessRequestsDataProvid
           resolve(this._listItemEntityTypeName);
         });
     });
+  }
+  private _getFormattedDate(d) {
+    let thisDay = (d.getDate() < 10 ? '0' : '') + d.getDate();
+    let thisMonth = (d.getMonth() < 10 ? '0' : '') + (d.getMonth() + 1);
+    return d.getFullYear() + '-' + thisMonth + '-' + thisDay;
   }
 }
