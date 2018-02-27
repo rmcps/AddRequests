@@ -23,40 +23,62 @@ export interface IModifyAccessRequestProps {
 }
 
 export default class ModifyAccessRequest extends React.Component<IModifyAccessRequestProps, IModifyAccessRequestsState> {
-  private _dataProvider: IAccessRequestsDataProvider;
+  private _savingMessage:string = "Saving record...";
 
   constructor(props: IModifyAccessRequestProps, state: IModifyAccessRequestsState) {
     super(props);
-    // set initial state
     this.state = this.setCleanState(true);
-    // this.state = {
-    //   status: '',
-    //   isLoadingData: false,
-    //   Item: {},
-    //   errors: [],
-    //   members: [],
-    //   committees: [],
-    //   selectedCommittees: [],
-    //   originalCommittees: [],
-    //   dropDownErrorMsg: '',
-    //   enableSave: false,
-    //   hideDialog: true
-    // };
   }
   public componentWillReceiveProps(nextProps: IModifyAccessRequestProps): void {
   }
-  public componentDidMount() {
+  public async componentDidMount() {
     if (this.state.committees.length < 1) {
-      this.props.dataProvider.getCommittees(this.props.committeesListTitle).then(response => {
+      try {
+        const response = await this.props.dataProvider.getCommittees(this.props.committeesListTitle);
         this.setState({
-          committees: response.value
+          committees: response.value,
         });
-      });
+      }
+      catch (error) {
+        console.log(error);
+      }
+      // this.props.dataProvider.getCommittees(this.props.committeesListTitle).then(response => {
+      //   this.setState({
+      //     committees: response.value
+      //   });
+      // });
     }
     if (this.state.members.length < 1) {
-      this.props.dataProvider.getMembers(this.props.membersList).then(response => {
+      try {
+        let response = await this.props.dataProvider.getMembers(this.props.membersList);
         this.setState({ members: response });
-      });
+      }
+      catch (error) {
+        console.log(error);
+      }
+      // this.props.dataProvider.getMembers(this.props.membersList).then(response => {
+      //   this.setState({ members: response });
+      // });
+    }
+  }
+  public async componentDidUpdate() {
+    if (this.state.status === this._savingMessage) {
+      const response = await this.props.dataProvider.saveChangeRequest(this.state.Item);
+        if (response === 'ok') {
+          this.setState({
+            hideDialog: false,
+            status: ""
+          });
+  
+        }
+        else {
+          this.setState((prevState: IModifyAccessRequestsState, props: IModifyAccessRequestProps): IModifyAccessRequestsState => {
+            prevState.errors.push('Error: Failed to save record.');
+            prevState.status = '';
+            prevState.enableSave = true;
+            return prevState;
+          });
+        }      
     }
   }
   public render(): React.ReactElement<IModifyAccessRequestProps> {
@@ -214,22 +236,21 @@ export default class ModifyAccessRequest extends React.Component<IModifyAccessRe
     });
   }
   @autobind
-  private _onMemberChanged(option: IComboBoxOption, index: number, value: string) {
-    this.props.dataProvider.getMemberCommittees(this.props.membersCommList, option.key).then(response => {
-      this.setState((prevState: IModifyAccessRequestsState, props: IModifyAccessRequestProps): IModifyAccessRequestsState => {
-        prevState.Item.spLoginName = option.key;
-        prevState.Item.Title = option.text;
-        const selMember = this.state.members.filter((mem) => {
-          return mem.spLoginName == option.key;
-        });
-        prevState.Item.EMail = selMember[0].EMail;
-        prevState.originalCommittees = response.value.map(c => c.CommitteeId);
-        prevState.selectedCommittees = response.value.map(c => c.CommitteeId);
-        prevState.enableSave = option.key ? true : false;
-        return prevState;
-      });
-    });
+  private async _onMemberChanged(option: IComboBoxOption, index: number, value: string) {
+    const response = await this.props.dataProvider.getMemberCommittees(this.props.membersCommList, option.key);
 
+    this.setState((prevState: IModifyAccessRequestsState, props: IModifyAccessRequestProps): IModifyAccessRequestsState => {
+      prevState.Item.spLoginName = option.key;
+      prevState.Item.Title = option.text;
+      const selMember = this.state.members.filter((mem) => {
+        return mem.spLoginName == option.key;
+      });
+      prevState.Item.EMail = selMember[0].EMail;
+      prevState.originalCommittees = response.value.map(c => c.CommitteeId);
+      prevState.selectedCommittees = response.value.map(c => c.CommitteeId);
+      prevState.enableSave = option.key ? true : false;
+      return prevState;
+    });
   }
 
   @autobind
@@ -274,63 +295,31 @@ export default class ModifyAccessRequest extends React.Component<IModifyAccessRe
   }
   @autobind
   private async _saveItem(): Promise<void> {
+      let arrAdd = [];
+      let arrRemove = [];
     if (this.state.Item.RequestReason != "Terminate") {
       if (this.state.selectedCommittees.length < 1) {
         this.setState({ dropDownErrorMsg: "Select one or more committee(s)" });
         return null;
       }
-      let arrAdd = [];
       this.state.selectedCommittees.forEach((item => {
         if (this.state.originalCommittees.indexOf(item) == -1) {
           arrAdd.push(item);
         }
       }));
-      this.setState((prevState: IModifyAccessRequestsState, props: IModifyAccessRequestProps): IModifyAccessRequestsState => {
-        prevState.Item.AddCommittees = arrAdd;
-        return prevState;
-      });
-      let arrRemove = [];
       this.state.originalCommittees.forEach((item => {
         if (this.state.selectedCommittees.indexOf(item) == -1) {
           arrRemove.push(item);
         }
       }));
-      this.setState((prevState: IModifyAccessRequestsState, props: IModifyAccessRequestProps): IModifyAccessRequestsState => {
-        prevState.Item.RemoveCommittees = arrRemove;
-        return prevState;
-      });
-    }
-    else {
-      this.setState((prevState: IModifyAccessRequestsState, props: IModifyAccessRequestProps): IModifyAccessRequestsState => {
-        prevState.Item.AddCommittees = [];
-        prevState.Item.RemoveCommittees = [];
-        return prevState;
-      });
-    }
-    this.setState({
-      status: 'Saving record...',
-      enableSave: false
+    }    
+    this.setState((prevState: IModifyAccessRequestsState, props: IModifyAccessRequestProps): IModifyAccessRequestsState => {
+      prevState.Item.AddCommittees = arrAdd;
+      prevState.Item.RemoveCommittees = arrRemove;
+      prevState.status = this._savingMessage;
+      prevState.enableSave = false;
+      return prevState;
     });
-
-    this.props.dataProvider.saveModifyRequest(this.state.Item).then((result) => {
-      if (result.ok) {
-        this.setState({
-          hideDialog: false,
-          status: ""
-        });
-
-      }
-      else {
-        this.setState((prevState: IModifyAccessRequestsState, props: IModifyAccessRequestProps): IModifyAccessRequestsState => {
-          prevState.errors.push('Error: Failed to save record.');
-          prevState.status = '';
-          prevState.enableSave = true;
-          return prevState;
-        });
-      }
-
-    });
-
   }
   @autobind
   private _closeDialog() {

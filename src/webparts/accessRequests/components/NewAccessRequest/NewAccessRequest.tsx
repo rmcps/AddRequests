@@ -20,26 +20,12 @@ export interface NewAccessRequestProps {
 }
 
 export default class NewAccessRequest extends React.Component<NewAccessRequestProps, INewAccessRequestsState> {
-  // private _dataProvider: IAccessRequestsDataProvider;
+  private _savingMessage:string = "Saving record...";
 
   constructor(props: NewAccessRequestProps, state: INewAccessRequestsState) {
     super(props);
     // set initial state
     this.state = this.setCleanState(true);
-    // this.state = {
-    //   status: '',
-    //   isLoadingData: false,
-    //   isSaving: false,
-    //   newItem: {},
-    //   errors: [],
-    //   committees: [],
-    //   selectedCommittees: [],
-    //   CommitteeAccess: true,
-    //   dropDownErrorMsg: '',
-    //   hideDialog: true,
-    //   enableSave: true
-    // };
-
   }
   public componentWillMount() {
     // FOR TESTING ONLY.  Remove after:
@@ -55,13 +41,37 @@ export default class NewAccessRequest extends React.Component<NewAccessRequestPr
   }
   public componentWillReceiveProps(nextProps: NewAccessRequestProps): void {
   }
-  public componentDidMount() {
+  public async componentDidMount() {
     if (this.state.committees.length < 1) {
-      this.props.dataProvider.getCommittees(this.props.committeesListTitle).then(response => {
+      try {
+        const response = await this.props.dataProvider.getCommittees(this.props.committeesListTitle);
         this.setState({
           committees: response.value,
         });
-      });
+      }
+      catch(error) {
+        console.log(error);
+      }
+    }
+  }
+  public async componentDidUpdate() {
+    if (this.state.status === this._savingMessage) {
+      const response = await this.props.dataProvider.saveNewItem(this.state.newItem);
+        if (response.ok) {
+          this.setState({
+            hideDialog: false,
+            isSaving: false,
+            status: '',
+          });
+        }
+        else {
+          this.setState((prevState: INewAccessRequestsState, props: NewAccessRequestProps): INewAccessRequestsState => {
+            prevState.errors.push('Error: Failed to save record.');
+            prevState.status = '';
+            prevState.isSaving = false;
+            return prevState;
+          });
+        }
     }
   }
   public render(): React.ReactElement<NewAccessRequestProps> {
@@ -342,26 +352,9 @@ export default class NewAccessRequest extends React.Component<NewAccessRequestPr
       return null;
     }
     this.setState({
-      status: 'Saving record...',
+      status: this._savingMessage,
       isSaving: true,
     });
-    this.props.dataProvider.saveNewItem(this.state.newItem).then((result) => {
-      if (result.ok) {
-        this.setState({
-          hideDialog: false,
-          isSaving: false
-        });
-      }
-      else {
-        this.setState((prevState: INewAccessRequestsState, props: NewAccessRequestProps): INewAccessRequestsState => {
-          prevState.errors.push('Error: Failed to save record.');
-          prevState.status = '';
-          prevState.isSaving = false;
-          return prevState;
-        });
-      }
-    });
-
   }
   @autobind
   private _closeDialog() {

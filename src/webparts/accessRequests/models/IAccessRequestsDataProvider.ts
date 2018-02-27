@@ -15,7 +15,7 @@ interface INewAccessRequestsDataProvider {
     getMemberCommittees(membersCommList: string, loginName: any):Promise<any>;
     getCommittees(committeesListTitle: string): Promise<any>;
     saveNewItem(INewAccessRequest): Promise<any>;
-    saveModifyRequest(IModifyAccessRequest): Promise<any>;
+    saveChangeRequest(IModifyAccessRequest): Promise<any>;
 }
 
 export default INewAccessRequestsDataProvider;
