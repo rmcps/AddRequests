@@ -2,6 +2,7 @@ import { IWebPartContext } from '@microsoft/sp-webpart-base';
 import INewAccessRequest from '../models/INewAccessRequest';
 import IModifyAccessRequest from './IModifyAccessRequest';
 import IAccessRequest from './IAccessRequest';
+import ITask from '../models/ITask';
 
 interface INewAccessRequestsDataProvider {
 
@@ -16,6 +17,9 @@ interface INewAccessRequestsDataProvider {
     getCommittees(committeesListTitle: string): Promise<any>;
     saveNewItem(INewAccessRequest): Promise<any>;
     saveChangeRequest(IModifyAccessRequest): Promise<any>;
+    getTasksForCurrentUser(requestsByCommList: string):Promise<ITask[]>;
+    updateForCommittee(itemId: string, action: "Approved" | "Rejected", requestsByCommList: string):Promise<boolean>;
+    updateForRequest(itemId: string, action: "Approved" | "Rejected"):Promise<any>;
 }
 
 export default INewAccessRequestsDataProvider;

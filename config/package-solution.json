@@ -3,7 +3,7 @@
   "solution": {
     "name": "webpart-access-requests",
     "id": "2d05e43c-f87d-4a93-a926-fce9ba5a5d1a",
-    "version": "1.0.0.3",
+    "version": "1.0.0.4",
     "includeClientSideAssets": true
   },
   "paths": {

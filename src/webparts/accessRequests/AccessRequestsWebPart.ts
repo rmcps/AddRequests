@@ -15,6 +15,7 @@ export interface IAccessRequestsWebPartProps {
   membersList: string;
   committeesList: string;
   membersCommitteesList: string;
+  requestsByCommitteeList: string;
 }
 
 export default class AccessRequestsWebPart extends BaseClientSideWebPart<IAccessRequestsWebPartProps> {
@@ -29,6 +30,7 @@ export default class AccessRequestsWebPart extends BaseClientSideWebPart<IAccess
         membersList: this.properties.membersList,
         committeesList: this.properties.committeesList,
         membersCommitteesList: this.properties.membersCommitteesList,
+        requestsByCommitteeList: this.properties.requestsByCommitteeList,
         context:this.context,
         dom: this.domElement,
       }
@@ -67,7 +69,11 @@ export default class AccessRequestsWebPart extends BaseClientSideWebPart<IAccess
           PropertyPaneTextField('membersCommitteesList', {
             label: strings.MembersListFieldLabel
           }
-        )
+        ),
+        PropertyPaneTextField('requestsByCommitteeList', {
+          label: strings.RequestsByCommitteeListFieldLabel
+        }
+      )
           ]
             }
           ]

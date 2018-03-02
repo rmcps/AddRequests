@@ -16,10 +16,11 @@ import AccessRequestList from './AccessRequestsList/AccessRequestList';
 import IAccessRequest from '../models/IAccessRequest';
 import DisplayRequest from './DisplayAccessRequest/DisplayRequest';
 import IDisplayRequestProps from './DisplayAccessRequest/IDisplayRequestProps';
+import TaskList from './TaskList/TaskList';
 import TopNav from './Navigation/TopNav';
 
 export interface IDefaultState {
-  show: "List" | "New" | "Change" | "Display";
+  show: "List" | "New" | "Change" | "Display" | "Tasks";
   selectedItem: IAccessRequest;
   listNotConfigured: boolean;
 }
@@ -28,10 +29,12 @@ export default class DefaultPage extends React.Component<IDefaultProps, IDefault
   private _dataProvider: IAccessRequestsDataProvider;
 
   constructor(props: IDefaultProps, state: IDefaultState) {
+    const urlParams = new URLSearchParams(window.location.search);
+
     super(props);
     // set initial state   
     this.state = {
-      show: "List",
+      show: urlParams.get("view") === "tasks" ? "Tasks" : "List",
       selectedItem: null,
       listNotConfigured: false,
     };
@@ -77,6 +80,7 @@ export default class DefaultPage extends React.Component<IDefaultProps, IDefault
             {(this.state.listNotConfigured == false && this.state.show == "Change") && <ModifyAccessRequest
               dataProvider={this._dataProvider} membersList={this.props.membersList} membersCommList={this.props.membersCommitteesList}
               committeesListTitle={this.props.committeesList} onRecordAdded={this.handleViewSelected} />}
+            {(this.state.listNotConfigured == false && this.state.show == "Tasks") && <TaskList dataProvider={this._dataProvider} requestsByCommList = {this.props.requestsByCommitteeList} /> }
           </div>
         </div>
       </div>
@@ -106,7 +110,12 @@ export default class DefaultPage extends React.Component<IDefaultProps, IDefault
           show: "List"
         });
         break;
-    }
+        case "tasks":
+        this.setState({
+          show: "Tasks"
+        });
+        break;
+      }
   }
   @autobind
   private handleItemSelected(item) {
