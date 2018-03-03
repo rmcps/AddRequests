@@ -5,7 +5,7 @@ import styles from '../AccessRequests.module.scss';
 
 export interface TopNavProps {
     onItemSelected: any;
-    show: "List" | "New" | "Change" | "Display" | "Tasks";
+    show: "List" | "New" | "Change" | "Display" | "Tasks" | "FinalTasks";
 }
 
 export default class TopNav extends React.Component<TopNavProps, {}> {
@@ -20,6 +20,7 @@ export default class TopNav extends React.Component<TopNavProps, {}> {
                 {"Change" !== this.props.show && <Link data-target-name="change" onClick={this._onItemSelected}>Modify existing member</Link>}
                 {"List" !== this.props.show && <Link data-target-name="list" onClick={this._onItemSelected}>My Requests</Link>}
                 {"Tasks" !== this.props.show && <Link data-target-name="tasks" onClick={this._onItemSelected}>My Tasks</Link>}
+                {"FinalTasks" !== this.props.show && <Link data-target-name="finaltasks" onClick={this._onItemSelected}>Final Approvals</Link>}
             </div>
         );
     }

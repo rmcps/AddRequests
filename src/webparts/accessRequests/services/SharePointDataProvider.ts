@@ -2,7 +2,9 @@ import {
   SPHttpClient,
   SPHttpClientBatch,
   SPHttpClientResponse,
-  ISPHttpClientOptions
+  ISPHttpClientOptions,
+  SPHttpClientConfiguration,
+  SPHttpClientBatchConfiguration
 } from '@microsoft/sp-http';
 import { IWebPartContext } from '@microsoft/sp-webpart-base';
 import INewAccessRequest from '../models/INewAccessRequest';
@@ -10,8 +12,9 @@ import IAccessRequest from '../models/IAccessRequest';
 import IAccessRequestsDataProvider from '../models/IAccessRequestsDataProvider';
 import IModifyAccessRequest from "../models/IModifyAccessRequest";
 import ITask from '../models/ITask';
-import SPHttpClientConfiguration from '@microsoft/sp-http/lib/spHttpClient/SPHttpClientConfiguration';
-import SPHttpClientBatchConfiguration from '@microsoft/sp-http/lib/spHttpClient/SPHttpClientBatchConfiguration';
+// import SPHttpClientConfiguration from '@microsoft/sp-http/lib/spHttpClient/SPHttpClientConfiguration';
+// import SPHttpClientBatchConfiguration from '@microsoft/sp-http/lib/spHttpClient/SPHttpClientBatchConfiguration';
+import IFinalTask from '../models/IFinalTask';
 
 export default class SharePointDataProvider implements IAccessRequestsDataProvider {
   private _accessListTitle: string;
@@ -438,10 +441,113 @@ export default class SharePointDataProvider implements IAccessRequestsDataProvid
     }
   }
   public updateForRequest(itemId: string, action: "Approved" | "Rejected") {
-    return null;
+    return this._updateForRequest(itemId, action, this.webPartContext.spHttpClient);
   }
-  private _updateForRequest(itemId: string, action: "Approved" | "Rejected", requester: SPHttpClient) {
+  private async _updateForRequest(itemId: string, action: "Approved" | "Rejected", requester: SPHttpClient) {
+    const queryUrl: string = `${this._listsUrl}/GetByTitle('${this._accessListTitle}')/items(${itemId})`;
+    const entityTypeName = await this._getListItemEntityTypeName(this._accessListTitle, requester);
+    const body: string = JSON.stringify({
+      '@data.type': entityTypeName,
+      'CompletionStatus': action
+    });
+    const headers: Headers = new Headers();
+    headers.append('If-Match', '*');
+    try {
+      const response = await requester.fetch(queryUrl, SPHttpClient.configurations.v1,
+        {
+          body: body,
+          headers,
+          method: 'PATCH'
+        });
+      if (!response.ok || response.status !== 204) {
+        throw new Error(response.statusMessage);
+      }
+      else {
+        return Promise.resolve(true);
+      }
+    }
+    catch (error) {
+      console.log(error);
+      throw new Error(error.message);
+    }
   }
+  public getFinalTasks(requestsByCommList: string):Promise<IFinalTask[]> {
+    return this._getFinalTasks(requestsByCommList, this.webPartContext.spHttpClient);
+  } 
+  public async _getFinalTasks(requestsByCommList: string, requester: SPHttpClient):Promise<IFinalTask[]> {
+    const reqItems: IFinalTask[] = [];
+    const headers = {
+      'Accept': 'application/json;odata=nometadata',
+      'odata-version': ''
+    };
+
+    let filterString: string = `CompletionStatus eq 'Waiting for final Approval'`;
+    filterString = "&$filter=" + encodeURIComponent(filterString);
+    let queryString: string = `?$select=Id,Title,Company,JobTitle,RequestReason,Comments${filterString}`;
+    const ReqsUrl: string = `${this._listsUrl}/GetByTitle('${this._accessListTitle}')/items${queryString}`;
+    try {
+      const reqTasks = await requester.fetch(ReqsUrl, SPHttpClient.configurations.v1, { headers: headers });
+      if (!reqTasks.ok && reqTasks.status !== 200) {
+        throw new Error(reqTasks.statusMessage);
+      }
+      const requestsResults = await reqTasks.json();
+      const spBatch: SPHttpClientBatch = requester.beginBatch();
+      const commsResponses: Promise<SPHttpClientResponse>[] = [];
+      const requests = requestsResults.value;
+      for (let request of requests) {
+        filterString = `RequestId eq ${request.Id} and CompletionStatus ne 'Completed'`;
+        filterString = "&$filter=" + encodeURIComponent(filterString);
+        queryString = `?$select=Id,Title,RequestId/Id,Committee/Title,Outcome,ApprovalComments,RequestStatus&$expand=Committee/Title,RequestId${filterString}`;
+        let commUrl: string = `${this._listsUrl}/GetByTitle('${requestsByCommList}')/items${queryString}`;
+        commsResponses.push(spBatch.get(commUrl, SPHttpClientBatch.configurations.v1));
+      }
+      try {
+        await spBatch.execute();
+        const commTasks: ITask[] = [];
+        for (let response of commsResponses) {
+          const result: SPHttpClientResponse = await response;
+          if (!result.ok && result.status !== 200) {
+            throw new Error(result.statusMessage);
+          }
+          const commReq = await result.json();
+          for (let task of commReq.value) {
+            commTasks.push({
+              Id: task.Id,
+              RequestId: task.RequestId.Id,
+              Name: task.Title,
+              Committee: task.Committee.Title,
+              RequestStatus: task.RequestStatus,
+              Outcome: task.Outcome,
+              CompletionStatus: task.CompletionStatus,
+              Created: task.Created,
+              Modified: task.Modified
+            })
+          }
+        }
+        for (let request of requests) {
+          const reqItem: IFinalTask = {
+            Id: request.Id,
+            Title: request.Title,
+            Comments: request.Comments,
+            JobTitle: request.JobTitle,
+            Office: request.Company,
+            RequestReason: request.RequestReason,
+            CompletionStatus: request.CompletionStatus,
+            CommitteeTasks: commTasks.filter((t) => t.RequestId == request.Id)
+          }
+          reqItems.push(reqItem);
+        }
+      }
+      catch (error) {
+        throw new Error(error.message);
+      }
+    }
+    catch (error) {
+      console.log(error);
+      throw new Error(error.message);
+    }
+    return reqItems;
+  } 
   private _getListItemEntityTypeName(listName: string, requester: SPHttpClient): Promise<string> {
     return new Promise<string>((resolve: (listItemEntityTypeName: string) => void, reject: (error: any) => void): void => {
       if (listName == this._lastListName && this._listItemEntityTypeName) {

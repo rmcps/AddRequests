@@ -1,9 +1,9 @@
 import { IWebPartContext } from '@microsoft/sp-webpart-base';
-import INewAccessRequest from '../models/INewAccessRequest';
+import INewAccessRequest from './INewAccessRequest';
 import IModifyAccessRequest from './IModifyAccessRequest';
 import IAccessRequest from './IAccessRequest';
-import ITask from '../models/ITask';
-
+import ITask from './ITask';
+import IFinalTask from './IFinalTask'
 interface INewAccessRequestsDataProvider {
 
     accessListTitle: string;
@@ -20,6 +20,7 @@ interface INewAccessRequestsDataProvider {
     getTasksForCurrentUser(requestsByCommList: string):Promise<ITask[]>;
     updateForCommittee(itemId: string, action: "Approved" | "Rejected", requestsByCommList: string):Promise<boolean>;
     updateForRequest(itemId: string, action: "Approved" | "Rejected"):Promise<any>;
+    getFinalTasks(requestsByCommList: string):Promise<IFinalTask[]>;
 }
 
 export default INewAccessRequestsDataProvider;

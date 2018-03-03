@@ -1,5 +1,6 @@
 export default interface ITask {
     Id: string;
+    RequestId?: string;
     Name: string;
     Committee: string;
     RequestStatus: string;

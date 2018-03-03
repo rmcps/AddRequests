@@ -6,6 +6,7 @@ import IModifyAccessRequest from "../models/IModifyAccessRequest";
 import SharePointDataProvider from '../models/IAccessRequestsDataProvider';
 import IAccessRequestsDataProvider from '../models/IAccessRequestsDataProvider';
 import ITask from '../models/ITask';
+import IFinalTask from '../models/IFinalTask';
 
 export default class MockNewAccessRequest implements IAccessRequestsDataProvider {
 
@@ -138,6 +139,9 @@ export default class MockNewAccessRequest implements IAccessRequestsDataProvider
         return Promise.resolve(true);
     }
     public updateForRequest(action: "approve" | "reject") {
+        return null;
+    }
+    public getFinalTasks(requestsByCommList: string):Promise<IFinalTask[]> {
         return null;
     }
 }

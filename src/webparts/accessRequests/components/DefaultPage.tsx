@@ -17,10 +17,11 @@ import IAccessRequest from '../models/IAccessRequest';
 import DisplayRequest from './DisplayAccessRequest/DisplayRequest';
 import IDisplayRequestProps from './DisplayAccessRequest/IDisplayRequestProps';
 import TaskList from './TaskList/TaskList';
+import FinalTaskList from './FinalTaskList/FinalTaskList';
 import TopNav from './Navigation/TopNav';
 
 export interface IDefaultState {
-  show: "List" | "New" | "Change" | "Display" | "Tasks";
+  show: "List" | "New" | "Change" | "Display" | "Tasks" | "FinalTasks";
   selectedItem: IAccessRequest;
   listNotConfigured: boolean;
 }
@@ -34,7 +35,7 @@ export default class DefaultPage extends React.Component<IDefaultProps, IDefault
     super(props);
     // set initial state   
     this.state = {
-      show: urlParams.get("view") === "tasks" ? "Tasks" : "List",
+      show: urlParams.get("view") === "tasks" ? "Tasks" : (urlParams.get("view") === "finaltasks" ? "FinalTasks" : "List"),
       selectedItem: null,
       listNotConfigured: false,
     };
@@ -81,6 +82,7 @@ export default class DefaultPage extends React.Component<IDefaultProps, IDefault
               dataProvider={this._dataProvider} membersList={this.props.membersList} membersCommList={this.props.membersCommitteesList}
               committeesListTitle={this.props.committeesList} onRecordAdded={this.handleViewSelected} />}
             {(this.state.listNotConfigured == false && this.state.show == "Tasks") && <TaskList dataProvider={this._dataProvider} requestsByCommList = {this.props.requestsByCommitteeList} /> }
+            {(this.state.listNotConfigured == false && this.state.show == "FinalTasks") && <FinalTaskList dataProvider={this._dataProvider} requestsByCommList = {this.props.requestsByCommitteeList} /> }
           </div>
         </div>
       </div>
@@ -113,6 +115,11 @@ export default class DefaultPage extends React.Component<IDefaultProps, IDefault
         case "tasks":
         this.setState({
           show: "Tasks"
+        });
+        break;
+        case "finaltasks":
+        this.setState({
+          show: "FinalTasks"
         });
         break;
       }
