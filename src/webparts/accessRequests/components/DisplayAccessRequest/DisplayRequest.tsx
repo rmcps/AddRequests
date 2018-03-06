@@ -77,8 +77,8 @@ export default class DisplayRequest extends React.Component<IDisplayRequestProps
                         {this.props.item.RemoveCommittees.length > 0 && <div className={styles.fieldContainer}>
                             <TextField label='Remove Committees' disabled={true} multiline value={this.props.item.RemoveCommittees.join(", ")} />
                         </div>}
-                        {this.props.additionalInfo && <div className={styles.fieldContainer}>
-                            <TextField disabled={true} multiline value={this.props.additionalInfo} />
+                        {this.props.item.RequestStatus && <div className={styles.fieldContainer}>
+                            <TextField label='Status' disabled={true} multiline value={this.props.item.RequestStatus} />
                         </div>}
                     </div>
                 </div>

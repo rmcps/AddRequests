@@ -24,6 +24,7 @@ export interface IDefaultState {
   show: "List" | "New" | "Change" | "Display" | "Tasks" | "FinalTasks";
   selectedItem: IAccessRequest;
   listNotConfigured: boolean;
+  currentUser: any;
 }
 
 export default class DefaultPage extends React.Component<IDefaultProps, IDefaultState> {
@@ -38,6 +39,7 @@ export default class DefaultPage extends React.Component<IDefaultProps, IDefault
       show: urlParams.get("view") === "tasks" ? "Tasks" : (urlParams.get("view") === "finaltasks" ? "FinalTasks" : "List"),
       selectedItem: null,
       listNotConfigured: false,
+      currentUser: null
     };
 
     if (DEBUG && Environment.type === EnvironmentType.Local) {
@@ -49,12 +51,20 @@ export default class DefaultPage extends React.Component<IDefaultProps, IDefault
     }
 
   }
-  public componentWillReceiveProps(nextProps: IDefaultProps) {
+  public async componentWillReceiveProps(nextProps: IDefaultProps) {
     this.setState({
       listNotConfigured: this.listNotConfigured(nextProps),
     });
+    if (!this.state.currentUser) {
+      const results = await this._dataProvider.getCurrentUser();
+      this.setState({ currentUser : results });
+    }
   }
-  public componentDidMount() {
+  public async componentDidMount() {
+    if (!this.state.currentUser) {
+      const results = await this._dataProvider.getCurrentUser();
+      this.setState({ currentUser : results });
+    }
 
   }
   public render(): React.ReactElement<IDefaultProps> {
@@ -73,7 +83,7 @@ export default class DefaultPage extends React.Component<IDefaultProps, IDefault
           </div>
           <div className={styles.innerContent}>
             {(this.state.listNotConfigured == false && this.state.show == "List") && <AccessRequestList dataProvider={this._dataProvider}
-              onItemSelected={this.handleItemSelected} />}
+              onItemSelected={this.handleItemSelected} currentUser={this.state.currentUser} />}
             {(this.state.listNotConfigured == false && this.state.show == "Display") && <DisplayRequest item={this.state.selectedItem}
               recordType="Display" onReturnClick={this.handleViewSelected} />}
             {(this.state.listNotConfigured == false && this.state.show == "New") && <NewAccessRequest
@@ -81,8 +91,10 @@ export default class DefaultPage extends React.Component<IDefaultProps, IDefault
             {(this.state.listNotConfigured == false && this.state.show == "Change") && <ModifyAccessRequest
               dataProvider={this._dataProvider} membersList={this.props.membersList} membersCommList={this.props.membersCommitteesList}
               committeesListTitle={this.props.committeesList} onRecordAdded={this.handleViewSelected} />}
-            {(this.state.listNotConfigured == false && this.state.show == "Tasks") && <TaskList dataProvider={this._dataProvider} requestsByCommList = {this.props.requestsByCommitteeList} /> }
-            {(this.state.listNotConfigured == false && this.state.show == "FinalTasks") && <FinalTaskList dataProvider={this._dataProvider} requestsByCommList = {this.props.requestsByCommitteeList} /> }
+            {(this.state.listNotConfigured == false && this.state.show == "Tasks") && <TaskList dataProvider={this._dataProvider} 
+                  requestsByCommList = {this.props.requestsByCommitteeList} currentUser={this.state.currentUser} /> }
+            {(this.state.listNotConfigured == false && this.state.show == "FinalTasks") && <FinalTaskList dataProvider={this._dataProvider} 
+                  requestsByCommList = {this.props.requestsByCommitteeList} currentUser={this.state.currentUser} /> }
           </div>
         </div>
       </div>

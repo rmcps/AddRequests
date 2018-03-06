@@ -6,17 +6,26 @@ import { autobind } from 'office-ui-fabric-react/lib/Utilities';
 import { FocusZone, FocusZoneDirection } from 'office-ui-fabric-react/lib/FocusZone';
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import { IconButton, IButtonProps } from 'office-ui-fabric-react/lib/Button';
+import { TextField } from 'office-ui-fabric-react/lib/TextField';
 import IFinalTask from '../../models/IFinalTask';
 
 export interface IFinalTaskItemProps {
     item: IFinalTask;
     onApprovalAction: any;
+    onError: any;
 }
-export default class TaskList extends React.Component<IFinalTaskItemProps, {updating:boolean}> {
+export interface IFinalTaskItemState {
+    updating:boolean; 
+    approvalComments:string;
+    errorMsg: string;
+}
+export default class TaskList extends React.Component<IFinalTaskItemProps, IFinalTaskItemState> {
     constructor(props) {
         super(props);
         this.state = {
-            updating: false
+            updating: false,
+            approvalComments: null,
+            errorMsg:null
         };
     }
     public componentWillReceiveProps(nextProps: IFinalTaskItemProps) {
@@ -33,9 +42,16 @@ export default class TaskList extends React.Component<IFinalTaskItemProps, {upda
             <div className={taskStyles.itemCell} data-is-focusable={true}>
                 <div className={taskStyles.itemContent}>
                     <div><span className={taskStyles.itemLabel}>Name:</span> {this.props.item.Title}</div>
+                    <div><span className={taskStyles.itemLabel}>Reason:</span> {this.props.item.RequestReason}</div>
+                    <div><span className={taskStyles.itemLabel}>Status:</span> 
+                        {this.props.item.RequestStatus ? this.props.item.RequestStatus.split('\n').map((item, key) => {return <span key={key}>{item}<br/></span>}): ""}
+                    </div>
                     {this.props.item.CommitteeTasks.map(c => (
                     <CommitteeItem item={c} />
-                    ))};
+                    ))}
+                    <div><TextField placeholder='Comments' name='ApprovalComments' 
+                        value={this.state.approvalComments} multiline onChanged={this._onApprovalCommentsChanged} /> 
+                    </div>                    
                 </div>
                 <div className={taskStyles.actionIconsContainer}>
                     <IconButton
@@ -63,14 +79,26 @@ export default class TaskList extends React.Component<IFinalTaskItemProps, {upda
     @autobind
     private _onItemApproved(event: React.MouseEvent<HTMLButtonElement>) {
         this.setState({updating: true});
-        const newItem: IFinalTask = {...this.props.item, CompletionStatus:'Approved'};
+        const newItem: IFinalTask = {...this.props.item, CompletionStatus:'Approved', ApprovalComments: this.state.approvalComments};
         this.props.onApprovalAction(newItem);
     }
     @autobind
     private _onItemRejected(event: React.MouseEvent<HTMLButtonElement>) {
+        if (this.state.approvalComments === null || this.state.approvalComments.length < 1) {
+            this.props.onError("Please enter a reason for rejecting this item.");
+            return null;
+        }        
         this.setState({updating: true});
-        const newItem: IFinalTask = {...this.props.item, CompletionStatus:'Rejected'};
+        const newItem: IFinalTask = {...this.props.item, CompletionStatus:'Rejected', ApprovalComments: this.state.approvalComments};
         this.props.onApprovalAction(newItem);
+    }    
+    @autobind
+    private _onApprovalCommentsChanged(value:string) {
+        this.setState((prevState: IFinalTaskItemState, props: IFinalTaskItemProps): IFinalTaskItemState => {
+            prevState.approvalComments = value;
+            return prevState;
+          });
+      
     }    
 }
 function CommitteeItem(props) {
@@ -78,7 +106,9 @@ function CommitteeItem(props) {
         <div className={styles.row}>
         <div className={styles.column1}><span className={taskStyles.itemLabel}>Committee:</span> {props.item.Committee}</div>
         <div className={styles.column1}><span className={taskStyles.itemLabel}>Outcome:</span> {props.item.Outcome}</div>
-        <div className={styles.column1}><span className={taskStyles.itemLabel}>Status:</span> {props.item.RequestStatus}</div>
+        <div className={styles.column1}><span className={taskStyles.itemLabel}>Status:</span> 
+            {props.item.RequestStatus ? props.item.RequestStatus.split('\n').map((item, key) => {return <span key={key}>{item}<br/></span>}) : ""}
+        </div>
         </div>
     );
 }

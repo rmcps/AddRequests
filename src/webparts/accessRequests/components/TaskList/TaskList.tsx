@@ -16,6 +16,7 @@ export interface ITaskListProps {
   //onItemSelected: any;
   dataProvider: IAccessRequestsDataProvider;
   requestsByCommList: string;
+  currentUser: any;
 }
 export interface ITaskListState {
   taskItems: ITask[];
@@ -33,7 +34,7 @@ export default class TaskList extends React.Component<ITaskListProps, ITaskListS
   }
   public async componentWillReceiveProps(nextProps: ITaskListProps) {
     try {
-      let results = await this.props.dataProvider.getTasksForCurrentUser(this.props.requestsByCommList);
+      let results = await this.props.dataProvider.getTasksForCurrentUser(this.props.requestsByCommList, this.props.currentUser);
       this.setState({
         taskItems: results,
         dataIsLoading: false
@@ -46,7 +47,7 @@ export default class TaskList extends React.Component<ITaskListProps, ITaskListS
   }
   public async componentDidMount() {
     try {
-      const results = await this.props.dataProvider.getTasksForCurrentUser(this.props.requestsByCommList);
+      const results = await this.props.dataProvider.getTasksForCurrentUser(this.props.requestsByCommList, this.props.currentUser);
       this.setState({
         taskItems: results,
         dataIsLoading: false
@@ -63,6 +64,7 @@ export default class TaskList extends React.Component<ITaskListProps, ITaskListS
         <div className={styles.column2}>
           <h3>My Tasks</h3>
           {this.state.dataIsLoading ? <Spinner size={SpinnerSize.medium} /> : null}
+          {this.renderErrors()}          
           <Fabric>
             <FocusZone direction={FocusZoneDirection.vertical}>
               <List
@@ -71,7 +73,6 @@ export default class TaskList extends React.Component<ITaskListProps, ITaskListS
               />
             </FocusZone>
           </Fabric>
-          {this.renderErrors()}
         </div>
       </div>
     );
@@ -79,7 +80,7 @@ export default class TaskList extends React.Component<ITaskListProps, ITaskListS
   @autobind
   private _onRenderCell(item: ITask, index: number | undefined): JSX.Element {
     return (
-      <TaskItem item={item} onApprovalAction={this.handleApprovalAction} />
+      <TaskItem item={item} onApprovalAction={this.handleApprovalAction} onError={this.handleErrors} />
     );
   }
   @autobind
@@ -91,8 +92,7 @@ export default class TaskList extends React.Component<ITaskListProps, ITaskListS
     });
     
     try {
-      const result = await this.props.dataProvider.updateForCommittee(item.Id,
-            item.Outcome == "Approved" ? "Approved" : "Rejected", this.props.requestsByCommList);
+      const result = await this.props.dataProvider.updateForCommittee(item, this.props.requestsByCommList);
         if (result) {
           let newItems = this.state.taskItems.filter((i) => i.Id !== item.Id);
           this.setState({ taskItems: newItems });
@@ -105,6 +105,13 @@ export default class TaskList extends React.Component<ITaskListProps, ITaskListS
         return prevState;
       });
     }
+  }
+  @autobind
+  private async handleErrors(errorMessage: string) {
+    this.setState((prevState: ITaskListState, props: ITaskListProps): ITaskListState => {
+      prevState.errors.push(errorMessage);
+      return prevState;
+    });
   }
   private renderErrors() {
     return this.state.errors.length > 0

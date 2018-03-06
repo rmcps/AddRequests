@@ -29,15 +29,15 @@ export default class NewAccessRequest extends React.Component<NewAccessRequestPr
   }
   public componentWillMount() {
     // FOR TESTING ONLY.  Remove after:
-    // let access: INewAccessRequest = {
-    //   FirstName: "Sheila",
-    //   LastName: "Allen",
-    //   EMail: 'sheila.allen@rmcps.com',
-    //   Company: "RMC"
-    // };
-    // this.setState({
-    //   newItem: access
-    // });
+    let access: INewAccessRequest = {
+      FirstName: "Sheila",
+      LastName: "Allen",
+      EMail: 'sheila.allen@rmcps.com',
+      Company: "RMC"
+    };
+    this.setState({
+      newItem: access
+    });
   }
   public componentWillReceiveProps(nextProps: NewAccessRequestProps): void {
   }
@@ -57,7 +57,7 @@ export default class NewAccessRequest extends React.Component<NewAccessRequestPr
   public async componentDidUpdate() {
     if (this.state.status === this._savingMessage) {
       const response = await this.props.dataProvider.saveNewItem(this.state.newItem);
-        if (response.ok) {
+        if (response == 'ok') {
           this.setState({
             hideDialog: false,
             isSaving: false,
@@ -289,7 +289,7 @@ export default class NewAccessRequest extends React.Component<NewAccessRequestPr
   private _onToggleNoCommittees(checked: boolean) {
     this.setState((prevState: INewAccessRequestsState, props: NewAccessRequestProps): INewAccessRequestsState => {
       prevState.CommitteeAccess = checked;
-      prevState.newItem.Committees = checked ? null : prevState.newItem.Committees;
+      prevState.newItem.Committees = checked ? prevState.newItem.Committees : [];
       return prevState;
     });
   }

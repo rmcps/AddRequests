@@ -6,17 +6,27 @@ import { autobind } from 'office-ui-fabric-react/lib/Utilities';
 import { FocusZone, FocusZoneDirection } from 'office-ui-fabric-react/lib/FocusZone';
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import { IconButton, IButtonProps } from 'office-ui-fabric-react/lib/Button';
+import { TextField } from 'office-ui-fabric-react/lib/TextField';
+import { MessageBar, MessageBarType } from 'office-ui-fabric-react/lib/MessageBar';
 import ITask from '../../models/ITask';
 
 export interface ITaskItemProps {
     item: ITask;
     onApprovalAction: any;
+    onError: any;
 }
-export default class TaskList extends React.Component<ITaskItemProps, {updating:boolean}> {
+export interface ITaskItemState {
+    updating:boolean; 
+    approvalComments:string;
+    errorMsg: string;
+}
+export default class TaskList extends React.Component<ITaskItemProps, ITaskItemState> {
     constructor(props) {
         super(props);
         this.state = {
-            updating: false
+            updating: false,
+            approvalComments: null,
+            errorMsg: '',
         };
     }
     public componentWillReceiveProps(nextProps: ITaskItemProps) {
@@ -34,8 +44,11 @@ export default class TaskList extends React.Component<ITaskItemProps, {updating:
                 <div className={taskStyles.itemContent}>
                     <div><span className={taskStyles.itemLabel}>Name:</span> {this.props.item.Name}</div>
                     <div><span className={taskStyles.itemLabel}>Committee:</span> {this.props.item.Committee}</div>
-                    <div><span className={taskStyles.itemLabel}>Status:</span> {this.props.item.RequestStatus}</div>
+                    <div><span className={taskStyles.itemLabel}>Status:</span> {this.props.item.RequestStatus.split('\n').map((item, key) => {return <span key={key}>{item}<br/></span>})}</div>
                     <div><span className={taskStyles.itemLabel}>Submitted:</span> {this.props.item.Created} </div>
+                    <div><TextField placeholder='Comments' name='ApprovalComments' 
+                        value={this.state.approvalComments} multiline onChanged={this._onApprovalCommentsChanged} /> 
+                    </div>
                 </div>
                 <div className={taskStyles.actionIconsContainer}>
                     <IconButton
@@ -62,14 +75,28 @@ export default class TaskList extends React.Component<ITaskItemProps, {updating:
     }
     @autobind
     private _onItemApproved(event: React.MouseEvent<HTMLButtonElement>) {
-        this.setState({updating: true});
-        const newItem: ITask = {...this.props.item, Outcome:'Approved'};
+        this.setState((prevState: ITaskItemState, props: ITaskItemProps): ITaskItemState => {
+            prevState.updating = true;
+            return prevState;
+          });
+        const newItem: ITask = {...this.props.item, Outcome:'Approved', ApprovalComments: this.state.approvalComments};
         this.props.onApprovalAction(newItem);
     }
     @autobind
     private _onItemRejected(event: React.MouseEvent<HTMLButtonElement>) {
-        this.setState({updating: true});
-        const newItem: ITask = {...this.props.item, Outcome:'Rejected'};
+        if (this.state.approvalComments === null || this.state.approvalComments.length < 1) {
+            this.props.onError("Please enter a reason for rejecting this item.");
+            return null;
+        }
+        const newItem: ITask = {...this.props.item, Outcome:'Rejected',ApprovalComments: this.state.approvalComments};
         this.props.onApprovalAction(newItem);
     }    
+    @autobind
+    private _onApprovalCommentsChanged(value:string) {
+        this.setState((prevState: ITaskItemState, props: ITaskItemProps): ITaskItemState => {
+            prevState.approvalComments = value;
+            return prevState;
+          });
+      
+    }
 }

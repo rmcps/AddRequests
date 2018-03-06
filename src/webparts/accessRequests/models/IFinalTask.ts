@@ -7,7 +7,9 @@ interface IFinalTask {
     Title?: string;    
     Office?: string;
     RequestReason?: string;
+    RequestStatus?: string;
     CompletionStatus: string;
+    ApprovalComments?: string;
     CommitteeTasks?: ITask[];
   }
 

@@ -5,8 +5,10 @@ export default interface ITask {
     Committee: string;
     RequestStatus: string;
     Outcome: string;
-    CompletionStatus: string;    
+    CompletionStatus: string;
+    ApprovalComments?: string;
     Created: string;
     Modified: string;
     Updating?: boolean;
+    CurrentUser: string;
 }

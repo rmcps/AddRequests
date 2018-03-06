@@ -14,6 +14,7 @@ import IAccessRequestsDataProvider from '../../models/IAccessRequestsDataProvide
 export interface IAccessRequestListProps {
   onItemSelected: any;
   dataProvider: IAccessRequestsDataProvider;
+  currentUser: any;
 }
 
 export interface IAccessRequestListState {
@@ -31,7 +32,7 @@ export default class AccessRequestList extends React.Component<IAccessRequestLis
     };
   }
   public componentWillReceiveProps(nextProps: IAccessRequestListProps) {
-    this.props.dataProvider.getItemsForCurrentUser().then((items: IAccessRequest[]) => {
+    this.props.dataProvider.getItemsForCurrentUser(this.props.currentUser).then((items: IAccessRequest[]) => {
       this.setState({
         listItems: items,
         dataIsLoading: false
@@ -39,7 +40,7 @@ export default class AccessRequestList extends React.Component<IAccessRequestLis
     });
   }
   public componentDidMount() {
-    this.props.dataProvider.getItemsForCurrentUser().then((items: IAccessRequest[]) => {
+    this.props.dataProvider.getItemsForCurrentUser(this.props.currentUser).then((items: IAccessRequest[]) => {
       this.setState({
         listItems: items,
         dataIsLoading: false
@@ -74,7 +75,7 @@ export default class AccessRequestList extends React.Component<IAccessRequestLis
           <div className={aLstyles.itemName}><span className={aLstyles.itemLabel}>Requested For:</span> {item.Title}</div>
           <div><span className={aLstyles.itemLabel}>Email:</span> {item.EMail}</div>
           <div><span className={aLstyles.itemLabel}>Reason for Request:</span> {item.RequestReason}</div>
-          <div><span className={aLstyles.itemLabel}>Status:</span> {item.RequestStatus}</div>
+          <div><span className={aLstyles.itemLabel}>Status:</span> {item.RequestStatus.split('\n').map((arrItem, key) => {return <span key={key}>{arrItem}<br/></span>})}</div>
           <div><span className={aLstyles.itemLabel}>Created By:</span> {item.CreatedBy}</div>
           <div><span className={aLstyles.itemLabel}>Submitted:</span> {item.Created} </div>
           {item.AddCommittees.length > 0 && <div><span className={aLstyles.itemLabel}>Add Committees:</span> {item.AddCommittees.join(", ")}</div>}

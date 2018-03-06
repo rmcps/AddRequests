@@ -16,6 +16,7 @@ export interface IFinalTaskProps {
   //onItemSelected: any;
   dataProvider: IAccessRequestsDataProvider;
   requestsByCommList: string;
+  currentUser: any;
 }
 export interface IFinalTaskState {
   taskItems: IFinalTask[];
@@ -33,7 +34,7 @@ export default class FinalTaskList extends React.Component<IFinalTaskProps, IFin
   }
   public async componentWillReceiveProps(nextProps: IFinalTaskProps) {
     try {
-      let result = await this.props.dataProvider.getFinalTasks(this.props.requestsByCommList);
+      let result = await this.props.dataProvider.getFinalTasks(this.props.requestsByCommList, this.props.currentUser);
       this.setState({
         taskItems: result,
         dataIsLoading: false
@@ -46,7 +47,7 @@ export default class FinalTaskList extends React.Component<IFinalTaskProps, IFin
   }
   public async componentDidMount() {
     try {
-      const result = await this.props.dataProvider.getFinalTasks(this.props.requestsByCommList);
+      const result = await this.props.dataProvider.getFinalTasks(this.props.requestsByCommList, this.props.currentUser);
       this.setState({
         taskItems: result,
         dataIsLoading: false
@@ -63,6 +64,7 @@ export default class FinalTaskList extends React.Component<IFinalTaskProps, IFin
         <div className={styles.column2}>
           <h3>Approvals</h3>
           {this.state.dataIsLoading ? <Spinner size={SpinnerSize.medium} /> : null}          
+          {this.renderErrors()}
           <Fabric>
             <FocusZone direction={FocusZoneDirection.vertical}>
               <List
@@ -71,7 +73,6 @@ export default class FinalTaskList extends React.Component<IFinalTaskProps, IFin
               />
             </FocusZone>
           </Fabric>
-          {this.renderErrors()}
         </div>
       </div>
     );
@@ -79,7 +80,7 @@ export default class FinalTaskList extends React.Component<IFinalTaskProps, IFin
   @autobind
   private _onRenderCell(item: IFinalTask, index: number | undefined): JSX.Element {
     return (
-      <FinalTaskItem item={item} onApprovalAction={this._handleApprovalAction} />
+      <FinalTaskItem item={item} onApprovalAction={this._handleApprovalAction} onError={this._handleItemError} />
     );
   }
   @autobind
@@ -90,8 +91,7 @@ export default class FinalTaskList extends React.Component<IFinalTaskProps, IFin
       return prevState;
     });
     try {
-      const result = await this.props.dataProvider.updateForRequest(item.Id,
-            item.CompletionStatus == "Approved" ? "Approved" : "Rejected");
+      const result = await this.props.dataProvider.updateForRequest(item);
         if (result) {
           let newItems = this.state.taskItems.filter((i) => i.Id !== item.Id);
           this.setState({ taskItems: newItems });
@@ -104,6 +104,13 @@ export default class FinalTaskList extends React.Component<IFinalTaskProps, IFin
         return prevState;
       });
     }
+  }
+  @autobind
+  private _handleItemError(errorMessage:string) {
+    this.setState((prevState: IFinalTaskState, props: IFinalTaskProps): IFinalTaskState => {
+      prevState.errors.push(errorMessage);
+      return prevState;
+    });
   }
   private renderErrors() {
     return this.state.errors.length > 0
