@@ -271,7 +271,11 @@ export default class SharePointDataProvider implements IAccessRequestsDataProvid
     let restUrl = this.accessListItemsUrl.replace("/items", "");
     const queryUrl: string = this.accessListItemsUrl;
     try {
-      const listItemEntityTypeName = await this._getListItemEntityTypeName(this._accessListTitle, this.webPartContext.spHttpClient);
+      const listItemEntityTypeName = await this._getListItemEntityTypeName(this._accessListTitle, requester);
+      debugger
+      if (listItemEntityTypeName === '' || listItemEntityTypeName.length === 0) {
+        throw new Error('Failed to retrieve ListItemEntityTypeFullName');
+      }
       const body: string = JSON.stringify({
         '__metadata': {
           'type': listItemEntityTypeName
@@ -329,7 +333,7 @@ export default class SharePointDataProvider implements IAccessRequestsDataProvid
     const spBatch: SPHttpClientBatch = requester.beginBatch();
     const postResponses: Promise<SPHttpClientResponse>[] = [];
 
-    const entityTypeName = await this._getListItemEntityTypeName(this._accessListTitle, this.webPartContext.spHttpClient);
+    const entityTypeName = await this._getListItemEntityTypeName(this._accessListTitle, requester);
 
     const postHeaders = {
       //'Accept': 'application/json;odata=verbose',
@@ -424,6 +428,9 @@ export default class SharePointDataProvider implements IAccessRequestsDataProvid
     return this._updateForCommittee(item, requestsByCommList, this.webPartContext.spHttpClient, currentUser);
   }
   private async _updateForCommittee(item: ITask, requestsByCommList: string, requester: SPHttpClient, currentUser?: any): Promise<boolean> {
+        // sleep
+        await this._sleep(5000);
+
     let user: any = currentUser == null ? await this.getCurrentUser() : currentUser;
 
     const approvalsUrl = `https://prod-42.westus.logic.azure.com/workflows/13e4c8e31da946cba3e82c96d67446a0/triggers/manual/paths/invoke/items/${item.Id}?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=TMc_96taHAQpZQhCBJ6Vg_YIGAfNtXbyxZHlBmGYJOo`;
@@ -473,6 +480,10 @@ export default class SharePointDataProvider implements IAccessRequestsDataProvid
     return this._updateForRequest(item, this.webPartContext.spHttpClient, currentUser);
   }
   private async _updateForRequest(item: IFinalTask, requester: SPHttpClient, currentUser?: any) {
+        // sleep
+        await this._sleep(5000);
+
+    
     let user: any = currentUser == null ? await this.getCurrentUser() : currentUser;
 
     const approvalsUrl = `https://prod-61.westus.logic.azure.com/workflows/a957592735af43f5bec601631b68632d/triggers/manual/paths/invoke/request/${item.Id}?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=FP27ZBs5kmEUD0rAFVmz_vFxoHUf5mkEwlc-5C0nRcI`;
@@ -603,13 +614,12 @@ export default class SharePointDataProvider implements IAccessRequestsDataProvid
     return reqItems;
   }
   private async _getListItemEntityTypeName(listName: string, requester: SPHttpClient): Promise<string> {
-
     if (listName == this._lastListName && this._listItemEntityTypeName) {
       return Promise.resolve(this._listItemEntityTypeName);
     }
+    const queryUrl: string = `${this._listsUrl}/GetByTitle('${listName}')?$select=ListItemEntityTypeFullName`;
     try {
-      const response: SPHttpClientResponse = await requester.get(`${this._listsUrl}/getbytitle('${listName}')?$select=ListItemEntityTypeFullName`,
-        SPHttpClient.configurations.v1,
+      const response: SPHttpClientResponse = await requester.get(queryUrl, SPHttpClient.configurations.v1,
         {
           headers: {
             'Accept': 'application/json;odata=nometadata',
@@ -623,7 +633,7 @@ export default class SharePointDataProvider implements IAccessRequestsDataProvid
         const results = await response.json();
         this._listItemEntityTypeName = results.ListItemEntityTypeFullName;
         this._lastListName = listName;
-        Promise.resolve(this._listItemEntityTypeName);
+        return Promise.resolve(this._listItemEntityTypeName);
       }
     }
     catch (error) {
@@ -634,5 +644,8 @@ export default class SharePointDataProvider implements IAccessRequestsDataProvid
     let thisDay = (d.getDate() < 10 ? '0' : '') + d.getDate();
     let thisMonth = (d.getMonth() < 10 ? '0' : '') + (d.getMonth() + 1);
     return d.getFullYear() + '-' + thisMonth + '-' + thisDay;
+  }
+  private _sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 }

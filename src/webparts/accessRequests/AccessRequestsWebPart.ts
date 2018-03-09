@@ -16,6 +16,7 @@ export interface IAccessRequestsWebPartProps {
   committeesList: string;
   membersCommitteesList: string;
   requestsByCommitteeList: string;
+  finalApproverId: any;
 }
 
 export default class AccessRequestsWebPart extends BaseClientSideWebPart<IAccessRequestsWebPartProps> {
@@ -31,6 +32,7 @@ export default class AccessRequestsWebPart extends BaseClientSideWebPart<IAccess
         committeesList: this.properties.committeesList,
         membersCommitteesList: this.properties.membersCommitteesList,
         requestsByCommitteeList: this.properties.requestsByCommitteeList,
+        finalApproverId: this.properties.finalApproverId,
         context:this.context,
         dom: this.domElement,
       }
@@ -72,6 +74,10 @@ export default class AccessRequestsWebPart extends BaseClientSideWebPart<IAccess
         ),
         PropertyPaneTextField('requestsByCommitteeList', {
           label: strings.RequestsByCommitteeListFieldLabel
+        }
+      ),
+        PropertyPaneTextField('finalApproverId', {
+          label: strings.FinalApproverIdFieldLabel
         }
       )
           ]

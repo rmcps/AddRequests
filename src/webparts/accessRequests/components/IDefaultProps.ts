@@ -6,6 +6,7 @@ export default interface IDefaultProps {
     committeesList: string;
     membersCommitteesList: string;
     requestsByCommitteeList: string;
+    finalApproverId: any;
     context:any;
     dom:any;  
     dataProvider?: IAccessRequestsDataProvider;

@@ -65,7 +65,6 @@ export default class DefaultPage extends React.Component<IDefaultProps, IDefault
       const results = await this._dataProvider.getCurrentUser();
       this.setState({ currentUser : results });
     }
-
   }
   public render(): React.ReactElement<IDefaultProps> {
     return (
@@ -76,7 +75,8 @@ export default class DefaultPage extends React.Component<IDefaultProps, IDefault
               <div className={styles.headerBar}>
                 {this.state.listNotConfigured ?
                   <MessageBar messageBarType={MessageBarType.warning}>Please configure the lists for this component first.</MessageBar>
-                  : <TopNav onItemSelected={this.handleViewSelected} show={this.state.show} />
+                  : <TopNav isApprover={this.state.currentUser && Number(this.state.currentUser.Id) === Number(this.props.finalApproverId)} 
+                            onItemSelected={this.handleViewSelected} show={this.state.show} />
                 }
               </div>
             </div>
@@ -93,7 +93,7 @@ export default class DefaultPage extends React.Component<IDefaultProps, IDefault
               committeesListTitle={this.props.committeesList} onRecordAdded={this.handleViewSelected} />}
             {(this.state.listNotConfigured == false && this.state.show == "Tasks") && <TaskList dataProvider={this._dataProvider} 
                   requestsByCommList = {this.props.requestsByCommitteeList} currentUser={this.state.currentUser} /> }
-            {(this.state.listNotConfigured == false && this.state.show == "FinalTasks") && <FinalTaskList dataProvider={this._dataProvider} 
+            {(this.state.listNotConfigured == false && this.state.show === "FinalTasks") && <FinalTaskList dataProvider={this._dataProvider} 
                   requestsByCommList = {this.props.requestsByCommitteeList} currentUser={this.state.currentUser} /> }
           </div>
         </div>

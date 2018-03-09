@@ -30,12 +30,19 @@
   .actionIconsContainer {
       margin-left: 6px;
       flex-shrink: 0;
-  }
-  .actionIcons {
-    align-self: center;
-    margin-left: 2px;
-    // @include margin-left(10px);
-    color: $ms-color-neutralTertiary;
-    font-size: $ms-font-size-m;
-    flex-shrink: 0;
-  }
+      .ms-Button--icon {
+        align-self: center;
+        margin-left: 2px;
+        flex-shrink: 0;
+    }
+    .approveButton:hover {
+        color: green;
+    }
+    .rejectButton:hover  {
+        color: red;
+    }    
+    i {
+        @include ms-fontSize-xl;
+        font-weight: $ms-font-weight-semibold;
+    }
+}

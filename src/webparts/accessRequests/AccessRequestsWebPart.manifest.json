@@ -24,7 +24,8 @@
       "membersList": "UPHP Members",
       "committeesList": "UPHP Committees",
       "membersCommitteesList": "UPHP Member Committees",
-      "requestsByCommitteeList": "Access Requests By Committee"
+      "requestsByCommitteeList": "Access Requests By Committee",
+      "finalApproverId": "6"
     }
   }]
 }

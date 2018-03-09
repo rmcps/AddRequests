@@ -8,6 +8,7 @@ import { List } from 'office-ui-fabric-react/lib/List';
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import { IconButton, IButtonProps } from 'office-ui-fabric-react/lib/Button';
 import { MessageBar, MessageBarType } from 'office-ui-fabric-react/lib/MessageBar';
+import { Dialog, DialogType } from 'office-ui-fabric-react/lib/Dialog';
 import IAccessRequestsDataProvider from '../../models/IAccessRequestsDataProvider';
 import ITask from '../../models/ITask';
 import TaskItem from '../TaskItem/TaskItem';
@@ -21,7 +22,8 @@ export interface ITaskListProps {
 export interface ITaskListState {
   taskItems: ITask[];
   dataIsLoading: boolean;
-  errors: string[];
+  errorMsg: string;
+  hideDialog: boolean;
 }
 export default class TaskList extends React.Component<ITaskListProps, ITaskListState> {
   constructor(props: ITaskListProps) {
@@ -29,7 +31,8 @@ export default class TaskList extends React.Component<ITaskListProps, ITaskListS
     this.state = {
       taskItems: [],
       dataIsLoading: true,
-      errors: [],
+      errorMsg: null,
+      hideDialog: true
     };
   }
   public async componentWillReceiveProps(nextProps: ITaskListProps) {
@@ -64,7 +67,13 @@ export default class TaskList extends React.Component<ITaskListProps, ITaskListS
         <div className={styles.column2}>
           <h3>My Tasks</h3>
           {this.state.dataIsLoading ? <Spinner size={SpinnerSize.medium} /> : null}
-          {this.renderErrors()}          
+          {this.state.errorMsg ? <MessageBar
+              messageBarType={MessageBarType.error}
+              isMultiline={true}>
+              {this.state.errorMsg}
+            </MessageBar>
+            : null
+            }
           <Fabric>
             <FocusZone direction={FocusZoneDirection.vertical}>
               <List
@@ -74,6 +83,17 @@ export default class TaskList extends React.Component<ITaskListProps, ITaskListS
             </FocusZone>
           </Fabric>
         </div>
+        <Dialog
+          hidden={this.state.hideDialog}
+          dialogContentProps={{
+            type: DialogType.normal,
+            subText: "Updating..."
+          }}
+          modalProps={{
+            isBlocking: true,
+          }}
+        >
+        </Dialog>        
       </div>
     );
   }
@@ -85,9 +105,9 @@ export default class TaskList extends React.Component<ITaskListProps, ITaskListS
   }
   @autobind
   private async handleApprovalAction(item: ITask) {
-
     this.setState((prevState: ITaskListState, props: ITaskListProps): ITaskListState => {
-      prevState.errors.length = 0;
+      prevState.errorMsg = null;
+      prevState.hideDialog = false;
       return prevState;
     });
     
@@ -95,13 +115,18 @@ export default class TaskList extends React.Component<ITaskListProps, ITaskListS
       const result = await this.props.dataProvider.updateForCommittee(item, this.props.requestsByCommList);
         if (result) {
           let newItems = this.state.taskItems.filter((i) => i.Id !== item.Id);
-          this.setState({ taskItems: newItems });
+          this.setState((prevState: ITaskListState, props: ITaskListProps): ITaskListState => {
+            prevState.taskItems = newItems;
+            prevState.hideDialog = true;
+            return prevState;
+          });
         }
     }
     catch (error) {
       console.log(error);
       this.setState((prevState: ITaskListState, props: ITaskListProps): ITaskListState => {
-        prevState.errors.push("Error updating approval");
+        prevState.errorMsg = "Error updating approval";
+        prevState.hideDialog = true;
         return prevState;
       });
     }
@@ -109,30 +134,8 @@ export default class TaskList extends React.Component<ITaskListProps, ITaskListS
   @autobind
   private async handleErrors(errorMessage: string) {
     this.setState((prevState: ITaskListState, props: ITaskListProps): ITaskListState => {
-      prevState.errors.push(errorMessage);
+      prevState.errorMsg = errorMessage;
       return prevState;
-    });
-  }
-  private renderErrors() {
-    return this.state.errors.length > 0
-      ?
-      <div>
-        {
-          this.state.errors.map((item, idx) =>
-            <MessageBar
-              messageBarType={MessageBarType.error}
-              isMultiline={true}
-            >
-              {item}
-            </MessageBar>
-          )
-        }
-      </div>
-      : null;
-  }
-  private clearError(idx: number) {
-    this.setState((prevState, props) => {
-      return { ...prevState, errors: prevState.errors.splice(idx, 1) };
     });
   }
 }

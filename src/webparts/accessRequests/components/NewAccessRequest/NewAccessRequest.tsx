@@ -56,7 +56,8 @@ export default class NewAccessRequest extends React.Component<NewAccessRequestPr
   }
   public async componentDidUpdate() {
     if (this.state.status === this._savingMessage) {
-      const response = await this.props.dataProvider.saveNewItem(this.state.newItem);
+      try {
+        const response = await this.props.dataProvider.saveNewItem(this.state.newItem);
         if (response == 'ok') {
           this.setState({
             hideDialog: false,
@@ -65,13 +66,18 @@ export default class NewAccessRequest extends React.Component<NewAccessRequestPr
           });
         }
         else {
-          this.setState((prevState: INewAccessRequestsState, props: NewAccessRequestProps): INewAccessRequestsState => {
-            prevState.errors.push('Error: Failed to save record.');
-            prevState.status = '';
-            prevState.isSaving = false;
-            return prevState;
-          });
+          throw new Error('Error: Failed to save record.');
         }
+      }
+      catch (error) {
+        console.log(error);
+        this.setState((prevState: INewAccessRequestsState, props: NewAccessRequestProps): INewAccessRequestsState => {
+          prevState.errors.push('Error: Failed to save record.');
+          prevState.status = '';
+          prevState.isSaving = false;
+          return prevState;
+        });
+      }
     }
   }
   public render(): React.ReactElement<NewAccessRequestProps> {

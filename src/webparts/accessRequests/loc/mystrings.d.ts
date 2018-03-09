@@ -6,6 +6,7 @@ declare interface IAccessRequestsWebPartStrings {
   CommitteesList: string;
   MembersCommitteesListFieldLabel: string;
   RequestsByCommitteeListFieldLabel: string;
+  FinalApproverIdFieldLabel: string;
 }
 
 declare module 'AccessRequestsWebPartStrings' {
