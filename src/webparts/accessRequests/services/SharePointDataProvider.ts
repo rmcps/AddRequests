@@ -181,11 +181,11 @@ export default class SharePointDataProvider implements IAccessRequestsDataProvid
     return this._getMembers(membersList, this.webPartContext.spHttpClient);
   }
   private async _getMembers(membersList: string, requester: SPHttpClient): Promise<IModifyAccessRequest[]> {
-    const queryString: string = '?$select=Id,spLoginName,Title,EMail';
+    const queryString: string = '?$top=1000&$select=Id,spLoginName,Title,EMail';
     let options: ISPHttpClientOptions = {
       headers: {
-        "accept": "application/json;odata=nometadata",
-        "content-type": "application/json;odata=verbose"
+        "accept": "application/json;odata=nometadata" //,
+        //"content-type": "application/json;odata=verbose"
       }
     };
     const queryUrl: string = `${this._listsUrl}/GetByTitle('${membersList}')/items` + queryString;

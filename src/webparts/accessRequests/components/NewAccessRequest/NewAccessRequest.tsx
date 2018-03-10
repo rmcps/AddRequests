@@ -29,15 +29,15 @@ export default class NewAccessRequest extends React.Component<NewAccessRequestPr
   }
   public componentWillMount() {
     // FOR TESTING ONLY.  Remove after:
-    let access: INewAccessRequest = {
-      FirstName: "Sheila",
-      LastName: "Allen",
-      EMail: 'sheila.allen@rmcps.com',
-      Company: "RMC"
-    };
-    this.setState({
-      newItem: access
-    });
+    // let access: INewAccessRequest = {
+    //   FirstName: "Sheila",
+    //   LastName: "Allen",
+    //   EMail: 'sheila.allen@rmcps.com',
+    //   Company: "RMC"
+    // };
+    // this.setState({
+    //   newItem: access
+    // });
   }
   public componentWillReceiveProps(nextProps: NewAccessRequestProps): void {
   }
