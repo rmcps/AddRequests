@@ -1,3 +1,5 @@
+import ITask from "./ITask";
+
 interface IAccessRequest {
     Id?: string;
     Title?: string;
@@ -18,6 +20,7 @@ interface IAccessRequest {
     CreatedBy?: string;
     EditorId?: number;
     ModifiedBy?: string;
+    CommitteeApprovals?: ITask[];
   }
   
   export default IAccessRequest;

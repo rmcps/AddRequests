@@ -84,8 +84,8 @@ export default class DefaultPage extends React.Component<IDefaultProps, IDefault
           <div className={styles.innerContent}>
             {(this.state.listNotConfigured == false && this.state.show == "List") && <AccessRequestList dataProvider={this._dataProvider}
               onItemSelected={this.handleItemSelected} currentUser={this.state.currentUser} />}
-            {(this.state.listNotConfigured == false && this.state.show == "Display") && <DisplayRequest item={this.state.selectedItem}
-              recordType="Display" onReturnClick={this.handleViewSelected} />}
+            {(this.state.listNotConfigured == false && this.state.show == "Display") && <DisplayRequest dataProvider={this._dataProvider} recordType="Display" 
+              requestId={this.state.selectedItem.Id} requestsByCommList={this.props.requestsByCommitteeList} onReturnClick={this.handleViewSelected} />}
             {(this.state.listNotConfigured == false && this.state.show == "New") && <NewAccessRequest
               dataProvider={this._dataProvider} committeesListTitle={this.props.committeesList} onRecordAdded={this.handleViewSelected} />}
             {(this.state.listNotConfigured == false && this.state.show == "Change") && <ModifyAccessRequest

@@ -30,8 +30,12 @@ export default class TaskList extends React.Component<ITaskItemProps, ITaskItemS
                 <div className={taskStyles.itemContent}>
                     <div><span className={taskStyles.itemLabel}>Name:</span> {this.props.item.Name}</div>
                     <div><span className={taskStyles.itemLabel}>Committee:</span> {this.props.item.Committee}</div>
-                    <div><span className={taskStyles.itemLabel}>Status:</span> {this.props.item.RequestStatus.split('\n').map((item, key) => { return <span key={key}>{item}<br /></span> })}</div>
-                    <div><span className={taskStyles.itemLabel}>Submitted:</span> {this.props.item.Created} </div>
+                    <div><span className={taskStyles.itemLabel}>Request:</span> {this.props.item.RequestType}</div>
+                    <div><span className={taskStyles.itemLabel}>Status:</span>
+                        <ul>
+                            {this.props.item.RequestStatus.split('\n').map((item, key) => { return <li key={key}>{item}</li> })}
+                        </ul>
+                    </div>                    
                     <div><TextField placeholder='Comments' name='ApprovalComments'
                         value={this.state.approvalComments} multiline onChanged={this._onApprovalCommentsChanged} />
                     </div>

@@ -17,8 +17,8 @@ export default class TopNav extends React.Component<TopNavProps, {}> {
     public render() {
         return (
             <div className={styles.pageNav}>
-                {"New" !== this.props.show && <Link data-target-name="addNew" onClick={this._onItemSelected}>New member access</Link>}
-                {"Change" !== this.props.show && <Link data-target-name="change" onClick={this._onItemSelected}>Modify existing member</Link>}
+                {"New" !== this.props.show && <Link data-target-name="addNew" onClick={this._onItemSelected}>New member</Link>}
+                {"Change" !== this.props.show && <Link data-target-name="change" onClick={this._onItemSelected}>Modify member</Link>}
                 {"List" !== this.props.show && <Link data-target-name="list" onClick={this._onItemSelected}>My Requests</Link>}
                 {"Tasks" !== this.props.show && <Link data-target-name="tasks" onClick={this._onItemSelected}>My Tasks</Link>}
                 {"FinalTasks" !== this.props.show && this.props.isApprover && <Link data-target-name="finaltasks" onClick={this._onItemSelected}>Final Approvals</Link>}

@@ -1,0 +1,24 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.committeesList {
+    .header {
+        @include ms-font-m;
+        @include ms-fontWeight-semibold;
+        //color: "[theme:primaryText, default:#0078d7]";       
+        display: block;    
+        padding-bottom: 2px; 
+    }
+    ul {
+        padding-left: 12px;
+        margin-top:0;
+        margin-bottom: 1px;
+    }
+    ul li {
+        list-style-type: none;
+        padding-bottom: 4px;
+    }   
+    ul li span {  
+        display:block;
+        @include ms-font-s;
+    }
+}

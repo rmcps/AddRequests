@@ -84,7 +84,7 @@ export default class MockNewAccessRequest implements IAccessRequestsDataProvider
     public get webPartContext(): IWebPartContext {
         return this._webPartContext;
     }
-    public getItem(requestId: string): Promise<IAccessRequest> {
+    public getItem(requestId: string,requestsByCommList: string): Promise<IAccessRequest> {
         const item: IAccessRequest = lodash.clone(this._items[1]);
         return new Promise<IAccessRequest>((resolve) => {
             setTimeout(() => resolve(item), 500);

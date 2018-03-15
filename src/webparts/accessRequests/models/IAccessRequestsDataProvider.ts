@@ -10,7 +10,7 @@ interface INewAccessRequestsDataProvider {
     accessListItemsUrl;
     webPartContext: IWebPartContext;   
     getCurrentUser():Promise<any>;
-    getItem(requestId:string): Promise<IAccessRequest>;
+    getItem(requestId:string, requestsByCommList: string): Promise<IAccessRequest>;
     getItemsForCurrentUser(currentUser?: any):Promise<IAccessRequest[]>;
     getMembers(membersList: string): Promise<any>;
     getMemberCommittees(membersCommList: string, loginName: any):Promise<any>;

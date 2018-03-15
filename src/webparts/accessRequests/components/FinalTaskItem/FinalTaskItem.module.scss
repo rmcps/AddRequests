@@ -17,6 +17,15 @@
     // @include margin-left(10px);
     overflow: hidden;
     flex-grow: 1;
+    ul {
+        padding-left: 8px;
+        margin-top:0;
+        margin-bottom: 1px;
+        @include ms-font-s;
+    }
+    ul li {
+        list-style-type: none;
+    }       
 }
 .itemName {
     @include ms-font-m-plus;
@@ -51,4 +60,9 @@
     @include ms-sm12;
     @include ms-md6;
     @include ms-lg6;
+}
+.itemContainer {
+    border-top: 1px solid $ms-color-neutralLight;
+    margin-left: 10px;
+    margin-right: 10px;
 }

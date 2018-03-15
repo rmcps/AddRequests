@@ -12,8 +12,6 @@ import IAccessRequest from '../models/IAccessRequest';
 import IAccessRequestsDataProvider from '../models/IAccessRequestsDataProvider';
 import IModifyAccessRequest from "../models/IModifyAccessRequest";
 import ITask from '../models/ITask';
-// import SPHttpClientConfiguration from '@microsoft/sp-http/lib/spHttpClient/SPHttpClientConfiguration';
-// import SPHttpClientBatchConfiguration from '@microsoft/sp-http/lib/spHttpClient/SPHttpClientBatchConfiguration';
 import IFinalTask from '../models/IFinalTask';
 
 export default class SharePointDataProvider implements IAccessRequestsDataProvider {
@@ -79,51 +77,74 @@ export default class SharePointDataProvider implements IAccessRequestsDataProvid
       throw new Error(error.message);
     }
   }
-  public getItem(requestId: string): Promise<IAccessRequest> {
-    return this._getItem(requestId, this.webPartContext.spHttpClient);
+  public getItem(requestId: string, requestsByCommList: string): Promise<IAccessRequest> {
+    return this._getItem(requestId, requestsByCommList, this.webPartContext.spHttpClient);
   }
-  public _getItem(requestId: string, requester: SPHttpClient): Promise<IAccessRequest> {
-    return new Promise<IAccessRequest>((resolve, reject) => {
-      const queryUrl: string = `${this._listsUrl}/GetByTitle('${this._accessListTitle}')/items${requestId}`;
-      requester.get(queryUrl, SPHttpClient.configurations.v1,
-        {
-          headers: {
-            'Accept': 'application/json;odata=nometadata',
-            'odata-version': ''
-          }
-        }).then((response: SPHttpClientResponse) => {
-          if (response.ok) {
-            response.json().then((data: any) => {
-              const reqItem: IAccessRequest = {
-                Id: data.Id,
-                Title: data.Title,
-                Comments: data.Comments,
-                AddCommittees: data.AddCommittees.map(c => c.Title).join(","),
-                RemoveCommittees: data.RemoveCommittees.map(c => c.Title).join(","),
-                Created: data.Created,
-                EMail: data.Email,
-                FirstName: data.FirstName,
-                JobTitle: data.JobTitle,
-                LastName: data.LastName,
-                Modified: data.Modified,
-                Company: data.Company,
-                Office: data.Office,
-                RequestReason: data.RequestReason,
-                RequestStatus: data.RequestStatus,
-                AuthorId: data.AuthorId,
-                CreatedBy: data.Author.Title,
-                EditorId: data.EditorId
-              };
-              resolve(reqItem);
-            })
-              .catch((error) => { reject(error); });
-          }
-          else {
-            reject(response);
-          }
-        })
-        .catch((error) => { reject(error); });
-    });
+  public async _getItem(requestId: string, requestsByCommList: string, requester: SPHttpClient): Promise<IAccessRequest> {
+    let commArr: ITask[] = [];
+    const queryReqUrl: string = `${this._listsUrl}/GetByTitle('${this._accessListTitle}')/items(${requestId})?$select=*,Author/Title&$expand=Author`;
+    let filterString: string = `RequestId eq ${requestId}`;
+    filterString = "$filter=" + encodeURIComponent(filterString);
+    const queryCommUrl: string = `${this._listsUrl}/GetByTitle('${requestsByCommList}')/items?${filterString}&$select=*,Committee/Title&$expand=Committee/Title`
+    const spBatch: SPHttpClientBatch = requester.beginBatch();
+    const batchArr: Promise<SPHttpClientResponse>[] = [];
+    try {      
+      batchArr.push(spBatch.get(queryReqUrl, SPHttpClientBatch.configurations.v1));
+      batchArr.push(spBatch.get(queryCommUrl, SPHttpClientBatch.configurations.v1));
+
+      await spBatch.execute();
+      let response: SPHttpClientResponse = await batchArr[0];
+      if (!response.ok && response.status !== 200) {
+        throw new Error(response.statusMessage);
+      }
+      const reqData= await response.json();
+      response = await batchArr[1];
+      if (!response.ok && response.status !== 200) {
+        throw new Error(response.statusMessage);
+      }
+      const commData = await response.json();      
+
+      for (let item of commData.value) {
+        commArr.push({
+          Id: item.Id,
+          RequestId: item.RequestIdId,
+          Name: item.Title,
+          Committee: item.Committee.Title,
+          RequestStatus: item.RequestStatus,
+          Outcome: item.Outcome,
+          CompletionStatus: item.CompletionStatus,
+          Created: item.Created,
+          Modified: item.Modified,
+          CurrentUser: null       
+        });
+      }
+
+      const reqItem: IAccessRequest = {
+        Id: reqData.Id,
+        Title: reqData.Title,
+        Comments: reqData.Comments,
+        AddCommittees: reqData.AddCommittees ? reqData.AddCommittees.map(c => c.Title).join(",") : '',
+        RemoveCommittees: reqData.RemoveCommittees ? reqData.RemoveCommittees.map(c => c.Title).join(",") : '',
+        Created: reqData.Created,
+        EMail: reqData.EMail,
+        FirstName: reqData.FirstName,
+        JobTitle: reqData.JobTitle,
+        LastName: reqData.LastName,
+        Modified: reqData.Modified,
+        Company: reqData.Company,
+        Office: reqData.Office,
+        RequestReason: reqData.RequestReason,
+        RequestStatus: reqData.RequestStatus,
+        AuthorId: reqData.AuthorId,
+        CreatedBy: reqData.Author.Title,
+        EditorId: reqData.EditorId,
+        CommitteeApprovals: commArr
+      };
+      return reqItem;
+    }
+    catch(error) {
+      throw new Error(error.message);
+    }
   }
   public getItemsForCurrentUser(currentUser?: any): Promise<IAccessRequest[]> {
     return this._getItemsForCurrentUser(this.webPartContext.spHttpClient);
@@ -318,15 +339,18 @@ export default class SharePointDataProvider implements IAccessRequestsDataProvid
   private async _saveChangeRequest(item: IModifyAccessRequest, requester: SPHttpClient): Promise<any> {
     const queryUrl: string = this.accessListItemsUrl;
     let requests = [];
-    if (item.RequestReason == "Terminate") {
+    if (item.RequestReason === "Terminate") {
       requests.push("Terminate");
     }
     else {
-      if (item.AddCommittees || (item.RemoveCommittees == null || item.RemoveCommittees.length == 0)) {
+      if (item.AddCommittees !== null && item.AddCommittees.length > 0) {
         requests.push("Add access");
       }
-      if (item.RemoveCommittees != null && item.RemoveCommittees.length > 0) {
+      if (item.RemoveCommittees !== null && item.RemoveCommittees.length > 0) {
         requests.push("Remove access");
+      }
+      if (requests.length == 0) {
+        throw new Error("No reason for request chosen.");
       }
     }
 
@@ -390,7 +414,7 @@ export default class SharePointDataProvider implements IAccessRequestsDataProvid
     let user: any = currentUser == null ? await this.getCurrentUser() : currentUser;
     let filterString: string = `substringof('${user.LoginName}',Approvers) and Outcome ne 'Approved' and Outcome ne 'Rejected'`;
     filterString = "&$filter=" + encodeURIComponent(filterString);
-    const queryString: string = `?$orderby=Id desc&$select=Id,RequestStatus,RequestId/Title,CompletionStatus,Outcome,Created,Modified,Committee/Title&$expand=Committee/Title,RequestId/Title${filterString}`;
+    const queryString: string = `?$orderby=Id desc&$select=Id,Title,RequestStatus,RequestId/Title,CompletionStatus,Outcome,Created,Modified,Committee/Title&$expand=Committee/Title,RequestId/Title${filterString}`;
     const queryUrl: string = `${this._listsUrl}/GetByTitle('${requestsByCommList}')/items${queryString}`;
     try {
       const qryResponse: SPHttpClientResponse = await requester.get(queryUrl, SPHttpClient.configurations.v1,
@@ -409,6 +433,7 @@ export default class SharePointDataProvider implements IAccessRequestsDataProvid
           Id: item.Id,
           Name: item.RequestId.Title,
           Committee: item.Committee.Title,
+          RequestType: item.Title,
           RequestStatus: item.RequestStatus,
           CompletionStatus: item.CompletionStatus,
           Outcome: item.Outcome,

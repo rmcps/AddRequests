@@ -4,6 +4,7 @@ export default interface ITask {
     Name: string;
     Committee: string;
     RequestStatus: string;
+    RequestType?: string;
     Outcome: string;
     CompletionStatus: string;
     ApprovalComments?: string;

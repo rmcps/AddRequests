@@ -31,7 +31,9 @@ export default class TaskList extends React.Component<IFinalTaskItemProps, IFina
                     <div><span className={taskStyles.itemLabel}>Name:</span> {this.props.item.Title}</div>
                     <div><span className={taskStyles.itemLabel}>Reason:</span> {this.props.item.RequestReason}</div>
                     <div><span className={taskStyles.itemLabel}>Status:</span>
-                        {this.props.item.RequestStatus ? this.props.item.RequestStatus.split('\n').map((item, key) => { return <span key={key}>{item}<br /></span> }) : ""}
+                        <ul>
+                            {this.props.item.RequestStatus ? this.props.item.RequestStatus.split('\n').map((item, key) => { return <li key={key}>{item}</li> }) : ""}
+                        </ul>
                     </div>
                     {this.props.item.CommitteeTasks.map(c => (
                         <CommitteeItem item={c} />
@@ -89,10 +91,14 @@ export default class TaskList extends React.Component<IFinalTaskItemProps, IFina
 function CommitteeItem(props) {
     return (
         <div className={styles.row}>
-            <div className={styles.column1}><span className={taskStyles.itemLabel}>Committee:</span> {props.item.Committee}</div>
-            <div className={styles.column1}><span className={taskStyles.itemLabel}>Outcome:</span> {props.item.Outcome}</div>
-            <div className={styles.column1}><span className={taskStyles.itemLabel}>Status:</span>
-                {props.item.RequestStatus ? props.item.RequestStatus.split('\n').map((item, key) => { return <span key={key}>{item}<br /></span> }) : ""}
+            <div className={taskStyles.itemContainer}>
+                <div className={styles.column1}><span className={taskStyles.itemLabel}>Committee:</span> {props.item.Committee}</div>
+                <div className={styles.column1}><span className={taskStyles.itemLabel}>Outcome:</span> {props.item.Outcome}</div>
+                <div className={styles.column1}><span className={taskStyles.itemLabel}>Status:</span>
+                    <ul>
+                        {props.item.RequestStatus ? props.item.RequestStatus.split('\n').map((item, key) => { return <li key={key}>{item}</li> }) : ""}
+                    </ul>
+                </div>
             </div>
         </div>
     );

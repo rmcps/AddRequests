@@ -75,9 +75,12 @@ export default class AccessRequestList extends React.Component<IAccessRequestLis
           <div className={aLstyles.itemName}><span className={aLstyles.itemLabel}>Requested For:</span> {item.Title}</div>
           <div><span className={aLstyles.itemLabel}>Email:</span> {item.EMail}</div>
           <div><span className={aLstyles.itemLabel}>Reason for Request:</span> {item.RequestReason}</div>
-          <div><span className={aLstyles.itemLabel}>Status:</span> {item.RequestStatus.split('\n').map((arrItem, key) => {return <span key={key}>{arrItem}<br/></span>})}</div>
-          <div><span className={aLstyles.itemLabel}>Created By:</span> {item.CreatedBy}</div>
-          <div><span className={aLstyles.itemLabel}>Submitted:</span> {item.Created} </div>
+          <div><span className={aLstyles.itemLabel}>Created By:</span> {item.CreatedBy}</div>          
+          <div><span className={aLstyles.itemLabel}>Status:</span>
+            <ul>
+              {item.RequestStatus.split('\n').map((arrItem, key) => {return <li key={key}>{arrItem}</li>})}
+            </ul>
+          </div>
           {item.AddCommittees.length > 0 && <div><span className={aLstyles.itemLabel}>Add Committees:</span> {item.AddCommittees.join(", ")}</div>}
           {item.RemoveCommittees.length > 0 && <div><span className={aLstyles.itemLabel}>Remove Committees:</span> {item.RemoveCommittees.join(",")}</div>}
         </div>

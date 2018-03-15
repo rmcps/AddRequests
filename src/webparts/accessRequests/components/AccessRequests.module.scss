@@ -97,6 +97,9 @@
     &.isDataLoading{
       opacity: 0.5;
     }
+    label {
+      @include ms-fontWeight-semibold;
+    }
   }
   .button {
     // Our button
