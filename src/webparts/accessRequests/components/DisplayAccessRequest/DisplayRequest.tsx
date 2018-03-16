@@ -151,6 +151,6 @@ export default class DisplayRequest extends React.Component<IDisplayRequestProps
     }
     @autobind
     private _onReturn() {
-        this.props.onReturnClick("list");
+        this.props.onReturnClick(this.props.callingView);
     }
 }

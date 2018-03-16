@@ -414,7 +414,7 @@ export default class SharePointDataProvider implements IAccessRequestsDataProvid
     let user: any = currentUser == null ? await this.getCurrentUser() : currentUser;
     let filterString: string = `substringof('${user.LoginName}',Approvers) and Outcome ne 'Approved' and Outcome ne 'Rejected'`;
     filterString = "&$filter=" + encodeURIComponent(filterString);
-    const queryString: string = `?$orderby=Id desc&$select=Id,Title,RequestStatus,RequestId/Title,CompletionStatus,Outcome,Created,Modified,Committee/Title&$expand=Committee/Title,RequestId/Title${filterString}`;
+    const queryString: string = `?$orderby=Id desc&$select=Id,Title,RequestStatus,RequestIdId,RequestId/Title,CompletionStatus,Outcome,Created,Modified,Committee/Title&$expand=Committee/Title,RequestId/Title${filterString}`;
     const queryUrl: string = `${this._listsUrl}/GetByTitle('${requestsByCommList}')/items${queryString}`;
     try {
       const qryResponse: SPHttpClientResponse = await requester.get(queryUrl, SPHttpClient.configurations.v1,
@@ -431,6 +431,7 @@ export default class SharePointDataProvider implements IAccessRequestsDataProvid
       const reqItems: ITask[] = data.value.map((item) => {
         return {
           Id: item.Id,
+          RequestId: item.RequestIdId,
           Name: item.RequestId.Title,
           Committee: item.Committee.Title,
           RequestType: item.Title,

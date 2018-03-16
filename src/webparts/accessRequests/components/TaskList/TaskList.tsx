@@ -18,6 +18,7 @@ export interface ITaskListProps {
   dataProvider: IAccessRequestsDataProvider;
   requestsByCommList: string;
   currentUser: any;
+  onTaskItemSelected: any;
 }
 export interface ITaskListState {
   taskItems: ITask[];
@@ -100,11 +101,11 @@ export default class TaskList extends React.Component<ITaskListProps, ITaskListS
   @autobind
   private _onRenderCell(item: ITask, index: number | undefined): JSX.Element {
     return (
-      <TaskItem item={item} onApprovalAction={this.handleApprovalAction} onError={this.handleErrors} />
+      <TaskItem item={item} onApprovalAction={this._handleApprovalAction} onError={this._handleErrors} onShowRequest={this._handleShowRequest} />
     );
   }
   @autobind
-  private async handleApprovalAction(item: ITask) {
+  private async _handleApprovalAction(item: ITask) {
     this.setState((prevState: ITaskListState, props: ITaskListProps): ITaskListState => {
       prevState.errorMsg = null;
       prevState.hideDialog = false;
@@ -132,10 +133,14 @@ export default class TaskList extends React.Component<ITaskListProps, ITaskListS
     }
   }
   @autobind
-  private async handleErrors(errorMessage: string) {
+  private async _handleErrors(errorMessage: string) {
     this.setState((prevState: ITaskListState, props: ITaskListProps): ITaskListState => {
       prevState.errorMsg = errorMessage;
       return prevState;
-    });
+    });  
+  }
+  @autobind
+  private _handleShowRequest(requestId) {
+    this.props.onTaskItemSelected(requestId, "Tasks");
   }
 }

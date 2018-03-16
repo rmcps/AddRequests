@@ -7,12 +7,14 @@ import { FocusZone, FocusZoneDirection } from 'office-ui-fabric-react/lib/FocusZ
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import { IconButton, IButtonProps } from 'office-ui-fabric-react/lib/Button';
 import { TextField } from 'office-ui-fabric-react/lib/TextField';
+import { Link } from 'office-ui-fabric-react/lib/Link';
 import IFinalTask from '../../models/IFinalTask';
 
 export interface IFinalTaskItemProps {
     item: IFinalTask;
     onApprovalAction: any;
     onError: any;
+    onShowRequest;
 }
 export interface IFinalTaskItemState {
     approvalComments: string;
@@ -28,8 +30,12 @@ export default class TaskList extends React.Component<IFinalTaskItemProps, IFina
         return (
             <div className={taskStyles.itemCell} data-is-focusable={true}>
                 <div className={taskStyles.itemContent}>
-                    <div><span className={taskStyles.itemLabel}>Name:</span> {this.props.item.Title}</div>
-                    <div><span className={taskStyles.itemLabel}>Reason:</span> {this.props.item.RequestReason}</div>
+                    <div>
+                        <span className={taskStyles.itemLabel}>Name: </span>{this.props.item.Title}
+                    </div>
+                    <div><span className={taskStyles.itemLabel}>Reason: </span>
+                        <Link href="#" onClick={this._onShowRequest} data-requestId={this.props.item.Id}>{this.props.item.RequestReason}</Link>
+                    </div>
                     <div><span className={taskStyles.itemLabel}>Status:</span>
                         <ul>
                             {this.props.item.RequestStatus ? this.props.item.RequestStatus.split('\n').map((item, key) => { return <li key={key}>{item}</li> }) : ""}
@@ -86,6 +92,12 @@ export default class TaskList extends React.Component<IFinalTaskItemProps, IFina
             return prevState;
         });
 
+    }
+    @autobind
+    private _onShowRequest(event: React.MouseEvent<HTMLButtonElement>) {
+        const attributes: NamedNodeMap = event.currentTarget.attributes;
+        const requestId = attributes.getNamedItem("data-requestId").value;
+        this.props.onShowRequest(requestId);
     }
 }
 function CommitteeItem(props) {

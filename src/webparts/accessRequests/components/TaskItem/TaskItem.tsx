@@ -6,6 +6,7 @@ import { autobind } from 'office-ui-fabric-react/lib/Utilities';
 import { FocusZone, FocusZoneDirection } from 'office-ui-fabric-react/lib/FocusZone';
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import { IconButton, IButtonProps } from 'office-ui-fabric-react/lib/Button';
+import { Link } from 'office-ui-fabric-react/lib/Link';
 import { TextField } from 'office-ui-fabric-react/lib/TextField';
 import ITask from '../../models/ITask';
 
@@ -13,6 +14,7 @@ export interface ITaskItemProps {
     item: ITask;
     onApprovalAction: any;
     onError: any;
+    onShowRequest: any;
 }
 export interface ITaskItemState {
     approvalComments: string;
@@ -28,14 +30,17 @@ export default class TaskList extends React.Component<ITaskItemProps, ITaskItemS
         return (
             <div className={taskStyles.itemCell} data-is-focusable={true}>
                 <div className={taskStyles.itemContent}>
-                    <div><span className={taskStyles.itemLabel}>Name:</span> {this.props.item.Name}</div>
+                    <div><span className={taskStyles.itemLabel}>Name: </span>{this.props.item.Name}
+                    </div>
                     <div><span className={taskStyles.itemLabel}>Committee:</span> {this.props.item.Committee}</div>
-                    <div><span className={taskStyles.itemLabel}>Request:</span> {this.props.item.RequestType}</div>
+                    <div><span className={taskStyles.itemLabel}>Request: </span>
+                        <Link href="#" onClick={this._onShowRequest} data-requestId={this.props.item.RequestId}>{this.props.item.RequestType}</Link>
+                    </div>
                     <div><span className={taskStyles.itemLabel}>Status:</span>
                         <ul>
                             {this.props.item.RequestStatus.split('\n').map((item, key) => { return <li key={key}>{item}</li> })}
                         </ul>
-                    </div>                    
+                    </div>
                     <div><TextField placeholder='Comments' name='ApprovalComments'
                         value={this.state.approvalComments} multiline onChanged={this._onApprovalCommentsChanged} />
                     </div>
@@ -85,5 +90,11 @@ export default class TaskList extends React.Component<ITaskItemProps, ITaskItemS
             return prevState;
         });
 
+    }
+    @autobind
+    private _onShowRequest(event: React.MouseEvent<HTMLButtonElement>) {
+        const attributes: NamedNodeMap = event.currentTarget.attributes;
+        const requestId = attributes.getNamedItem("data-requestId").value;
+        this.props.onShowRequest(requestId);
     }
 }

@@ -368,6 +368,6 @@ export default class NewAccessRequest extends React.Component<NewAccessRequestPr
       prevState.hideDialog = true;
       return prevState;
     });
-    this.props.onRecordAdded("list");
+    this.props.onRecordAdded("List");
   }
 }

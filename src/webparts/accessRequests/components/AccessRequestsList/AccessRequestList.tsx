@@ -101,7 +101,8 @@ export default class AccessRequestList extends React.Component<IAccessRequestLis
   private _onItemClick(event?: React.MouseEvent<HTMLButtonElement>) {
     const attributes: NamedNodeMap = event.currentTarget.attributes;
     const requestId = attributes.getNamedItem("data-requestId").value;
-    const item = this.state.listItems.filter((i) => i.Id == requestId)[0];
-    this.props.onItemSelected(item);
+    //const item = this.state.listItems.filter((i) => i.Id == requestId)[0];
+    //this.props.onItemSelected(item);
+    this.props.onItemSelected(requestId);
   }
 }

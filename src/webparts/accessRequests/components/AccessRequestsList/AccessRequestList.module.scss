@@ -44,5 +44,9 @@
         color: $ms-color-neutralTertiary;
         font-size: $ms-font-size-l;
         flex-shrink: 0;
+        &:hover {
+            font-weight: 700;
+            color: "[theme:themePrimary, default: #0078d7]"
+        }
       }
     }

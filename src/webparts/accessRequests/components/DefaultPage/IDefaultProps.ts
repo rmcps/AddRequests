@@ -1,4 +1,4 @@
-import IAccessRequestsDataProvider from '../models/IAccessRequestsDataProvider';
+import IAccessRequestsDataProvider from '../../models/IAccessRequestsDataProvider';
 
 export default interface IDefaultProps {
     requestsList: string;

@@ -18,6 +18,7 @@ export interface IFinalTaskProps {
   dataProvider: IAccessRequestsDataProvider;
   requestsByCommList: string;
   currentUser: any;
+  onTaskItemSelected: any;  
 }
 export interface IFinalTaskState {
   taskItems: IFinalTask[];
@@ -100,7 +101,7 @@ export default class FinalTaskList extends React.Component<IFinalTaskProps, IFin
   @autobind
   private _onRenderCell(item: IFinalTask, index: number | undefined): JSX.Element {
     return (
-      <FinalTaskItem item={item} onApprovalAction={this._handleApprovalAction} onError={this._handleItemError} />
+      <FinalTaskItem item={item} onApprovalAction={this._handleApprovalAction} onError={this._handleItemError} onShowRequest={this._handleShowRequest} />
     );
   }
   @autobind
@@ -138,4 +139,8 @@ export default class FinalTaskList extends React.Component<IFinalTaskProps, IFin
       return prevState;
     });
   }
+  @autobind
+  private _handleShowRequest(requestId) {
+    this.props.onTaskItemSelected(requestId, "FinalTasks");
+  }  
 }

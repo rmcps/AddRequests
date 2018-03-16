@@ -47,43 +47,46 @@
   }
   .pageNav {
     display: block;
-  }
-  .pageNav button {
-    float:left;
-    margin-right: 28px;
-    @include ms-fontColor-white;
-    font-size: 14px;
-    font-weight: 300;
-    // height: 24px;
-    // line-height: 24px;
-    text-align: center;    
-    padding: 8px 16px;
-    @media (max-width: $ms-screen-max-sm) {
-      float: none;
-      width:100%;
-      padding: 2px 2px;
+    button {
+      float:left;
+      margin-right: 28px;
+      @include ms-fontColor-white;
+      font-size: 14px;
+      font-weight: 300;
+      // height: 24px;
+      // line-height: 24px;
+      text-align: center;    
+      padding: 8px 16px;
+      @media (max-width: $ms-screen-max-sm) {
+        float: none;
+        width:100%;
+        padding: 2px 2px;
+      }
+      &.btnSelected {
+        color: "[theme:themePrimary, default: #0078d7]";
+      }
     }
-  }
-  .pageNav button:hover {
-    font-weight: bolder;
-  }
-  .pageNav ul {
-    // display: flex;
-    list-style: none;
-  
-  }
-  .pageNav ul li {
-    float: left;
-  }
-  .pageNav ul li button {
-    margin-right: 28px;
-    @include ms-fontColor-white;
-    font-size: 14px;
-    font-weight: 300;
-    // height: 24px;
-    // line-height: 24px;
-    text-decoration: none;
-    text-align: center;
+    button:hover {
+      font-weight: bolder;
+      color: "[theme:themeSecondary, default: #2b88d8]";
+    }
+    ul {
+      // display: flex;
+      list-style: none;
+      li {
+          float: left;
+      }    
+      li button {
+        margin-right: 28px;
+        @include ms-fontColor-white;
+        font-size: 14px;
+        font-weight: 300;
+        // height: 24px;
+        // line-height: 24px;
+        text-decoration: none;
+        text-align: center;
+      }
+    }
   }
   .description {
     @include ms-font-l;
@@ -146,7 +149,6 @@
   .formButtonsContainer{
     padding-top: 10px;
     padding-bottom: 10px;
-
     button {
       margin-right: 4px;
     }

@@ -4,27 +4,30 @@ import { autobind } from 'office-ui-fabric-react/lib/Utilities';
 import { Link } from 'office-ui-fabric-react/lib/Link';
 import { Icon } from 'office-ui-fabric-react/lib/Icon';
 import { MessageBar, MessageBarType } from 'office-ui-fabric-react/lib/MessageBar';
-import styles from './AccessRequests.module.scss';
+import styles from '../AccessRequests.module.scss';
 import { Environment, EnvironmentType } from '@microsoft/sp-core-library';
-import SharePointDataProvider from '../services/SharePointDataProvider';
-import MockSharePointDataProvider from '../test/MockSharePointDataProvider';
-import IAccessRequestsDataProvider from '../models/IAccessRequestsDataProvider';
-import NewAccessRequest from './NewAccessRequest/NewAccessRequest';
-import ModifyAccessRequest from './ModifyAccessRequest/ModifyAccessRequest';
-import IDefaultProps from './IDefaultProps';
-import AccessRequestList from './AccessRequestsList/AccessRequestList';
-import IAccessRequest from '../models/IAccessRequest';
-import DisplayRequest from './DisplayAccessRequest/DisplayRequest';
-import IDisplayRequestProps from './DisplayAccessRequest/IDisplayRequestProps';
-import TaskList from './TaskList/TaskList';
-import FinalTaskList from './FinalTaskList/FinalTaskList';
-import TopNav from './Navigation/TopNav';
+import SharePointDataProvider from '../../services/SharePointDataProvider';
+import MockSharePointDataProvider from '../../test/MockSharePointDataProvider';
+import IAccessRequestsDataProvider from '../../models/IAccessRequestsDataProvider';
+import NewAccessRequest from '../NewAccessRequest/NewAccessRequest';
+import ModifyAccessRequest from '../ModifyAccessRequest/ModifyAccessRequest';
+import IDefaultProps from '../DefaultPage/IDefaultProps';
+import AccessRequestList from '../AccessRequestsList/AccessRequestList';
+import IAccessRequest from '../../models/IAccessRequest';
+import DisplayRequest from '../DisplayAccessRequest/DisplayRequest';
+import IDisplayRequestProps from '../DisplayAccessRequest/IDisplayRequestProps';
+import TaskList from '../TaskList/TaskList';
+import FinalTaskList from '../FinalTaskList/FinalTaskList';
+import TopNav from '../Navigation/TopNav';
+import {IDisplayView} from '../../utilities/types';
 
 export interface IDefaultState {
-  show: "List" | "New" | "Change" | "Display" | "Tasks" | "FinalTasks";
-  selectedItem: IAccessRequest;
+  show: IDisplayView;
+  //selectedItem: IAccessRequest;
+  selectedRequestId: string;
   listNotConfigured: boolean;
   currentUser: any;
+  callingView: IDisplayView;
 }
 
 export default class DefaultPage extends React.Component<IDefaultProps, IDefaultState> {
@@ -37,9 +40,11 @@ export default class DefaultPage extends React.Component<IDefaultProps, IDefault
     // set initial state   
     this.state = {
       show: urlParams.get("view") === "tasks" ? "Tasks" : (urlParams.get("view") === "finaltasks" ? "FinalTasks" : "List"),
-      selectedItem: null,
+      //selectedItem: null,
+      selectedRequestId: null,
       listNotConfigured: false,
-      currentUser: null
+      currentUser: null,
+      callingView: "List"
     };
 
     if (DEBUG && Environment.type === EnvironmentType.Local) {
@@ -85,16 +90,17 @@ export default class DefaultPage extends React.Component<IDefaultProps, IDefault
             {(this.state.listNotConfigured == false && this.state.show == "List") && <AccessRequestList dataProvider={this._dataProvider}
               onItemSelected={this.handleItemSelected} currentUser={this.state.currentUser} />}
             {(this.state.listNotConfigured == false && this.state.show == "Display") && <DisplayRequest dataProvider={this._dataProvider} recordType="Display" 
-              requestId={this.state.selectedItem.Id} requestsByCommList={this.props.requestsByCommitteeList} onReturnClick={this.handleViewSelected} />}
+              requestId={this.state.selectedRequestId} requestsByCommList={this.props.requestsByCommitteeList} 
+              callingView={this.state.callingView} onReturnClick={this.handleViewSelected} />}
             {(this.state.listNotConfigured == false && this.state.show == "New") && <NewAccessRequest
               dataProvider={this._dataProvider} committeesListTitle={this.props.committeesList} onRecordAdded={this.handleViewSelected} />}
             {(this.state.listNotConfigured == false && this.state.show == "Change") && <ModifyAccessRequest
               dataProvider={this._dataProvider} membersList={this.props.membersList} membersCommList={this.props.membersCommitteesList}
               committeesListTitle={this.props.committeesList} onRecordAdded={this.handleViewSelected} />}
             {(this.state.listNotConfigured == false && this.state.show == "Tasks") && <TaskList dataProvider={this._dataProvider} 
-                  requestsByCommList = {this.props.requestsByCommitteeList} currentUser={this.state.currentUser} /> }
+                  requestsByCommList = {this.props.requestsByCommitteeList} currentUser={this.state.currentUser} onTaskItemSelected={this.handleItemSelected} /> }
             {(this.state.listNotConfigured == false && this.state.show === "FinalTasks") && <FinalTaskList dataProvider={this._dataProvider} 
-                  requestsByCommList = {this.props.requestsByCommitteeList} currentUser={this.state.currentUser} /> }
+                  requestsByCommList = {this.props.requestsByCommitteeList} currentUser={this.state.currentUser}  onTaskItemSelected={this.handleItemSelected} /> }
           </div>
         </div>
       </div>
@@ -102,45 +108,18 @@ export default class DefaultPage extends React.Component<IDefaultProps, IDefault
   }
 
   @autobind
-  private handleViewSelected(selectedView) {
-    switch (selectedView) {
-      case "addNew":
-        this.setState({
-          show: "New"
-        });
-        break;
-      case "change":
-        this.setState({
-          show: "Change"
-        });
-        break;
-      case "display":
-        this.setState({
-          show: "Display"
-        });
-        break;
-      case "list":
-        this.setState({
-          show: "List"
-        });
-        break;
-        case "tasks":
-        this.setState({
-          show: "Tasks"
-        });
-        break;
-        case "finaltasks":
-        this.setState({
-          show: "FinalTasks"
-        });
-        break;
-      }
+  private handleViewSelected(selectedView: IDisplayView) {
+    this.setState({
+      show: selectedView
+    });
   }
   @autobind
-  private handleItemSelected(item) {
+  private handleItemSelected(requestId, callingView?: IDisplayView) {
     this.setState({
-      selectedItem: item,
-      show: "Display"
+      //selectedItem: item,
+      selectedRequestId: requestId,
+      show: "Display",
+      callingView: callingView ? callingView: "List"
     });
 
   }

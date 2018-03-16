@@ -327,7 +327,7 @@ export default class ModifyAccessRequest extends React.Component<IModifyAccessRe
       prevState.hideDialog = true;
       return prevState;
     });
-    this.props.onRecordAdded("list");
+    this.props.onRecordAdded("List");
   }
 
 }
