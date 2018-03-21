@@ -117,7 +117,7 @@ export default class ModifyAccessRequest extends React.Component<IModifyAccessRe
               <Dropdown
                 onChanged={this._onChangeMultiSelect}
                 placeHolder='Select committee(s)'
-                label='Add or Remove Commitees:'
+                label="User's committees.  Check a name to add access, uncheck a name to remove access:"
                 selectedKeys={this.state.selectedCommittees}
                 errorMessage={this.state.dropDownErrorMsg}
                 multiSelect options={this.state.committees.map((item) => ({ key: item.Id, text: item.Title }))}

@@ -137,7 +137,7 @@ export default class NewAccessRequest extends React.Component<NewAccessRequestPr
             <div className={styles.fieldContainer}>
               <Toggle
                 checked={this.state.CommitteeAccess}
-                label='Committee Access Requested?'
+                label='Committee Access Requested? Select No for top level site access only (no committees).'
                 onText='Yes'
                 offText='No'
                 onChanged={this._onToggleNoCommittees}
