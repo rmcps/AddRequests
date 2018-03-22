@@ -106,7 +106,7 @@ function CommitteeItem(props) {
             <div className={taskStyles.itemContainer}>
                 <div className={styles.column1}><span className={taskStyles.itemLabel}>Committee:</span> {props.item.Committee}</div>
                 <div className={styles.column1}><span className={taskStyles.itemLabel}>Outcome:</span> {props.item.Outcome}</div>
-                <div className={styles.column1}><span className={taskStyles.itemLabel}>Status:</span>
+                <div className={styles.column1}>
                     <ul>
                         {props.item.RequestStatus ? props.item.RequestStatus.split('\n').map((item, key) => { return <li key={key}>{item}</li> }) : ""}
                     </ul>

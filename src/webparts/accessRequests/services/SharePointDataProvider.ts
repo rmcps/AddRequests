@@ -135,6 +135,7 @@ export default class SharePointDataProvider implements IAccessRequestsDataProvid
         Office: reqData.Office,
         RequestReason: reqData.RequestReason,
         RequestStatus: reqData.RequestStatus,
+        CompletionStatus: reqData.CompletionStatus,
         AuthorId: reqData.AuthorId,
         CreatedBy: reqData.Author.Title,
         EditorId: reqData.EditorId,
@@ -187,6 +188,7 @@ export default class SharePointDataProvider implements IAccessRequestsDataProvid
           Office: item.Office,
           RequestReason: item.RequestReason,
           RequestStatus: item.RequestStatus,
+          CompletionStatus: item.CompletionStatus,
           AuthorId: item.AuthorId,
           CreatedBy: item.Author.Title,
           EditorId: item.EditorId

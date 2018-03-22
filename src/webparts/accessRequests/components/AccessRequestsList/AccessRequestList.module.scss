@@ -23,6 +23,7 @@
             padding-left: 0;
             margin-top:0;
             margin-bottom: 1px;
+            @include ms-font-s;
         }
         ul li {
             list-style-type: none;
@@ -36,7 +37,10 @@
       }   
       .itemLabel {
           font-weight: 600;
-      } 
+      }
+      .itemStatusLabel {
+        color: "[theme:themeDarkAlt, default: #004578]"
+      }
       .chevron {
         align-self: center;
         margin-left: 10px;

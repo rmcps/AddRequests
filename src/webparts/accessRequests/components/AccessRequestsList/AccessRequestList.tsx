@@ -76,7 +76,7 @@ export default class AccessRequestList extends React.Component<IAccessRequestLis
           <div><span className={aLstyles.itemLabel}>Email:</span> {item.EMail}</div>
           <div><span className={aLstyles.itemLabel}>Reason for Request:</span> {item.RequestReason}</div>
           <div><span className={aLstyles.itemLabel}>Created By:</span> {item.CreatedBy}</div>          
-          <div><span className={aLstyles.itemLabel}>Status:</span>
+          <div><span className={aLstyles.itemLabel + " " + aLstyles.itemStatusLabel}>Status:</span> {item.CompletionStatus}
             <ul>
               {item.RequestStatus.split('\n').map((arrItem, key) => {return <li key={key}>{arrItem}</li>})}
             </ul>

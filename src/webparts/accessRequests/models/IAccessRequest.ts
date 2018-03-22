@@ -16,6 +16,7 @@ interface IAccessRequest {
     Office?: string;
     RequestReason?: string;
     RequestStatus?: string;
+    CompletionStatus?: string;
     AuthorId?: number;
     CreatedBy?: string;
     EditorId?: number;

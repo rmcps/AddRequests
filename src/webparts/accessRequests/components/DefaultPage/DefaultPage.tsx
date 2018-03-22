@@ -29,19 +29,22 @@ export interface IDefaultState {
   currentUser: any;
   callingView: IDisplayView;
 }
-
+export interface IViewRequest {
+  view: IDisplayView;
+  requestId?: string;
+}
 export default class DefaultPage extends React.Component<IDefaultProps, IDefaultState> {
   private _dataProvider: IAccessRequestsDataProvider;
 
   constructor(props: IDefaultProps, state: IDefaultState) {
-    const urlParams = new URLSearchParams(window.location.search);
-
+    //const urlParams = new URLSearchParams(window.location.search);
     super(props);
+    let showView:IViewRequest = this._getParams();
     // set initial state   
     this.state = {
-      show: urlParams.get("view") === "tasks" ? "Tasks" : (urlParams.get("view") === "finaltasks" ? "FinalTasks" : "List"),
-      //selectedItem: null,
-      selectedRequestId: null,
+      //show: urlParams.get("view") === "tasks" ? "Tasks" : (urlParams.get("view") === "finaltasks" ? "FinalTasks" : "List"),
+      show: showView.view,
+      selectedRequestId: showView.requestId,
       listNotConfigured: false,
       currentUser: null,
       callingView: "List"
@@ -139,5 +142,19 @@ export default class DefaultPage extends React.Component<IDefaultProps, IDefault
       props.membersCommitteesList.length === 0;
 
   }
-
+  private _getParams(): IViewRequest{
+    debugger
+    const urlParams = new URLSearchParams(window.location.search);
+    const view = urlParams.get("view");
+    switch(view) {
+      case "tasks":
+        return {view: "Tasks"};
+      case "finaltasks":
+        return {view: "FinalTasks"};
+      case "display":
+      return {view: "Display", requestId: urlParams.get("requestid")};
+      default:
+      return {view: "List"};
+    }
+  }
 }
