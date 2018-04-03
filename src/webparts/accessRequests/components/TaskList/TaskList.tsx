@@ -101,8 +101,23 @@ export default class TaskList extends React.Component<ITaskListProps, ITaskListS
   @autobind
   private _onRenderCell(item: ITask, index: number | undefined): JSX.Element {
     return (
-      <TaskItem item={item} onApprovalAction={this._handleApprovalAction} onError={this._handleErrors} onShowRequest={this._handleShowRequest} />
+      <TaskItem item={item} onApprovalAction={this._handleApprovalAction} onError={this._handleErrors} 
+      onShowRequest={this._handleShowRequest} onApprovalCommentsChanged={this._handleApprovalCommentsChanged}
+      />
     );
+  }
+  @autobind
+  private _handleApprovalCommentsChanged(item: ITask) {
+    this.setState((prevState: ITaskListState, props: ITaskListProps): ITaskListState => {
+      prevState.taskItems =  this.state.taskItems.map((el, index) => {
+        if (el.Id == item.Id) {
+          el.ApprovalComments = item.ApprovalComments;
+        }
+        return el;
+      });
+      return prevState;
+    });
+
   }
   @autobind
   private async _handleApprovalAction(item: ITask) {

@@ -15,17 +15,11 @@ export interface ITaskItemProps {
     onApprovalAction: any;
     onError: any;
     onShowRequest: any;
+    onApprovalCommentsChanged: any;
 }
-export interface ITaskItemState {
-    approvalComments: string;
-}
-export default class TaskList extends React.Component<ITaskItemProps, ITaskItemState> {
-    constructor(props) {
-        super(props);
-        this.state = {
-            approvalComments: null
-        };
-    }
+
+export default class TaskList extends React.Component<ITaskItemProps, null> {
+
     public render() {
         return (
             <div className={taskStyles.itemCell} data-is-focusable={true}>
@@ -42,7 +36,7 @@ export default class TaskList extends React.Component<ITaskItemProps, ITaskItemS
                         </ul>
                     </div>
                     <div><TextField placeholder='Comments' name='ApprovalComments'
-                        value={this.state.approvalComments} multiline onChanged={this._onApprovalCommentsChanged} />
+                        value={this.props.item.ApprovalComments} multiline onChanged={this._onApprovalCommentsChanged} />
                     </div>
                 </div>
                 <div className={taskStyles.actionIconsContainer}>
@@ -71,25 +65,26 @@ export default class TaskList extends React.Component<ITaskItemProps, ITaskItemS
     }
     @autobind
     private _onItemApproved(event: React.MouseEvent<HTMLButtonElement>) {
-        const newItem: ITask = { ...this.props.item, Outcome: 'Approved', ApprovalComments: this.state.approvalComments };
+        const newItem: ITask = { ...this.props.item, Outcome: 'Approved' };
         this.props.onApprovalAction(newItem);
     }
     @autobind
     private _onItemRejected(event: React.MouseEvent<HTMLButtonElement>) {
-        if (this.state.approvalComments === null || this.state.approvalComments.length < 1) {
+        if (this.props.item.ApprovalComments === null || this.props.item.ApprovalComments.length < 1) {
             this.props.onError("Please enter a reason for rejecting this item.");
             return null;
         }
-        const newItem: ITask = { ...this.props.item, Outcome: 'Rejected', ApprovalComments: this.state.approvalComments };
+        const newItem: ITask = { ...this.props.item, Outcome: 'Rejected' };
         this.props.onApprovalAction(newItem);
     }
     @autobind
     private _onApprovalCommentsChanged(value: string) {
-        this.setState((prevState: ITaskItemState, props: ITaskItemProps): ITaskItemState => {
-            prevState.approvalComments = value;
-            return prevState;
-        });
-
+        // this.setState((prevState: ITaskItemState, props: ITaskItemProps): ITaskItemState => {
+        //     prevState.approvalComments = value;
+        //     return prevState;
+        // });
+        const item: ITask = { ...this.props.item, ApprovalComments: value }
+        this.props.onApprovalCommentsChanged(item);
     }
     @autobind
     private _onShowRequest(event: React.MouseEvent<HTMLButtonElement>) {
