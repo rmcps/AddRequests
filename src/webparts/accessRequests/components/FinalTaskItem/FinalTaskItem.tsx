@@ -106,7 +106,7 @@ function CommitteeItem(props) {
             <div className={taskStyles.itemContainer}>
                 <div className={styles.column1}><span className={taskStyles.itemLabel}>Committee:</span> {props.item.Committee}</div>
                 <div className={styles.column1}><span className={taskStyles.itemLabel}>Outcome:</span> {props.item.Outcome}</div>
-                {this.props.item.ApprovedBy && <div className={styles.column1}><span className={taskStyles.itemLabel}>Approver:</span> {props.item.ApprovedBy}</div>}
+                {props.item.ApprovedBy && <div className={styles.column1}><span className={taskStyles.itemLabel}>Approver:</span> {props.item.ApprovedBy}</div>}
             </div>
         </div>
     );
