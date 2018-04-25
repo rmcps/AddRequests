@@ -36,7 +36,10 @@ export default class TaskList extends React.Component<IFinalTaskItemProps, IFina
                     <div><span className={taskStyles.itemLabel}>Reason: </span>
                         <Link href="#" onClick={this._onShowRequest} data-requestId={this.props.item.Id}>{this.props.item.RequestReason}</Link>
                     </div>
-                    <div><span className={taskStyles.itemLabel}>Status:</span>
+                    <div><TextField placeholder='Your Comments' name='ApprovalComments'
+                        value={this.state.approvalComments} multiline onChanged={this._onApprovalCommentsChanged} />
+                    </div>                    
+                    <div><span className={taskStyles.itemLabel}>Approval History:</span>
                         <ul>
                             {this.props.item.RequestStatus ? this.props.item.RequestStatus.split('\n').map((item, key) => { return <li key={key}>{item}</li> }) : ""}
                         </ul>
@@ -44,9 +47,6 @@ export default class TaskList extends React.Component<IFinalTaskItemProps, IFina
                     {this.props.item.CommitteeTasks.map(c => (
                         <CommitteeItem item={c} />
                     ))}
-                    <div><TextField placeholder='Comments' name='ApprovalComments'
-                        value={this.state.approvalComments} multiline onChanged={this._onApprovalCommentsChanged} />
-                    </div>
                 </div>
                 <div className={taskStyles.actionIconsContainer}>
                     <IconButton
@@ -106,11 +106,7 @@ function CommitteeItem(props) {
             <div className={taskStyles.itemContainer}>
                 <div className={styles.column1}><span className={taskStyles.itemLabel}>Committee:</span> {props.item.Committee}</div>
                 <div className={styles.column1}><span className={taskStyles.itemLabel}>Outcome:</span> {props.item.Outcome}</div>
-                <div className={styles.column1}>
-                    <ul>
-                        {props.item.RequestStatus ? props.item.RequestStatus.split('\n').map((item, key) => { return <li key={key}>{item}</li> }) : ""}
-                    </ul>
-                </div>
+                {this.props.item.ApprovedBy && <div className={styles.column1}><span className={taskStyles.itemLabel}>Approver:</span> {props.item.ApprovedBy}</div>}
             </div>
         </div>
     );

@@ -7,6 +7,7 @@ export default interface ITask {
     RequestType?: string;
     Outcome: string;
     CompletionStatus: string;
+    ApprovedBy?: string;
     ApprovalComments?: string;
     Created: string;
     Modified: string;

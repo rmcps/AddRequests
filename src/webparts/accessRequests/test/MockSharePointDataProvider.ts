@@ -132,12 +132,15 @@ export default class MockNewAccessRequest implements IAccessRequestsDataProvider
     public saveChangeRequest(item: IModifyAccessRequest): Promise<any> {
         return null;
     }
-    public getTasksForCurrentUser(requestsByCommList: string): Promise<ITask[]> {
+    public getTasksForCurrentUser(requestsByCommList: string, alltasks: boolean): Promise<ITask[]> {
         return null;
     }
-    public updateForCommittee(item:ITask, requestsByCommList: string, action: "approve" | "reject"): Promise<boolean> {
+    public updateCommitteeTaskItem(item:ITask, requestsByCommList: string, action: "approve" | "reject"): Promise<boolean> {
         return Promise.resolve(true);
     }
+    public updateAllCommitteeTaskItems(items: ITask[], requestsByCommList: string, currentUser?: any): Promise<boolean> {
+        return Promise.resolve(true);
+      }    
     public updateForRequest(item:IFinalTask) {
         return null;
     }

@@ -21,7 +21,7 @@ export default class TopNav extends React.Component<TopNavProps, {}> {
                 <Link data-target-name="New" onClick={this._onItemSelected} className={"New" == this.props.show ? styles.btnSelected : null}>New member</Link>
                 <Link data-target-name="Change" onClick={this._onItemSelected } className={"Change" == this.props.show ? styles.btnSelected : null}>Modify member</Link>
                 <Link data-target-name="List" onClick={this._onItemSelected} className={"List" == this.props.show ? styles.btnSelected : null}>My Requests</Link>
-                <Link data-target-name="Tasks" onClick={this._onItemSelected} className={"Tasks" == this.props.show ? styles.btnSelected : null}>My Tasks</Link>
+                <Link data-target-name="Tasks" onClick={this._onItemSelected} className={"Tasks" == this.props.show ? styles.btnSelected : null}>My Approvals</Link>
                 {this.props.isApprover && <Link data-target-name="FinalTasks" onClick={this._onItemSelected} className={"FinalTasks" == this.props.show ? styles.btnSelected : null}>Final Approvals</Link>}
             </div>
         );

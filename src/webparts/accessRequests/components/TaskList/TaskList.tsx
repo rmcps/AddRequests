@@ -9,6 +9,8 @@ import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import { IconButton, IButtonProps } from 'office-ui-fabric-react/lib/Button';
 import { MessageBar, MessageBarType } from 'office-ui-fabric-react/lib/MessageBar';
 import { Dialog, DialogType } from 'office-ui-fabric-react/lib/Dialog';
+import { Link } from 'office-ui-fabric-react/lib/Link';
+import { DefaultButton } from 'office-ui-fabric-react/lib/Button';
 import IAccessRequestsDataProvider from '../../models/IAccessRequestsDataProvider';
 import ITask from '../../models/ITask';
 import TaskItem from '../TaskItem/TaskItem';
@@ -18,11 +20,13 @@ export interface ITaskListProps {
   dataProvider: IAccessRequestsDataProvider;
   requestsByCommList: string;
   currentUser: any;
+  isApprover: boolean;
   onTaskItemSelected: any;
 }
 export interface ITaskListState {
   taskItems: ITask[];
   dataIsLoading: boolean;
+  showAllLink: boolean;
   errorMsg: string;
   hideDialog: boolean;
 }
@@ -32,57 +36,50 @@ export default class TaskList extends React.Component<ITaskListProps, ITaskListS
     this.state = {
       taskItems: [],
       dataIsLoading: true,
+      showAllLink: true,
       errorMsg: null,
       hideDialog: true
     };
   }
   public async componentWillReceiveProps(nextProps: ITaskListProps) {
-    try {
-      let results = await this.props.dataProvider.getTasksForCurrentUser(this.props.requestsByCommList, this.props.currentUser);
-      this.setState({
-        taskItems: results,
-        dataIsLoading: false
-      });
-    }
-    catch (error) {
-      console.log(error);
-      this.setState({ dataIsLoading: false });
-    }
+    this._getTasks(false);
   }
   public async componentDidMount() {
-    try {
-      const results = await this.props.dataProvider.getTasksForCurrentUser(this.props.requestsByCommList, this.props.currentUser);
-      this.setState({
-        taskItems: results,
-        dataIsLoading: false
-      });
-    }
-    catch (error) {
-      console.log(error);
-      this.setState({ dataIsLoading: false });
-    }
+    this._getTasks(false);
   }
   public render() {
     return (
-      <div className={styles.row}>
-        <div className={styles.column2}>
-          <h3>My Tasks</h3>
-          {this.state.dataIsLoading ? <Spinner size={SpinnerSize.medium} /> : null}
-          {this.state.errorMsg ? <MessageBar
+      <div>
+        <div className={styles.row}>
+          <div className={styles.column2}>
+            {this.props.isApprover ? <div>
+            {this.state.showAllLink && <DefaultButton disabled={false} text='Show All' onClick={this._onShowAllTasks} /> }            
+              {this.state.taskItems.length > 0 && !this.state.showAllLink && <DefaultButton disabled={false} text='Cancel All' onClick={this._onCancelAllTasks} />}
+            </div>
+              : ''}
+          </div>
+        </div>        
+        <div className={styles.row}>
+          <div className={styles.column2}>
+            {this.state.taskItems.length > 0 && <h3>Your approval is requested on the items below</h3>}
+            {this.state.taskItems.length == 0 && <h3>No pending approvals</h3>}
+            {this.state.dataIsLoading ? <Spinner size={SpinnerSize.medium} /> : null}
+            {this.state.errorMsg ? <MessageBar
               messageBarType={MessageBarType.error}
               isMultiline={true}>
               {this.state.errorMsg}
             </MessageBar>
-            : null
+              : null
             }
-          <Fabric>
-            <FocusZone direction={FocusZoneDirection.vertical}>
-              <List
-                items={this.state.taskItems} className={taskStyles.TaskList}
-                onRenderCell={this._onRenderCell}
-              />
-            </FocusZone>
-          </Fabric>
+            <Fabric>
+              <FocusZone direction={FocusZoneDirection.vertical}>
+                <List
+                  items={this.state.taskItems} className={taskStyles.TaskList}
+                  onRenderCell={this._onRenderCell}
+                />
+              </FocusZone>
+            </Fabric>
+          </div>
         </div>
         <Dialog
           hidden={this.state.hideDialog}
@@ -94,22 +91,36 @@ export default class TaskList extends React.Component<ITaskListProps, ITaskListS
             isBlocking: true,
           }}
         >
-        </Dialog>        
+        </Dialog>
       </div>
     );
   }
   @autobind
   private _onRenderCell(item: ITask, index: number | undefined): JSX.Element {
     return (
-      <TaskItem item={item} onApprovalAction={this._handleApprovalAction} onError={this._handleErrors} 
-      onShowRequest={this._handleShowRequest} onApprovalCommentsChanged={this._handleApprovalCommentsChanged}
+      <TaskItem item={item} isApprover={this.props.isApprover} onApprovalAction={this._handleApprovalAction} onError={this._handleErrors}
+        onShowRequest={this._handleShowRequest} onApprovalCommentsChanged={this._handleApprovalCommentsChanged}
       />
     );
+  }
+  private async _getTasks(allTasks: boolean) {
+    try {
+      const results = await this.props.dataProvider.getTasksForCurrentUser(this.props.requestsByCommList, allTasks, this.props.currentUser);
+      this.setState({
+        taskItems: results,
+        dataIsLoading: false,
+        showAllLink: !allTasks
+      });
+    }
+    catch (error) {
+      console.log(error);
+      this.setState({ dataIsLoading: false });
+    }    
   }
   @autobind
   private _handleApprovalCommentsChanged(item: ITask) {
     this.setState((prevState: ITaskListState, props: ITaskListProps): ITaskListState => {
-      prevState.taskItems =  this.state.taskItems.map((el, index) => {
+      prevState.taskItems = this.state.taskItems.map((el, index) => {
         if (el.Id == item.Id) {
           el.ApprovalComments = item.ApprovalComments;
         }
@@ -126,17 +137,17 @@ export default class TaskList extends React.Component<ITaskListProps, ITaskListS
       prevState.hideDialog = false;
       return prevState;
     });
-    
+
     try {
-      const result = await this.props.dataProvider.updateForCommittee(item, this.props.requestsByCommList);
-        if (result) {
-          let newItems = this.state.taskItems.filter((i) => i.Id !== item.Id);
-          this.setState((prevState: ITaskListState, props: ITaskListProps): ITaskListState => {
-            prevState.taskItems = newItems;
-            prevState.hideDialog = true;
-            return prevState;
-          });
-        }
+      const result = await this.props.dataProvider.updateCommitteeTaskItem(item, this.props.requestsByCommList);
+      if (result) {
+        let newItems = this.state.taskItems.filter((i) => i.Id !== item.Id);
+        this.setState((prevState: ITaskListState, props: ITaskListProps): ITaskListState => {
+          prevState.taskItems = newItems;
+          prevState.hideDialog = true;
+          return prevState;
+        });
+      }
     }
     catch (error) {
       console.log(error);
@@ -152,10 +163,43 @@ export default class TaskList extends React.Component<ITaskListProps, ITaskListS
     this.setState((prevState: ITaskListState, props: ITaskListProps): ITaskListState => {
       prevState.errorMsg = errorMessage;
       return prevState;
-    });  
+    });
   }
   @autobind
   private _handleShowRequest(requestId) {
     this.props.onTaskItemSelected(requestId, "Tasks");
+  }
+  @autobind
+  private async _onShowAllTasks() {
+    this._getTasks(true);
+  }
+  @autobind
+  private async _onCancelAllTasks() {
+    this.setState((prevState: ITaskListState, props: ITaskListProps): ITaskListState => {
+      prevState.errorMsg = null;
+      prevState.hideDialog = false;
+      return prevState;
+    });
+
+    try {
+      let items: ITask[] = this.state.taskItems.map(el => {return {...el, Outcome: 'Canceled'}});
+       const result = await this.props.dataProvider.updateAllCommitteeTaskItems(items, this.props.requestsByCommList);              
+      if (result) {
+        this.setState((prevState: ITaskListState, props: ITaskListProps): ITaskListState => {
+          prevState.taskItems = [];
+          prevState.showAllLink = true;
+          prevState.hideDialog = true;
+          return prevState;
+        });
+      }
+    }
+    catch (error) {
+      console.log(error);
+      this.setState((prevState: ITaskListState, props: ITaskListProps): ITaskListState => {
+        prevState.errorMsg = "Error. Not all approvals canceled.";
+        prevState.hideDialog = true;
+        return prevState;
+      });
+    }    
   }
 }

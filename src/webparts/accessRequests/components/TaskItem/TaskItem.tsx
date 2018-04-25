@@ -12,13 +12,14 @@ import ITask from '../../models/ITask';
 
 export interface ITaskItemProps {
     item: ITask;
+    isApprover: boolean;
     onApprovalAction: any;
     onError: any;
     onShowRequest: any;
     onApprovalCommentsChanged: any;
 }
 
-export default class TaskList extends React.Component<ITaskItemProps, null> {
+export default class TaskItem extends React.Component<ITaskItemProps, null> {
 
     public render() {
         return (
@@ -79,10 +80,6 @@ export default class TaskList extends React.Component<ITaskItemProps, null> {
     }
     @autobind
     private _onApprovalCommentsChanged(value: string) {
-        // this.setState((prevState: ITaskItemState, props: ITaskItemProps): ITaskItemState => {
-        //     prevState.approvalComments = value;
-        //     return prevState;
-        // });
         const item: ITask = { ...this.props.item, ApprovalComments: value }
         this.props.onApprovalCommentsChanged(item);
     }

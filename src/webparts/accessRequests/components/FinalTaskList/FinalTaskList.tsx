@@ -66,15 +66,16 @@ export default class FinalTaskList extends React.Component<IFinalTaskProps, IFin
     return (
       <div className={styles.row}>
         <div className={styles.column2}>
-          <h3>Approvals</h3>
+          {this.state.taskItems.length > 0 && <h3>Your approval is requested on the items below</h3>}
+          {this.state.taskItems.length == 0 && <h3>No pending final approvals</h3>}
           {this.state.dataIsLoading ? <Spinner size={SpinnerSize.medium} /> : null}
           {this.state.errorMsg ? <MessageBar
-              messageBarType={MessageBarType.error}
-              isMultiline={true}>
-              {this.state.errorMsg}
-            </MessageBar>
+            messageBarType={MessageBarType.error}
+            isMultiline={true}>
+            {this.state.errorMsg}
+          </MessageBar>
             : null
-            }
+          }
           <Fabric>
             <FocusZone direction={FocusZoneDirection.vertical}>
               <List

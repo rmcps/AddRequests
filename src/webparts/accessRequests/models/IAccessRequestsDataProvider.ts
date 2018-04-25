@@ -17,8 +17,9 @@ interface INewAccessRequestsDataProvider {
     getCommittees(committeesListTitle: string): Promise<any>;
     saveNewItem(INewAccessRequest): Promise<any>;
     saveChangeRequest(IModifyAccessRequest): Promise<any>;
-    getTasksForCurrentUser(requestsByCommList: string, currentUser?: any):Promise<ITask[]>;
-    updateForCommittee(item: ITask, requestsByCommList: string, currentUser?: any):Promise<boolean>;
+    getTasksForCurrentUser(requestsByCommList: string, alltasks: boolean, currentUser?: any):Promise<ITask[]>;
+    updateCommitteeTaskItem(item: ITask, requestsByCommList: string, currentUser?: any):Promise<boolean>;
+    updateAllCommitteeTaskItems(items: ITask[], requestsByCommList: string, currentUser?: any): Promise<boolean>;
     updateForRequest(item: IFinalTask, currentUser?: any):Promise<any>;
     getFinalTasks(requestsByCommList: string, currentUser?: any):Promise<IFinalTask[]>;
 }

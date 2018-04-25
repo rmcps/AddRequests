@@ -116,7 +116,7 @@ export default class DisplayRequest extends React.Component<IDisplayRequestProps
                     <div className={styles.column2}>
 
                         {this.state.item.Comments && <div className={styles.fieldContainer}>
-                            <TextField label='Comments' disabled={true} multiline value={this.state.item.Comments} />
+                            <TextField label="Comments" disabled={true} multiline value={this.state.item.Comments} />
                         </div>}
                         {this.state.item.AddCommittees && this.state.item.AddCommittees.length > 0 && <div className={styles.fieldContainer}>
                             <TextField label='Add Committees' disabled={true} multiline value={this.state.item.AddCommittees.join(", ")} />
@@ -125,9 +125,32 @@ export default class DisplayRequest extends React.Component<IDisplayRequestProps
                         {this.state.item.RemoveCommittees && this.state.item.RemoveCommittees.length > 0 && <div className={styles.fieldContainer}>
                             <TextField label='Remove Committees' disabled={true} multiline value={this.state.item.RemoveCommittees.join(", ")} />
                         </div>}
-                        {this.state.item.RequestStatus && <div className={styles.fieldContainer}>
+                    </div>
+                </div>
+                <div className={styles.row}>
+                    <div className={styles.column1}>
+                        {this.state.item.CreatedBy && <div className={styles.fieldContainer}>
+                            <TextField label='Submitted By' disabled={true} value={this.state.item.CreatedBy} />
+                        </div>}
+                    </div>
+                </div>                
+                <div className={styles.row}>
+                    <div className={styles.column1}>
+                        {this.state.item.CompletionStatus && <div className={styles.fieldContainer}>
                             <TextField label='Status' disabled={true} value={this.state.item.CompletionStatus} />
-                            <TextField label='' disabled={true} multiline value={this.state.item.RequestStatus} />
+                        </div>}
+                        {this.state.item.ApprovedBy && <div className={styles.fieldContainer}>
+                            <TextField label='Approver' disabled={true} value={this.state.item.ApprovedBy} />
+                        </div>}
+                    </div>
+                </div>
+                <div className={styles.row}>
+                    <div className={styles.column2}>
+                        {this.state.item.ApprovalComments && <div className={styles.fieldContainer}>
+                            <TextField label="Approver's Comments" disabled={true} value={this.state.item.ApprovalComments} />
+                        </div>}
+                        {this.state.item.RequestStatus && <div className={styles.fieldContainer}>
+                            <TextField label='Approval history' disabled={true} multiline value={this.state.item.RequestStatus} />
                         </div>}
                     </div>
                 </div>
@@ -135,11 +158,15 @@ export default class DisplayRequest extends React.Component<IDisplayRequestProps
                     <div className={styles.column2}>
                         {this.state.item && this.state.item.CommitteeApprovals && this.state.item.CommitteeApprovals.length > 0 &&
                             <div className={styles2.committeesList}>
-                                <span className={styles2.header}>Committees</span>
+                                <span className={styles2.header}>Committee Approvals</span>
                                 <ul>
                                     {this.state.item.CommitteeApprovals.map((item, key) => {
-                                        return <li key={key}>{item.Committee}<span>{item.RequestType}</span>
-                                            {item.RequestStatus ? item.RequestStatus.split('\n').map((item, key) => { return <span key={key}>{item}</span> }) : ""}
+                                        console.log(item.RequestType);
+                                        return <li key={key}>{item.Committee}
+                                            <span>{item.RequestType}</span>
+                                            <span>Approver: {item.ApprovedBy}</span>
+                                            <span>Outcome: {item.Outcome}</span>
+                                            {item.ApprovalComments && <span>Approver's Comments: {item.ApprovalComments}</span>}
                                         </li>
                                     })
                                     }

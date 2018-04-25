@@ -37,12 +37,10 @@ export default class DefaultPage extends React.Component<IDefaultProps, IDefault
   private _dataProvider: IAccessRequestsDataProvider;
 
   constructor(props: IDefaultProps, state: IDefaultState) {
-    //const urlParams = new URLSearchParams(window.location.search);
     super(props);
     let showView:IViewRequest = this._getParams();
     // set initial state   
     this.state = {
-      //show: urlParams.get("view") === "tasks" ? "Tasks" : (urlParams.get("view") === "finaltasks" ? "FinalTasks" : "List"),
       show: showView.view,
       selectedRequestId: showView.requestId,
       listNotConfigured: false,
@@ -101,7 +99,9 @@ export default class DefaultPage extends React.Component<IDefaultProps, IDefault
               dataProvider={this._dataProvider} membersList={this.props.membersList} membersCommList={this.props.membersCommitteesList}
               committeesListTitle={this.props.committeesList} onRecordAdded={this.handleViewSelected} />}
             {(this.state.listNotConfigured == false && this.state.show == "Tasks") && <TaskList dataProvider={this._dataProvider} 
-                  requestsByCommList = {this.props.requestsByCommitteeList} currentUser={this.state.currentUser} onTaskItemSelected={this.handleItemSelected} /> }
+                  requestsByCommList = {this.props.requestsByCommitteeList} currentUser={this.state.currentUser} 
+                  isApprover={this.state.currentUser && Number(this.state.currentUser.Id) === Number(this.props.finalApproverId)} 
+                  onTaskItemSelected={this.handleItemSelected} /> }
             {(this.state.listNotConfigured == false && this.state.show === "FinalTasks") && <FinalTaskList dataProvider={this._dataProvider} 
                   requestsByCommList = {this.props.requestsByCommitteeList} currentUser={this.state.currentUser}  onTaskItemSelected={this.handleItemSelected} /> }
           </div>
@@ -143,7 +143,6 @@ export default class DefaultPage extends React.Component<IDefaultProps, IDefault
 
   }
   private _getParams(): IViewRequest{
-    debugger
     const urlParams = new URLSearchParams(window.location.search);
     const view = urlParams.get("view");
     switch(view) {

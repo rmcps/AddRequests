@@ -17,6 +17,9 @@ interface IAccessRequest {
     RequestReason?: string;
     RequestStatus?: string;
     CompletionStatus?: string;
+    Outcome?: string;
+    ApprovedBy?: string;
+    ApprovalComments?: string;
     AuthorId?: number;
     CreatedBy?: string;
     EditorId?: number;
