@@ -52,13 +52,10 @@ export default class TaskList extends React.Component<ITaskListProps, ITaskListS
       <div>
         <div className={styles.row}>
           <div className={styles.column2}>
-            {this.props.isApprover ? <div>
-            {this.state.showAllLink && <DefaultButton disabled={false} text='Show All' onClick={this._onShowAllTasks} /> }            
-              {this.state.taskItems.length > 0 && !this.state.showAllLink && <DefaultButton disabled={false} text='Cancel All' onClick={this._onCancelAllTasks} />}
-            </div>
-              : ''}
+            {this.props.isApprover && this.state.showAllLink && <DefaultButton disabled={false} text='Show All' onClick={this._onShowAllTasks} />}  
+            {this.state.taskItems.length > 1 && <DefaultButton disabled={false} text='Approve All' onClick={this._onApproveAllTasks} />}
           </div>
-        </div>        
+        </div>
         <div className={styles.row}>
           <div className={styles.column2}>
             {this.state.taskItems.length > 0 && <h3>Your approval is requested on the items below</h3>}
@@ -115,7 +112,7 @@ export default class TaskList extends React.Component<ITaskListProps, ITaskListS
     catch (error) {
       console.log(error);
       this.setState({ dataIsLoading: false });
-    }    
+    }
   }
   @autobind
   private _handleApprovalCommentsChanged(item: ITask) {
@@ -174,7 +171,7 @@ export default class TaskList extends React.Component<ITaskListProps, ITaskListS
     this._getTasks(true);
   }
   @autobind
-  private async _onCancelAllTasks() {
+  private async _onApproveAllTasks() {
     this.setState((prevState: ITaskListState, props: ITaskListProps): ITaskListState => {
       prevState.errorMsg = null;
       prevState.hideDialog = false;
@@ -182,8 +179,10 @@ export default class TaskList extends React.Component<ITaskListProps, ITaskListS
     });
 
     try {
-      let items: ITask[] = this.state.taskItems.map(el => {return {...el, Outcome: 'Canceled'}});
-       const result = await this.props.dataProvider.updateAllCommitteeTaskItems(items, this.props.requestsByCommList);              
+      let items: ITask[] = this.state.taskItems.map(el => {
+        return { ...el, Outcome: 'Approved' };
+      });
+      const result = await this.props.dataProvider.updateAllCommitteeTaskItems(items, this.props.requestsByCommList);
       if (result) {
         this.setState((prevState: ITaskListState, props: ITaskListProps): ITaskListState => {
           prevState.taskItems = [];
@@ -196,10 +195,10 @@ export default class TaskList extends React.Component<ITaskListProps, ITaskListS
     catch (error) {
       console.log(error);
       this.setState((prevState: ITaskListState, props: ITaskListProps): ITaskListState => {
-        prevState.errorMsg = "Error. Not all approvals canceled.";
+        prevState.errorMsg = "Error. Not all items approved.";
         prevState.hideDialog = true;
         return prevState;
       });
-    }    
+    }
   }
 }

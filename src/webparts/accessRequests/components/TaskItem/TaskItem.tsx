@@ -33,7 +33,7 @@ export default class TaskItem extends React.Component<ITaskItemProps, null> {
                     </div>
                     <div><span className={taskStyles.itemLabel}>Status:</span>
                         <ul>
-                            {this.props.item.RequestStatus.split('\n').map((item, key) => { return <li key={key}>{item}</li> })}
+                            {this.props.item.RequestStatus.split('\n').map((item, key) => { return <li key={key}>{item}</li>; })}
                         </ul>
                     </div>
                     <div><TextField placeholder='Comments' name='ApprovalComments'
@@ -71,7 +71,7 @@ export default class TaskItem extends React.Component<ITaskItemProps, null> {
     }
     @autobind
     private _onItemRejected(event: React.MouseEvent<HTMLButtonElement>) {
-        if (this.props.item.ApprovalComments === null || this.props.item.ApprovalComments.length < 1) {
+        if (undefined == this.props.item.ApprovalComments || this.props.item.ApprovalComments === null || this.props.item.ApprovalComments.length < 1) {
             this.props.onError("Please enter a reason for rejecting this item.");
             return null;
         }
@@ -80,7 +80,7 @@ export default class TaskItem extends React.Component<ITaskItemProps, null> {
     }
     @autobind
     private _onApprovalCommentsChanged(value: string) {
-        const item: ITask = { ...this.props.item, ApprovalComments: value }
+        const item: ITask = { ...this.props.item, ApprovalComments: value };
         this.props.onApprovalCommentsChanged(item);
     }
     @autobind

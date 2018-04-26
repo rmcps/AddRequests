@@ -41,7 +41,7 @@ export default class TaskList extends React.Component<IFinalTaskItemProps, IFina
                     </div>                    
                     <div><span className={taskStyles.itemLabel}>Approval History:</span>
                         <ul>
-                            {this.props.item.RequestStatus ? this.props.item.RequestStatus.split('\n').map((item, key) => { return <li key={key}>{item}</li> }) : ""}
+                            {this.props.item.RequestStatus ? this.props.item.RequestStatus.split('\n').map((item, key) => { return <li key={key}>{item}</li>; }) : ""}
                         </ul>
                     </div>
                     {this.props.item.CommitteeTasks.map(c => (
@@ -73,7 +73,7 @@ export default class TaskList extends React.Component<IFinalTaskItemProps, IFina
     }
     @autobind
     private _onItemApproved(event: React.MouseEvent<HTMLButtonElement>) {
-        const newItem: IFinalTask = { ...this.props.item, CompletionStatus: 'Approved', ApprovalComments: this.state.approvalComments };
+        const newItem: IFinalTask = { ...this.props.item, Outcome: 'Approved', CompletionStatus: 'Pending', ApprovalComments: this.state.approvalComments };
         this.props.onApprovalAction(newItem);
     }
     @autobind
@@ -82,7 +82,7 @@ export default class TaskList extends React.Component<IFinalTaskItemProps, IFina
             this.props.onError("Please enter a reason for rejecting this item.");
             return null;
         }
-        const newItem: IFinalTask = { ...this.props.item, CompletionStatus: 'Rejected', ApprovalComments: this.state.approvalComments };
+        const newItem: IFinalTask = { ...this.props.item, Outcome: 'Rejected', CompletionStatus: 'Pending', ApprovalComments: this.state.approvalComments };
         this.props.onApprovalAction(newItem);
     }
     @autobind

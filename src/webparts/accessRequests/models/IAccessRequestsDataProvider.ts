@@ -20,7 +20,7 @@ interface INewAccessRequestsDataProvider {
     getTasksForCurrentUser(requestsByCommList: string, alltasks: boolean, currentUser?: any):Promise<ITask[]>;
     updateCommitteeTaskItem(item: ITask, requestsByCommList: string, currentUser?: any):Promise<boolean>;
     updateAllCommitteeTaskItems(items: ITask[], requestsByCommList: string, currentUser?: any): Promise<boolean>;
-    updateForRequest(item: IFinalTask, currentUser?: any):Promise<any>;
+    updateForRequest(items: IFinalTask[], currentUser?: any):Promise<any>;
     getFinalTasks(requestsByCommList: string, currentUser?: any):Promise<IFinalTask[]>;
 }
 

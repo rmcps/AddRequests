@@ -54,6 +54,7 @@ export default class DisplayRequest extends React.Component<IDisplayRequestProps
             || undefined == this.state.item.Id || this.state.item.Id == null) {
             try {
                 const result = await this.props.dataProvider.getItem(this.props.requestId, this.props.requestsByCommList);
+                console.log(result);
                 this.setState({
                     item: result,
                     dataIsLoading: false,
@@ -99,8 +100,14 @@ export default class DisplayRequest extends React.Component<IDisplayRequestProps
                         {this.state.item.JobTitle && <div className={styles.fieldContainer}>
                             <TextField label='Title' disabled={true} value={this.state.item.JobTitle} />
                         </div>}
+                        {this.state.item.CreatedBy && <div className={styles.fieldContainer}>
+                            <TextField label='Submitted By' disabled={true} value={this.state.item.CreatedBy} />
+                        </div>}
                     </div>
                     <div className={styles.column1}>
+                        {this.state.item.Outcome && <div className={styles.fieldContainer}>
+                            <TextField label='Outcome' disabled={true} value={this.state.item.Outcome} />
+                        </div>}
                         {this.state.item.Company && <div className={styles.fieldContainer}>
                             <TextField label='Organization' disabled={true} value={this.state.item.Company} />
                         </div>}
@@ -114,7 +121,6 @@ export default class DisplayRequest extends React.Component<IDisplayRequestProps
                 </div>
                 <div className={styles.row}>
                     <div className={styles.column2}>
-
                         {this.state.item.Comments && <div className={styles.fieldContainer}>
                             <TextField label="Comments" disabled={true} multiline value={this.state.item.Comments} />
                         </div>}
@@ -127,13 +133,6 @@ export default class DisplayRequest extends React.Component<IDisplayRequestProps
                         </div>}
                     </div>
                 </div>
-                <div className={styles.row}>
-                    <div className={styles.column1}>
-                        {this.state.item.CreatedBy && <div className={styles.fieldContainer}>
-                            <TextField label='Submitted By' disabled={true} value={this.state.item.CreatedBy} />
-                        </div>}
-                    </div>
-                </div>                
                 <div className={styles.row}>
                     <div className={styles.column1}>
                         {this.state.item.CompletionStatus && <div className={styles.fieldContainer}>
@@ -167,7 +166,7 @@ export default class DisplayRequest extends React.Component<IDisplayRequestProps
                                             <span>Approver: {item.ApprovedBy}</span>
                                             <span>Outcome: {item.Outcome}</span>
                                             {item.ApprovalComments && <span>Approver's Comments: {item.ApprovalComments}</span>}
-                                        </li>
+                                        </li>;
                                     })
                                     }
                                 </ul>

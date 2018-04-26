@@ -8,7 +8,8 @@ interface IFinalTask {
     Office?: string;
     RequestReason?: string;
     RequestStatus?: string;
-    CompletionStatus: string;
+    CompletionStatus?: string;
+    Outcome?: string;
     ApprovalComments?: string;
     CommitteeTasks?: ITask[];
   }

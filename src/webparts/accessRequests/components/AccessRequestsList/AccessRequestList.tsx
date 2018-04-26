@@ -75,10 +75,14 @@ export default class AccessRequestList extends React.Component<IAccessRequestLis
           <div className={aLstyles.itemName}><span className={aLstyles.itemLabel}>Requested For:</span> {item.Title}</div>
           <div><span className={aLstyles.itemLabel}>Email:</span> {item.EMail}</div>
           <div><span className={aLstyles.itemLabel}>Reason for Request:</span> {item.RequestReason}</div>
-          <div><span className={aLstyles.itemLabel}>Created By:</span> {item.CreatedBy}</div>          
+          <div><span className={aLstyles.itemLabel}>Created By:</span> {item.CreatedBy}</div>     
+          {item.Outcome && <div><span className={aLstyles.itemLabel}>Outcome:</span> {item.Outcome}</div>}
           <div><span className={aLstyles.itemLabel + " " + aLstyles.itemStatusLabel}>Status:</span> {item.CompletionStatus}
             <ul>
-              {item.RequestStatus.split('\n').map((arrItem, key) => {return <li key={key}>{arrItem}</li>})}
+              {item.RequestStatus.split('\n').map((arrItem, key) => {
+                return <li key={key}>{arrItem}</li>;
+              })
+            }
             </ul>
           </div>
           {item.AddCommittees.length > 0 && <div><span className={aLstyles.itemLabel}>Add Committees:</span> {item.AddCommittees.join(", ")}</div>}

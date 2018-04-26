@@ -141,7 +141,7 @@ export default class MockNewAccessRequest implements IAccessRequestsDataProvider
     public updateAllCommitteeTaskItems(items: ITask[], requestsByCommList: string, currentUser?: any): Promise<boolean> {
         return Promise.resolve(true);
       }    
-    public updateForRequest(item:IFinalTask) {
+    public updateForRequest(items:IFinalTask[]) {
         return null;
     }
     public getFinalTasks(requestsByCommList: string):Promise<IFinalTask[]> {

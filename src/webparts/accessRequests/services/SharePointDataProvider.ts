@@ -26,7 +26,6 @@ export default class SharePointDataProvider implements IAccessRequestsDataProvid
     this._webPartContext = webPartContext;
     this._listsUrl = `${this._webPartContext.pageContext.web.absoluteUrl}/_api/web/lists`;
   }
-
   public set accessListTitle(value: string) {
     this._accessListTitle = value;
   }
@@ -36,16 +35,13 @@ export default class SharePointDataProvider implements IAccessRequestsDataProvid
   public get accessListItemsUrl() {
     return this._accessListItemsUrl = `${this._listsUrl}/GetByTitle('${this._accessListTitle}')/items`;
   }
-
   public set webPartContext(value: IWebPartContext) {
     this._webPartContext = value;
     this._listsUrl = `${this._webPartContext.pageContext.web.absoluteUrl}/_api/web/lists`;
   }
-
   public get webPartContext(): IWebPartContext {
     return this._webPartContext;
   }
-
   public getCurrentUser(): Promise<any> {
     return this._getCurrentUser(this.webPartContext.spHttpClient);
   }
@@ -82,10 +78,10 @@ export default class SharePointDataProvider implements IAccessRequestsDataProvid
   }
   public async _getItem(requestId: string, requestsByCommList: string, requester: SPHttpClient): Promise<IAccessRequest> {
     let commArr: ITask[] = [];
-    const queryReqUrl: string = `${this._listsUrl}/GetByTitle('${this._accessListTitle}')/items(${requestId})?$select=*,Author/Title,ApprovedBy/Title&$expand=Author,ApprovedBy`;
+    const queryReqUrl: string = `${this._listsUrl}/GetByTitle('${this._accessListTitle}')/items(${requestId})?$select=*,Author/Title,ApprovedBy/Title,AddCommittees/Title,RemoveCommittees/Title&$expand=Author,ApprovedBy,AddCommittees,RemoveCommittees`;
     let filterString: string = `RequestId eq ${requestId}`;
     filterString = "$filter=" + encodeURIComponent(filterString);
-    const queryCommUrl: string = `${this._listsUrl}/GetByTitle('${requestsByCommList}')/items?${filterString}&$select=*,Committee/Title,ApprovedBy/Title&$expand=Committee/Title,ApprovedBy/Title`
+    const queryCommUrl: string = `${this._listsUrl}/GetByTitle('${requestsByCommList}')/items?${filterString}&$select=*,Committee/Title,ApprovedBy/Title&$expand=Committee/Title,ApprovedBy/Title`;
     const spBatch: SPHttpClientBatch = requester.beginBatch();
     const batchArr: Promise<SPHttpClientResponse>[] = [];
     try {
@@ -121,13 +117,12 @@ export default class SharePointDataProvider implements IAccessRequestsDataProvid
           CurrentUser: null
         });
       }
-
       const reqItem: IAccessRequest = {
         Id: reqData.Id,
         Title: reqData.Title,
         Comments: reqData.Comments,
-        AddCommittees: reqData.AddCommittees ? reqData.AddCommittees.map(c => c.Title).join(",") : '',
-        RemoveCommittees: reqData.RemoveCommittees ? reqData.RemoveCommittees.map(c => c.Title).join(",") : '',
+        AddCommittees: reqData.AddCommittees.map(c => c.Title),
+        RemoveCommittees: reqData.RemoveCommittees.map(c => c.Title),
         Created: reqData.Created,
         EMail: reqData.EMail,
         FirstName: reqData.FirstName,
@@ -193,6 +188,7 @@ export default class SharePointDataProvider implements IAccessRequestsDataProvid
           RequestReason: item.RequestReason,
           RequestStatus: item.RequestStatus,
           CompletionStatus: item.CompletionStatus,
+          Outcome: item.Outcome,
           AuthorId: item.AuthorId,
           CreatedBy: item.Author.Title,
           EditorId: item.EditorId
@@ -299,7 +295,6 @@ export default class SharePointDataProvider implements IAccessRequestsDataProvid
     const queryUrl: string = this.accessListItemsUrl;
     try {
       const listItemEntityTypeName = await this._getListItemEntityTypeName(this._accessListTitle, requester);
-      debugger
       if (listItemEntityTypeName === '' || listItemEntityTypeName.length === 0) {
         throw new Error('Failed to retrieve ListItemEntityTypeFullName');
       }
@@ -520,7 +515,7 @@ export default class SharePointDataProvider implements IAccessRequestsDataProvid
     const headers: Headers = new Headers();
     headers.append('If-Match', '*');
     const entityTypeName = await this._getListItemEntityTypeName(requestsByCommList, requester);
-    
+
     for (let item of items) {
       const body: string = JSON.stringify({
         '@data.type': entityTypeName,
@@ -531,7 +526,6 @@ export default class SharePointDataProvider implements IAccessRequestsDataProvid
         'ApprovedById': user.Id
       });
       let itemQueryUrl = `${queryUrl}(${item.Id})`;
-      debugger
       try {
         const fetchResponse = await requester.fetch(itemQueryUrl, SPHttpClient.configurations.v1,
           {
@@ -539,7 +533,6 @@ export default class SharePointDataProvider implements IAccessRequestsDataProvid
             headers,
             method: 'PATCH'
           });
-          debugger
         if (!fetchResponse.ok || fetchResponse.status !== 204) {
           throw new Error(fetchResponse.statusMessage);
         }
@@ -555,58 +548,49 @@ export default class SharePointDataProvider implements IAccessRequestsDataProvid
     }
     return Promise.resolve(true);
   }
-  public updateForRequest(item: IFinalTask, currentUser?: any) {
-    return this._updateForRequest(item, this.webPartContext.spHttpClient, currentUser);
+  public updateForRequest(items: IFinalTask[], currentUser?: any) {
+    return this._updateForRequest(items, this.webPartContext.spHttpClient, currentUser);
   }
-  private async _updateForRequest(item: IFinalTask, requester: SPHttpClient, currentUser?: any) {
+  private async _updateForRequest(items: IFinalTask[], requester: SPHttpClient, currentUser?: any) {
     // sleep
     //await this._sleep(5000);
 
     let user: any = currentUser == null ? await this.getCurrentUser() : currentUser;
-
-    // const approvalsUrl = `https://prod-61.westus.logic.azure.com/workflows/a957592735af43f5bec601631b68632d/triggers/manual/paths/invoke/request/${item.Id}?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=FP27ZBs5kmEUD0rAFVmz_vFxoHUf5mkEwlc-5C0nRcI`;
-    const queryUrl: string = `${this._listsUrl}/GetByTitle('${this._accessListTitle}')/items(${item.Id})`;
+    const queryUrl: string = `${this._listsUrl}/GetByTitle('${this._accessListTitle}')/items`;
     const entityTypeName = await this._getListItemEntityTypeName(this._accessListTitle, requester);
-    const body: string = JSON.stringify({
-      '@data.type': entityTypeName,
-      'CompletionStatus': item.CompletionStatus,
-      'RequestStatus': `${this._getFormattedDateTime(new Date)} ${item.CompletionStatus} by ${user.Title}\n${item.RequestStatus}`,
-      'ApprovalComments': item.ApprovalComments,
-      'ApprovedById': user.Id
-    });
     const headers: Headers = new Headers();
     headers.append('If-Match', '*');
-    try {
-      const postResponse = await requester.fetch(queryUrl, SPHttpClient.configurations.v1,
-        {
-          body: body,
-          headers,
-          method: 'PATCH'
-        });
-      if (!postResponse.ok || postResponse.status !== 204) {
-        throw new Error(postResponse.statusMessage);
-      }
-      else {
-        return Promise.resolve(true);
-        // const response = await requester.get(approvalsUrl, SPHttpClient.configurations.v1,
-        //   {
-        //     headers: {
-        //       'Accept': 'application/json;odata=nometadata',
-        //       'odata-version': ''
-        //     }
-        //   });
-        // if (!response.ok || response.status !== 202) {
-        //   throw new Error(response.statusMessage);
-        // }
+    for (let item of items) {
+      let itemQueryUrl: string = `${queryUrl}(${item.Id})`;
+      const body: string = JSON.stringify({
+        '@data.type': entityTypeName,
+        'CompletionStatus': item.CompletionStatus,
+        'Outcome': item.Outcome,
+        'RequestStatus': `${this._getFormattedDateTime(new Date)} ${item.Outcome} by ${user.Title}\n${item.RequestStatus}`,
+        'ApprovalComments': item.ApprovalComments,
+        'ApprovedById': user.Id
+      });
+      try {
+        const fetchResponse = await requester.fetch(itemQueryUrl, SPHttpClient.configurations.v1,
+          {
+            body: body,
+            headers,
+            method: 'PATCH'
+          });
+        debugger
+        if (!fetchResponse.ok || fetchResponse.status !== 204) {
+          throw new Error(fetchResponse.statusMessage);
+        }
         // else {
-        //   return Promise.resolve(true);
+        //   //return Promise.resolve(true);
         // }
       }
+      catch (error) {
+        console.log(error);
+        throw new Error(error.message);
+      }
     }
-    catch (error) {
-      console.log(error);
-      throw new Error(error.message);
-    }
+    return Promise.resolve(true);
   }
   public getFinalTasks(requestsByCommList: string, currentUser?: any): Promise<IFinalTask[]> {
     return this._getFinalTasks(requestsByCommList, this.webPartContext.spHttpClient);
@@ -733,7 +717,7 @@ export default class SharePointDataProvider implements IAccessRequestsDataProvid
     return d.getFullYear() + '-' + thisMonth + '-' + thisDay + ' ' + thisTime;
   }
   private _addZero(n) {
-    n = n < 10 ? '0' + n : n
+    n = n < 10 ? '0' + n : n;
     return n;
   }
   private _sleep(ms) {
