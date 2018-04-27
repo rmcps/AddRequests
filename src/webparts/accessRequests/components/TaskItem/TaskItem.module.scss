@@ -47,7 +47,10 @@
     }
     .rejectButton:hover  {
         color: red;
-    }      
+    }  
+    .cancelButton:hover  {
+        color: #034f84;
+    }          
     i {
         @include ms-fontSize-xl;
         font-weight: $ms-font-weight-semibold;

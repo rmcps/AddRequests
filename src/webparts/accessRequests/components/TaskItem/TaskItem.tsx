@@ -59,6 +59,15 @@ export default class TaskItem extends React.Component<ITaskItemProps, null> {
                         ariaLabel='Reject Item'
                         onClick={this._onItemRejected}
                     />
+                    <IconButton
+                        data-action='Canceled'
+                        className={taskStyles.cancelButton}
+                        disabled={false}
+                        iconProps={{ iconName: 'Blocked' }}
+                        title='Cancel'
+                        ariaLabel='Cancel Item'
+                        onClick={this._onItemCanceled}
+                    />
                 </div>
 
             </div>
@@ -76,6 +85,15 @@ export default class TaskItem extends React.Component<ITaskItemProps, null> {
             return null;
         }
         const newItem: ITask = { ...this.props.item, Outcome: 'Rejected' };
+        this.props.onApprovalAction(newItem);
+    }
+    @autobind
+    private _onItemCanceled(event: React.MouseEvent<HTMLButtonElement>) {
+        if (undefined == this.props.item.ApprovalComments || this.props.item.ApprovalComments === null || this.props.item.ApprovalComments.length < 1) {
+            this.props.onError("Please enter a reason for canceling this item.");
+            return null;
+        }
+        const newItem: ITask = { ...this.props.item, Outcome: 'Canceled' };
         this.props.onApprovalAction(newItem);
     }
     @autobind

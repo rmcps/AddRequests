@@ -67,6 +67,15 @@ export default class TaskList extends React.Component<IFinalTaskItemProps, IFina
                         ariaLabel='Reject Item'
                         onClick={this._onItemRejected}
                     />
+                    <IconButton
+                        data-action='Canceled'
+                        className={taskStyles.cancelButton}
+                        disabled={false}
+                        iconProps={{ iconName: 'Blocked' }}
+                        title='Cancel'
+                        ariaLabel='Cancel Item'
+                        onClick={this._onItemCanceled}
+                    />
                 </div>
             </div>
         );
@@ -85,6 +94,15 @@ export default class TaskList extends React.Component<IFinalTaskItemProps, IFina
         const newItem: IFinalTask = { ...this.props.item, Outcome: 'Rejected', CompletionStatus: 'Pending', ApprovalComments: this.state.approvalComments };
         this.props.onApprovalAction(newItem);
     }
+    @autobind
+    private _onItemCanceled(event: React.MouseEvent<HTMLButtonElement>) {
+        if (this.state.approvalComments === null || this.state.approvalComments.length < 1) {
+            this.props.onError("Please enter a reason for canceling this item.");
+            return null;
+        }
+        const newItem: IFinalTask = { ...this.props.item, Outcome: 'Canceled', CompletionStatus: 'Pending', ApprovalComments: this.state.approvalComments };
+        this.props.onApprovalAction(newItem);
+    }    
     @autobind
     private _onApprovalCommentsChanged(value: string) {
         this.setState((prevState: IFinalTaskItemState, props: IFinalTaskItemProps): IFinalTaskItemState => {
